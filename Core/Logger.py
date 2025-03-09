@@ -17,6 +17,14 @@ class Logger:
     YELLOW = "\033[93m"  # 黄色
     RED = "\033[91m"  # 红色
 
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Logger, cls).__new__(cls)
+            # 初始化代码
+        return cls._instance
+
     def __init__(self):
         # 自动获取当前类的名称作为日志名称
         self.name = self.__class__.__name__

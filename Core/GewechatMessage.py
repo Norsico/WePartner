@@ -10,9 +10,11 @@ from Core.ChatMessage import ChatMessage
 from Core.Logger import Logger
 from Core.bridge.context import ContextType
 from Core.bridge.temp_dir import TmpDir
-from config import Config
+# 暂时注释掉这个导入，避免循环导入
+# from config import Config
 
-conf = Config(file_path='./config.json')
+# 不在模块级别创建Config实例
+# conf = Config(file_path='./config.json')
 logger = logging = Logger()
 
 
@@ -35,6 +37,10 @@ class GeWeChatMessage(ChatMessage):
 
         self.client = client
         msg_type = msg['Data']['MsgType']
+        
+        # 在需要时导入Config并创建实例
+        from config import Config
+        conf = Config(file_path='./config.json', is_init=True)
         self.app_id = conf.get("gewechat_app_id")
 
         self.from_user_id = msg['Data']['FromUserName']['string']
@@ -281,13 +287,15 @@ class GeWeChatMessage(ChatMessage):
             if image_info['ret'] == 200 and image_info['data']:
                 file_url = image_info['data']['fileUrl']
                 logger.info(f"[gewechat] Download image file from {file_url}")
-                download_url = conf.get("gewechat_download_url").rstrip('/')
+                # 在需要时导入Config并创建实例
+                from config import Config
+                config = Config(file_path='./config.json', is_init=True)
+                download_url = config.get("gewechat_download_url").rstrip('/')
                 full_url = download_url + '/' + file_url
                 try:
                     file_data = requests.get(full_url).content
                 except Exception as e:
                     logger.error(f"[gewechat] Failed to download image file: {e}")
-                    return
                 with open(self.content, "wb") as f:
                     f.write(file_data)
             else:

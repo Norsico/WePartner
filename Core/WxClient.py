@@ -8,6 +8,7 @@ import web
 from Core.GewechatMessage import GeWeChatMessage
 from Core.Logger import Logger
 from Core.bridge.context import ContextType
+from Core.factory.client_factory import ClientFactory
 from config import Config
 
 logger = logging = Logger()
@@ -23,33 +24,6 @@ class WxChatClient:
         self.set_wx_callback()
 
     def set_wx_callback(self):
-        # 创建新线程设置回调地址
-        def set_callback():
-            # 等待服务器启动（给予适当的启动时间）
-            import time
-            logger.info("[gewechat] sleep 3 seconds waiting for server to start, then set callback")
-            time.sleep(3)
-
-            # 设置回调地址，{ "ret": 200, "msg": "操作成功" }
-            callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
-            if callback_resp.get("ret") != 200:
-                logger.error(f"[gewechat] set callback failed: {callback_resp}")
-                # 可能是次日凌晨自动掉线，需要重新扫码登录
-                if callback_resp.get("ret") == 500 and callback_resp.get("msg") is None:
-                    logger.info("[gewechat] callback 设置失败,请重新扫码登录")
-                    # 退出登录
-                    self.client.log_out(self.gewechat_app_id)
-                    # 重新登录
-                    self.client.login(self.gewechat_app_id)
-                    # 重新设置回调地址
-                    self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
-                    logger.info("[gewechat] callback set successfully")
-                    return
-            logger.info("[gewechat] callback set successfully")
-
-        callback_thread = threading.Thread(target=set_callback, daemon=True)
-        callback_thread.start()
-
         # 从回调地址中解析出端口与url path，启动回调服务器
         parsed_url = urlparse(self.gewechat_callback_url)
         path = parsed_url.path
@@ -58,15 +32,49 @@ class WxChatClient:
         logger.info(f"[gewechat] start callback server: {self.gewechat_callback_url}, using port {port}")
         urls = (path, "Core.WxClient.Query")
         app = web.application(urls, globals(), autoreload=False)
-        web.httpserver.runsimple(app.wsgifunc(), ("0.0.0.0", port))
-
-        self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
+        
+        # 在新线程中启动服务器
+        def run_server():
+            web.httpserver.runsimple(app.wsgifunc(), ("0.0.0.0", port))
+            
+        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread.start()
+        
+        # 等待服务器启动
+        logger.info("[gewechat] waiting for server to start (5 seconds)...")
+        time.sleep(5)
+        
+        # 在新线程中设置回调地址
+        def setup_callback():
+            try:
+                callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
+                if callback_resp.get("ret") == 200:
+                    logger.success("[gewechat] callback set successfully")
+                else:
+                    logger.warning(f"[gewechat] set callback returned: {callback_resp}")
+                    logger.info("[gewechat] Continuing anyway as the callback might still work...")
+            except Exception as e:
+                logger.error(f"[gewechat] Error setting callback: {e}")
+                logger.info("[gewechat] Continuing anyway as the callback might still work...")
+        
+        # 启动回调设置线程
+        callback_thread = threading.Thread(target=setup_callback, daemon=True)
+        callback_thread.start()
+        
+        # 保持主线程运行
+        try:
+            while True:
+                time.sleep(1)  # 每秒检查一次
+        except KeyboardInterrupt:
+            logger.info("[gewechat] Server stopping...")
 
 
 class Query:
     def __init__(self):
+        # 使用is_init=True创建配置，表示只初始化配置，不执行登录
         self.config = Config(file_path='./config.json', is_init=True)
-        self.client = self.config.get_gewechat_client()
+        # 使用ClientFactory获取客户端实例，确保全局只有一个实例
+        self.client = ClientFactory.get_client(self.config)
 
     def POST(self):
         web_data = web.data()
@@ -115,9 +123,11 @@ class Query:
             return "success"
         # 处理普通消息
         else:
-            from Core.bridge.channel import Channel
-            channel = Channel(self.client, self.config)
-            # 立即处理消息
-            channel.compose_context(gewechat_msg.content)
+            # 先暂时不动
+            pass
+            # from Core.bridge.channel import Channel
+            # channel = Channel(self.client, self.config)
+            # # 立即处理消息
+            # #channel.compose_context(gewechat_msg.content)
 
         return "success"

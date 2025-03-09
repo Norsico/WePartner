@@ -77,6 +77,8 @@ class LoginApi:
         qr_response = self.get_qr(app_id)
         if qr_response.get('ret') != 200:
             print_yellow(f"获取二维码失败:{qr_response}")
+            if qr_response.get('data')['msg'] == 'EOF':
+                print_red("请关闭VPN后重试")
             return None, None
 
         qr_data = qr_response.get('data', {})

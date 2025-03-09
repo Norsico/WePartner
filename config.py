@@ -4,7 +4,7 @@ import os
 import requests
 
 from Core.Logger import Logger
-from gewechat.client import GewechatClient
+from Core.factory.client_factory import ClientFactory
 
 logging = Logger()
 
@@ -14,11 +14,13 @@ class Config:
         """
         初始化Config类，指定配置文件路径。
         :param file_path: 配置文件的路径，默认为当前目录下的config.json
+        :param is_init: 是否仅初始化配置，不执行登录操作
         """
         self.is_init = is_init
         self.file_path = file_path
         self.data = {}
         self.gewechat_client = None
+        
         # 如果文件存在，加载配置文件内容
         if os.path.exists(self.file_path):
             self.load()
@@ -26,45 +28,30 @@ class Config:
             # 如果文件不存在，创建一个空的配置文件
             logging.warning(f"配置文件 {self.file_path} 不存在，已创建空配置文件")
             self.save()
-        if not self.is_init:
-            self.init_config()
-        else:
-            self.gewechat_client = GewechatClient(self.data['gewechat_base_url'], self.data['gewechat_token'])
+            
+        # 初始化配置
+        self.init_config()
 
     def init_config(self):
-        if self.is_init:
-            # 创建 GewechatClient 实例
-            client = GewechatClient(self.data['gewechat_base_url'], self.data['gewechat_token'])
-            self.gewechat_client = client
-        if self.data['gewechat_token'] != '' and self.data['gewechat_app_id'] != '' and not self.is_init:
-            # 创建 GewechatClient 实例
-            client = GewechatClient(self.data['gewechat_base_url'], self.data['gewechat_token'])
-            print(client)
-            # 登录, 自动创建二维码，扫码后自动登录
-            app_id, error_msg = client.login(app_id=self.data['gewechat_app_id'])
-            if error_msg:
-                logging.error("登录失败")
+        """
+        初始化配置，包括检查必要的配置项和获取token
+        """
+        # 检查token是否存在，如果不存在则获取
+        if self.data.get('gewechat_token', '') == '':
+            # 获取token
+            url = self.data.get('gewechat_base_url', '') + "/tools/getTokenId"
+            if not self.data.get('gewechat_base_url', ''):
+                logging.error("缺少必要的配置参数：gewechat_base_url")
                 return
-            logging.success(f"登录成功")
-            self.gewechat_client = client
-        else:
-            if self.data['gewechat_token'] == '':
-                # 获取token
-                url = self.data['gewechat_base_url'] + "/tools/getTokenId"
+                
+            try:
                 response = requests.request("POST", url, headers={}, data={})
-                logging.warning(f"Token未设置，已自动获取Token: {json.loads(response.text)['data']}")
-                self.set('gewechat_token', json.loads(response.text)['data'])
-            if self.data['gewechat_app_id'] == '':
-                # 创建 GewechatClient 实例
-                client = GewechatClient(self.data['gewechat_base_url'], self.data['gewechat_token'])
-                # 登录, 自动创建二维码，扫码后自动登录
-                app_id, error_msg = client.login(app_id=self.data['gewechat_app_id'])
-                self.set('gewechat_app_id', app_id)
-                if error_msg:
-                    logging.error("登录失败")
-                    return
-                logging.success(f"登录成功")
-                self.gewechat_client = client
+                token = json.loads(response.text)['data']
+                logging.warning(f"Token未设置，已自动获取Token: {token}")
+                self.set('gewechat_token', token)
+            except Exception as e:
+                logging.error(f"获取Token失败: {e}")
+                return
 
     def load(self):
         """
@@ -113,32 +100,23 @@ class Config:
             self.save()
 
     def get_gewechat_client(self):
-        return self.gewechat_client
+        """
+        获取GewechatClient实例
+        使用ClientFactory确保全局只有一个实例
+        
+        :return: GewechatClient实例
+        """
+        # 使用工厂获取客户端实例
+        client = ClientFactory.get_client(self)
+        
+        # 如果不是仅初始化模式，并且有app_id，则尝试登录
+        if not self.is_init and self.get('gewechat_app_id', ''):
+            ClientFactory.login_if_needed(client, self.get('gewechat_app_id'))
+            
+        return client
 
     def __str__(self):
         """
         返回配置数据的字符串表示。
         """
         return json.dumps(self.data, indent=4, ensure_ascii=False)
-
-
-# 示例用法
-if __name__ == "__main__":
-    config = Config()
-
-    # # 设置配置项
-    # config.set("name", "Kimi")
-    # config.set("age", 25)
-    # config.set("is_active", True)
-    #
-    # # 获取配置项
-    # print("Name:", config.get("name"))
-    # print("Age:", config.get("age"))
-    # print("Is Active:", config.get("is_active"))
-    #
-    # # 删除配置项
-    # config.delete("is_active")
-
-    # 查看当前配置
-    print("Current Config:")
-    print(config)
