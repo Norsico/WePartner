@@ -1,105 +1,174 @@
 # wxChatBot
 
-一个基于 Python 的微信机器人客户端，支持自动化消息处理和管理。
+<div align="center">
 
-## 🌟 特性
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Python](https://img.shields.io/badge/Python-3.9+-green)
+![License](https://img.shields.io/badge/license-MIT-orange)
 
-- 支持微信消息的自动化发送和接收
-- 灵活的配置管理系统
-- 支持 Docker 部署
-- 模块化设计，易于扩展
-- 完整的日志记录
+</div>
+
+> 一个基于 Python 的微信机器人客户端，支持自动化消息处理和管理。
+
+## ✨ 功能特性
+
+- 🔄 **自动化消息处理**：支持微信消息的自动发送和接收
+- ⚙️ **灵活配置**：完善的配置管理系统
+- 🧩 **模块化设计**：易于扩展的架构
+- 📊 **完整日志**：详细的运行日志记录
+- 🔌 **API集成**：与第三方服务无缝集成
+
+## 📋 项目结构
+
+```
+wxChatBot/
+├── Core/                # 核心功能模块
+│   ├── bridge/         # 通信桥接模块
+│   ├── factory/        # 工厂类模块
+│   ├── DifyAI/         # Dify AI 集成
+│   ├── WxClient.py     # 微信客户端实现
+│   └── Logger.py       # 日志系统
+├── gewechat/            # 微信接口模块（第三方开源项目）
+│   ├── api/            # API 接口
+│   ├── util/           # 工具类
+│   └── data/           # 数据存储
+├── config.py            # 配置管理
+├── main.py              # 主程序入口
+├── config.json          # 配置文件
+└── docker-compose.yml   # gewechat的Docker配置文件
+```
 
 ## 🚀 快速开始
 
 ### 环境要求
 
 - Python 3.9+
-- Docker (可选，用于容器化部署)
+- gewechat 服务（可通过Docker部署）
 
-### 安装
+### 安装步骤
 
-1. 克隆仓库：
+#### 1. 克隆仓库
+
 ```bash
 git clone https://github.com/your-username/wxChatBot.git
 cd wxChatBot
 ```
 
-2. 创建并激活虚拟环境（推荐）：
+#### 2. 创建并激活虚拟环境（推荐）
+
 ```bash
+# 创建虚拟环境
 python -m venv venv
-# Windows
+
+# Windows 激活
 venv\Scripts\activate
-# Linux/Mac
+
+# Linux/Mac 激活
 source venv/bin/activate
 ```
 
-3. 安装依赖：
+#### 3. 安装依赖
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 配置
+### 配置说明
 
-1. 复制示例配置文件：
+#### 1. 配置文件
+
+复制示例配置文件并编辑：
+
 ```bash
 cp config.json.example config.json
 ```
 
-2. 编辑 `config.json`，填入必要的配置信息：
+编辑 `config.json`，填入必要的配置信息：
+
 ```json
 {
-    "gewechat_base_url": "你的服务器地址",
-    "gewechat_app_id": "你的应用ID",
-    "gewechat_token": ""  // 留空，程序会自动获取
+  "gewechat_base_url": "http://your-server:2531/v2/api",
+  "gewechat_app_id": "your-app-id",
+  "gewechat_token": "",  // 留空，程序会自动获取
+  "gewechat_callback_url": "http://your-server:1145/v2/api/callback/collect",
+  "gewechat_download_url": "http://your-server:2532/download"
 }
 ```
 
-### 使用方法
+#### 2. 部署 gewechat 服务
 
-1. 直接运行：
+本项目依赖于 gewechat 服务，需要先部署 gewechat：
+
+```bash
+# 启动 gewechat 服务
+docker-compose up -d
+```
+
+> **注意**：docker-compose.yml 中配置的是 gewechat 服务，而非本项目的容器化配置。
+
+## 💻 使用方法
+
+### 启动服务
+
 ```bash
 python main.py
 ```
 
-2. 使用 Docker 运行：
-```bash
-docker-compose up -d
+### 示例代码
+
+```python
+from Core.WxClient import WxChatClient
+from config import Config
+
+# 创建配置
+config = Config('./config.json')
+
+# 创建WxChatClient
+wx_client = WxChatClient(config)
+
+# 发送文本消息
+wx_client.send_text_message_by_name("好友昵称", "Hello, World!")
 ```
 
-## 📁 项目结构
+## 🔧 高级配置
 
-```
-wxChatBot/
-├── Core/               # 核心功能模块
-│   ├── bridge/        # 通信桥接模块
-│   └── factory/       # 工厂类模块
-├── gewechat/          # 微信接口模块
-│   ├── api/          # API 接口
-│   └── util/         # 工具类
-├── config.py          # 配置管理
-├── main.py           # 主程序入口
-└── docker-compose.yml # Docker 配置文件
-```
+### 主要配置项
 
-## 🔧 配置说明
+| 配置项 | 说明 | 示例 |
+|-------|------|------|
+| `gewechat_base_url` | gewechat服务的API基础URL | `http://localhost:2531/v2/api` |
+| `gewechat_app_id` | 应用ID | `wx_usXP_BDz8cmVGlBi6WDJQ` |
+| `gewechat_token` | 访问令牌（可留空自动获取） | - |
+| `gewechat_callback_url` | 回调URL | `http://localhost:1145/v2/api/callback/collect` |
+| `gewechat_download_url` | 文件下载URL | `http://localhost:2532/download` |
 
-主要配置项说明：
+## 📝 开发指南
 
-- `gewechat_base_url`: 微信服务器基础URL
-- `gewechat_app_id`: 应用ID
-- `gewechat_token`: 访问令牌（自动获取）
-
-## 📝 开发说明
+### 代码规范
 
 - 遵循 PEP 8 编码规范
-- 使用模块化设计，便于扩展
-- 完整的日志记录系统
+- 使用类型注解提高代码可读性
+- 编写详细的文档注释
 
-## 🤝 贡献
+### 模块扩展
 
-欢迎提交 Issue 和 Pull Request！
+1. 在 `Core` 目录下创建新模块
+2. 实现相应的接口
+3. 在 `main.py` 中集成新模块
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
 
 ## 📄 许可证
 
-[MIT License](LICENSE) 
+本项目采用 [MIT 许可证](LICENSE)。
+
+## 🙏 致谢
+
+- [gewechat](https://github.com/path/to/gewechat) - 提供微信通信接口
+- 所有贡献者和使用者 
