@@ -1,0 +1,4 @@
+web.py>=0.62
+requests>=2.26.0
+gradio>=3.50.2
+pyngrok>=6.0.0 

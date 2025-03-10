@@ -1,4 +1,6 @@
 {
+  "master_name": "N",
+  
   "dify_api_base": "http://192.168.43.236/v1",
   "dify_api_key": "app-RXrYhNCVHOCRJal6eVyzJyWy",
 
@@ -6,5 +8,8 @@
   "gewechat_token": "3d488d525a574657bcbb5144e67ca0b2",
   "gewechat_app_id": "wx_usXP_BDz8cmVGlBi6WDJQ",
   "gewechat_callback_url": "http://192.168.43.236:1145/v2/api/callback/collect",
-  "gewechat_download_url": "http://192.168.43.236:2532/download"
+  "gewechat_download_url": "http://192.168.43.236:2532/download",
+
+  "is_remote_server": false,
+  "ngrok_auth_token": "2tn5cUo5m7VrA4uYM3pY2GukYVj_3WkXHuJyb2nfLZLwsj1BH"
 }

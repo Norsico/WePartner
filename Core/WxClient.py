@@ -8,6 +8,7 @@ import web
 from Core.GewechatMessage import GeWeChatMessage
 from Core.Logger import Logger
 from Core.bridge.context import ContextType
+from Core.bridge.channel import Channel
 from Core.factory.client_factory import ClientFactory
 from config import Config
 
@@ -21,6 +22,8 @@ class WxChatClient:
         self.gewechat_app_id = config.get('gewechat_app_id')
         self.client = config.get_gewechat_client()
         self.gewechat_callback_url = config.get('gewechat_callback_url')
+        self.config = config
+        self.channel = Channel(self.client, config)
         self.set_wx_callback()
 
     def set_wx_callback(self):
@@ -75,59 +78,52 @@ class Query:
         self.config = Config(file_path='./config.json', is_init=True)
         # 使用ClientFactory获取客户端实例，确保全局只有一个实例
         self.client = ClientFactory.get_client(self.config)
+        # 创建通道对象
+        self.channel = Channel(self.client, self.config)
 
     def POST(self):
+        """处理微信回调消息"""
         web_data = web.data()
         data = json.loads(web_data)
+        
         # gewechat服务发送的回调测试消息
         if isinstance(data, dict) and 'testMsg' in data and 'token' in data:
             logger.debug(f"[gewechat] 收到gewechat服务发送的回调测试消息: {data}")
             return "success"
+            
+        # 解析消息
         gewechat_msg = GeWeChatMessage(data, self.client)
+        logger.info(f"收到微信消息: {gewechat_msg}")
+        
+        # 过滤不需要处理的消息
+        
         # 微信客户端的状态同步消息
         if gewechat_msg.ctype == ContextType.STATUS_SYNC:
-            # logger.debug(f"[gewechat] ignore status sync message: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] 忽略状态同步消息")
             return "success"
 
         # 忽略非用户消息（如公众号、系统通知等）
         if gewechat_msg.ctype == ContextType.NON_USER_MSG:
-            logger.debug(f"[gewechat] ignore non-user message from {gewechat_msg.from_user_id}: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] 忽略非用户消息，来自 {gewechat_msg.from_user_id}: {gewechat_msg.content}")
             return "success"
 
         # 忽略来自自己的消息
         if gewechat_msg.my_msg:
-            logger.debug(
-                f"[gewechat] ignore message from myself: {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] 忽略自己发送的消息: {gewechat_msg.content}")
             return "success"
 
         # 忽略过期的消息
         if int(gewechat_msg.create_time) < int(time.time()) - 60 * 5:  # 跳过5分钟前的历史消息
-            logger.debug(
-                f"[gewechat] ignore expired message from {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] 忽略过期消息，来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
 
-        print("Debug")
-        print(f"gewechat_msg.ctype: {gewechat_msg.ctype} Type: {type(gewechat_msg.ctype)}")
-        print(f"gewechat_msg.content: {gewechat_msg.content} Type: {type(gewechat_msg.content)}")
-        print(f"gewechat_msg.is_group: {gewechat_msg.is_group} Type: {type(gewechat_msg.is_group)}")
-        print(f"gewechat_msg: {gewechat_msg} Type: {type(gewechat_msg)}")
-        print(f"from_user_id: {gewechat_msg.from_user_id} Type: {type(gewechat_msg.from_user_id)}")
-        print("Debug end")
-
-        # 处理指令消息
-        if gewechat_msg.content.startswith("#"):
-            from Core.bridge.channel import Channel
-            channel = Channel(self.client, self.config)
-            # 立即处理指令
-            channel.compose_context(gewechat_msg.content)
-            return "success"
-        # 处理普通消息
-        else:
-            # 先暂时不动
-            pass
-            # from Core.bridge.channel import Channel
-            # channel = Channel(self.client, self.config)
-            # # 立即处理消息
-            # #channel.compose_context(gewechat_msg.content)
-
+        # 处理有效消息
+        try:
+            # 直接将消息传递给channel处理，让channel决定如何处理不同类型的消息
+            logger.info(f"处理消息: {gewechat_msg.content}")
+            result = self.channel.compose_context(gewechat_msg.content)
+            logger.info(f"消息处理结果: {result}")
+        except Exception as e:
+            logger.error(f"处理消息时出错: {str(e)}")
+            
         return "success"
