@@ -265,22 +265,32 @@ class SettingsApp:
                     # 设置Ngrok认证
                     ngrok.set_auth_token(ngrok_auth_token)
                     
-                    # 启动Ngrok隧道
-                    public_url = ngrok.connect(port, bind_tls=True).public_url
+                    # 先关闭所有现有的Ngrok隧道，避免多会话错误
+                    try:
+                        tunnels = ngrok.get_tunnels()
+                        for tunnel in tunnels:
+                            logger.info(f"关闭现有Ngrok隧道: {tunnel.public_url}")
+                            ngrok.disconnect(tunnel.public_url)
+                    except Exception as disconnect_err:
+                        logger.warning(f"关闭现有Ngrok隧道时出错: {str(disconnect_err)}")
                     
-                    # 如果路径不是/，则添加自定义路径
-                    if self.settings_path and not self.settings_path == "/":
-                        # 如果public_url最后有/，先去掉
-                        if public_url.endswith("/"):
-                            public_url = public_url[:-1]
-                            
-                        # 如果settings_path不是以/开头，先加上
-                        if not self.settings_path.startswith("/"):
-                            self.settings_path = "/" + self.settings_path
-                            
-                        # 组合URL
-                        public_url = public_url + self.settings_path
-                        
+                    # 添加重试机制
+                    max_retries = 3
+                    retry_count = 0
+                    
+                    while retry_count < max_retries:
+                        try:
+                            # 启动Ngrok隧道
+                            public_url = ngrok.connect(port, bind_tls=True).public_url
+                            break  # 成功连接，跳出循环
+                        except Exception as connect_err:
+                            retry_count += 1
+                            if retry_count >= max_retries:
+                                raise  # 重试次数用完，抛出异常
+                            logger.warning(f"Ngrok连接失败，正在重试 ({retry_count}/{max_retries}): {str(connect_err)}")
+                            time.sleep(2)  # 等待2秒后重试
+                    
+                    # 设置公共URL，不需要手动添加路径
                     self.public_url = public_url
                     logger.success(f"Ngrok隧道已建立，公共URL: {self.public_url}")
                 except Exception as e:
@@ -302,7 +312,8 @@ class SettingsApp:
                 server_port=port,
                 share=False,
                 inbrowser=False,
-                debug=False
+                debug=False,
+                root_path=self.settings_path if self.settings_path != "/" else None
             )
             
         thread = threading.Thread(target=run_interface, daemon=True)

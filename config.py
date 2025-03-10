@@ -36,6 +36,17 @@ class Config:
         """
         初始化配置，包括检查必要的配置项和获取token
         """
+        # 设置日志级别
+        log_level = self.data.get('log_level', 'INFO')
+        debug_mode = self.data.get('debug_mode', False)
+        if debug_mode:
+            log_level = 'DEBUG'
+        try:
+            logging.set_level(log_level)
+        except (ValueError, TypeError) as e:
+            logging.warning(f"设置日志级别失败: {e}，使用默认级别INFO")
+            logging.set_level('INFO')
+        
         # 检查token是否存在，如果不存在则获取
         if self.data.get('gewechat_token', '') == '':
             # 获取token

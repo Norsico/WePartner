@@ -1,4 +1,5 @@
 import json
+from typing import Dict, Any, Optional, List, Union
 
 import requests
 
@@ -24,10 +25,11 @@ class Dify:
             "Authorization": f"Bearer {self.api_key}"
         }
 
-    def upload_file(self, file_path: str, type: str, user: str):
+    def upload_file(self, file_path: str, type: str, user: str) -> Optional[str]:
         """
         上传文件到 Dify
         :param file_path: 文件路径
+        :param type: 文件类型
         :param user: 用户标识
         :return: 文件 ID 或 None
         """
@@ -51,22 +53,97 @@ class Dify:
             logger.error(f"发生错误: {str(e)}")
         return None
 
-    def run_workflow(self, data, user, streaming=False):
+    def run_workflow(self, data: Union[Dict, str], user: str, streaming: bool = False) -> Any:
+        """
+        运行工作流
+        :param data: 工作流输入数据，可以是字典或字符串
+        :param user: 用户标识
+        :param streaming: 是否使用流式输出
+        :return: 工作流执行结果
+        """
+        # 如果输入是字符串，假设是简单的文本消息
+        if isinstance(data, str):
+            data = {"message": data}
+            
+        # 如果输入是包含message键的字典，转换为Dify API需要的格式
+        if isinstance(data, dict) and "message" in data:
+            data = {"message": data["message"]}
+            
+        return self._run_workflow_internal(data, user, streaming)
+        
+    def run_workflow_with_file(self, message: str, file_path: str, file_type: str, user: str, streaming: bool = False) -> Any:
+        """
+        运行带文件的工作流
+        :param message: 消息文本
+        :param file_path: 文件路径
+        :param file_type: 文件类型
+        :param user: 用户标识
+        :param streaming: 是否使用流式输出
+        :return: 工作流执行结果
+        """
+        # 先上传文件
+        file_id = self.upload_file(file_path, file_type, user)
+        if not file_id:
+            return {"status": "error", "message": "文件上传失败"}
+            
+        # 构建包含文件的输入数据
+        data = {
+            "message": message,
+            "files": [
+                {
+                    "transfer_method": "local_file",
+                    "upload_file_id": file_id,
+                    "type": file_type
+                }
+            ]
+        }
+        
+        return self._run_workflow_internal(data, user, streaming)
+        
+    def run_workflow_with_image(self, message: str, image_path: str, user: str, streaming: bool = False) -> Any:
+        """
+        运行带图片的工作流
+        :param message: 消息文本
+        :param image_path: 图片路径
+        :param user: 用户标识
+        :param streaming: 是否使用流式输出
+        :return: 工作流执行结果
+        """
+        return self.run_workflow_with_file(message, image_path, "image", user, streaming)
+        
+    def run_workflow_with_history(self, message: str, history: List[Dict], user: str, streaming: bool = False) -> Any:
+        """
+        运行带聊天历史的工作流
+        :param message: 消息文本
+        :param history: 聊天历史，格式为[{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]
+        :param user: 用户标识
+        :param streaming: 是否使用流式输出
+        :return: 工作流执行结果
+        """
+        data = {
+            "message": message,
+            "history": history
+        }
+        
+        return self._run_workflow_internal(data, user, streaming)
+
+    def _run_workflow_internal(self, data: Dict, user: str, streaming: bool = False) -> Any:
         """
         内部方法：运行工作流
         :param data: 工作流输入数据
         :param user: 用户标识
+        :param streaming: 是否使用流式输出
         :return: 工作流执行结果
         """
         workflow_url = f"{self.base_url}/workflows/run"
         if streaming:
-            data = {
+            request_data = {
                 "inputs": data,
                 "response_mode": "streaming",
                 "user": user
             }
             try:
-                response = requests.post(workflow_url, headers=self.workflow_headers, json=data, stream=True)
+                response = requests.post(workflow_url, headers=self.workflow_headers, json=request_data, stream=True)
                 if response.status_code == 200:
                     logger.success("工作流执行成功，开始流式输出：")
                     full_text = ""  # 用于存储完整的文本内容
@@ -89,14 +166,14 @@ class Dify:
                 logger.error(f"发生错误: {str(e)}")
                 return {"status": "error", "message": str(e)}
         else:
-            data = {
+            request_data = {
                 "inputs": data,
                 "response_mode": "blocking",
                 "user": user
             }
             logger.info("开始运行工作流：")
             try:
-                response = requests.post(workflow_url, headers=self.workflow_headers, json=data)
+                response = requests.post(workflow_url, headers=self.workflow_headers, json=request_data)
                 if response.status_code == 200:
                     logger.success("工作流执行成功")
                     return response.json()['data']['outputs']['text']
@@ -116,21 +193,19 @@ if __name__ == "__main__":
     user = "difyuser"
 
     dify = Dify(api_key="app-V8tQlVW1Aw6R0yrFNILjfAbq")  # 初始化 DifyAPI 类
-    file_id = dify.upload_file(file_path, "TXT", user)  # 上传文件
-
-    if file_id:
-        # 文件上传成功，运行工作流
-        data = {
-            "input": [
-                {
-                    "transfer_method": "local_file",
-                    "upload_file_id": file_id,
-                    "type": "document"
-                }
-            ]
-        }
-        result_blocking = dify.run_workflow(data, user, streaming=True)
-        print(result_blocking)
-
-    else:
-        logger.error("文件上传失败，无法执行工作流")
+    
+    # 示例1：简单文本消息
+    result1 = dify.run_workflow("你好，请介绍一下自己", user)
+    print(f"文本消息结果: {result1}")
+    
+    # 示例2：上传文件并处理
+    result2 = dify.run_workflow_with_file("请分析这个文件", file_path, "TXT", user)
+    print(f"文件处理结果: {result2}")
+    
+    # 示例3：带聊天历史的对话
+    history = [
+        {"role": "user", "content": "你好"},
+        {"role": "assistant", "content": "你好！有什么我可以帮助你的吗？"}
+    ]
+    result3 = dify.run_workflow_with_history("继续我们的对话", history, user)
+    print(f"带历史的对话结果: {result3}")

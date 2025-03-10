@@ -55,7 +55,20 @@ class WxChatClient:
                     logger.success("[gewechat] callback set successfully")
                 else:
                     logger.warning(f"[gewechat] set callback returned: {callback_resp}")
-                    logger.info("[gewechat] Continuing anyway as the callback might still work...")
+                    self.client.logout(self.gewechat_app_id)
+                    ClientFactory.reset()
+                    # 重新登录
+                    app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
+                    if error_msg:
+                        logger.error(f"[gewechat] Relogin failed: {error_msg}")
+                    else:
+                        logger.success(f"[gewechat] Relogin successful, app_id: {app_id}")
+                    # 重新设置回调
+                    callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
+                    if callback_resp.get("ret") == 200:
+                        logger.success("[gewechat] callback set successfully after relogin")
+                    else:
+                        logger.warning(f"[gewechat] set callback after relogin returned: {callback_resp}")
             except Exception as e:
                 logger.error(f"[gewechat] Error setting callback: {e}")
                 logger.info("[gewechat] Continuing anyway as the callback might still work...")
@@ -93,7 +106,7 @@ class Query:
             
         # 解析消息
         gewechat_msg = GeWeChatMessage(data, self.client)
-        logger.info(f"收到微信消息: {gewechat_msg}")
+        # logger.info(f"收到微信消息: {gewechat_msg}")
         
         # 过滤不需要处理的消息
         
