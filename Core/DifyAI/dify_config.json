@@ -1,0 +1,11 @@
+{
+  "chatflow": {
+    "app-I4J0Rp2LfRKGXWXKV2LCko2x": {
+      "description": "用于测试的API Key",
+      "created_at": "2025-03-11",
+      "conversations": {
+        "测试对话_1": "7ebfaf59-9689-4a4b-87a6-c57da9708aae"
+      }
+    }
+  }
+}

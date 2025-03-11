@@ -1,6 +1,6 @@
 {
     "master_name": "N",
-    "dify_api_base": "http://192.168.43.236/v1",
+    "dify_api_base": "http://localhost/v1",
     "current_workflow": "chat",
     "gewechat_base_url": "http://192.168.43.236:2531/v2/api",
     "gewechat_token": "3d488d525a574657bcbb5144e67ca0b2",
