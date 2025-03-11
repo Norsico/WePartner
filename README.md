@@ -1,5 +1,5 @@
 # wxChatBot
-
+【暂未整理完成，请期待后续版本~】
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
