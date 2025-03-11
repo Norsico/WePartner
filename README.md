@@ -19,7 +19,7 @@
 - 智能上下文理解和对话管理
 - 可定制的对话流程和话术模板
 
-### 📱 企业微信集成
+### 📱 微信集成
 - 无缝对接企业微信应用
 - 支持多种消息类型（文本、图片、文件等）
 - 群聊和私聊消息处理
@@ -35,23 +35,24 @@
 - 自定义触发规则
 - 灵活的定时任务支持
 
-## 📁 项目结构
+## 📁 主要项目结构
 
 ```
 wxChatBot/
-├── Core/                   # 核心功能模块
-│   ├── Bridge/            # 通信桥接层
-│   ├── Handler/           # 消息处理器
-│   ├── Plugin/            # 插件系统
-│   └── Utils/             # 工具类
-├── gewechat/              # 企业微信API集成模块
-│   ├── API/               # API接口封装
-│   └── Models/            # 数据模型
+├── Core/                  # 核心功能模块
+│   ├── bridge/            # 通信桥接层
+│   ├── commands/          # 命令系统
+│   ├── difyAI/            # difyAI集成
+│   ├── factory/           # 通信层工厂
+│   └── web/               # 网页端设置
+├── gewechat/              # 微信API集成
+│   ├── api/               # API接口封装
+│   └── util/              # gewechat工具接口层
 ├── config.py              # 配置管理
 ├── main.py                # 主程序入口
 ├── config.example.json    # 配置文件示例
 ├── requirements.txt       # 项目依赖
-└── docker-compose.yml     # Docker部署配置
+└── docker-compose.yml     # Docker部署配置(Gewechat配置)
 ```
 
 ## 🔧 系统要求
