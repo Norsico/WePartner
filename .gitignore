@@ -30,6 +30,8 @@ ENV/
 .vscode/
 *.swp
 *.swo
+config.json
+wxChatBot.code-workspace
 
 # Local configuration
 *.log 
