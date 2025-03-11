@@ -1,180 +1,142 @@
 # wxChatBot
-【暂未整理完成，请期待后续版本~】
+
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/Python-3.9+-green)
+![Python](https://img.shields.io/badge/Python-3.7+-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
+![Dify](https://img.shields.io/badge/Dify-Powered-purple)
+![WeChat](https://img.shields.io/badge/WeChat-Work-brightgreen)
 
-- 🤖 智能对话：基于Dify API的智能对话系统
-- 📝 自动回复：可配置的自动回复功能
-- 📁 文件处理：支持多种类型文件的处理和分析
-- 🖼️ 图片分析：支持图片识别和分析
-- 🔄 工作流系统：灵活的工作流配置和管理
-- ⚙️ 可视化配置：提供Web界面进行配置管理
-- 📊 日志系统：完善的日志记录和管理
+</div>
 
-> 一个基于 Python 的微信机器人客户端，支持自动化消息处理和管理。
+<p align="center">wxChatBot 是一个强大的基于微信的智能聊天机器人，通过集成 Dify AI 平台，提供高效、智能的消息处理和自动回复服务。支持ChatFlow，可自定义编排AI作业任务</p>
 
-## ✨ 功能特性
+## ✨ 功能特性(暂未完善)
 
-- 🔄 **自动化消息处理**：支持微信消息的自动发送和接收
-- ⚙️ **灵活配置**：完善的配置管理系统
-- 🧩 **模块化设计**：易于扩展的架构
-- 📊 **完整日志**：详细的运行日志记录
-- 🔌 **API集成**：与第三方服务无缝集成
+### 🤖 智能对话系统
+- 集成 Dify AI 平台，支持自然语言处理
+- 智能上下文理解和对话管理
+- 可定制的对话流程和话术模板
 
-## 📋 项目结构
+### 📱 企业微信集成
+- 无缝对接企业微信应用
+- 支持多种消息类型（文本、图片、文件等）
+- 群聊和私聊消息处理
+
+### ⚙️ 系统功能
+- 多工作流程配置支持
+- 插件化架构设计
+- 完善的日志记录系统
+- 安全的配置管理机制
+
+### 🔄 自动化能力
+- 智能消息分类和路由
+- 自定义触发规则
+- 灵活的定时任务支持
+
+## 📁 项目结构
 
 ```
 wxChatBot/
-├── Core/                # 核心功能模块
-│   ├── bridge/         # 通信桥接模块
-│   ├── factory/        # 工厂类模块
-│   ├── DifyAI/         # Dify AI 集成
-│   ├── WxClient.py     # 微信客户端实现
-│   └── Logger.py       # 日志系统
-├── gewechat/            # 微信接口模块（第三方开源项目）
-│   ├── api/            # API 接口
-│   ├── util/           # 工具类
-│   └── data/           # 数据存储
-├── config.py            # 配置管理
-├── main.py              # 主程序入口
-├── config.json          # 配置文件
-└── docker-compose.yml   # gewechat的Docker配置文件
+├── Core/                   # 核心功能模块
+│   ├── Bridge/            # 通信桥接层
+│   ├── Handler/           # 消息处理器
+│   ├── Plugin/            # 插件系统
+│   └── Utils/             # 工具类
+├── gewechat/              # 企业微信API集成模块
+│   ├── API/               # API接口封装
+│   └── Models/            # 数据模型
+├── config.py              # 配置管理
+├── main.py                # 主程序入口
+├── config.example.json    # 配置文件示例
+├── requirements.txt       # 项目依赖
+└── docker-compose.yml     # Docker部署配置
 ```
 
-## 🚀 快速开始
+## 🔧 系统要求
 
-### 环境要求
+### 基础环境
+- Python 3.7+
+- 个人微信账号(最好是另一部手机上运行的)
+- Dify AI环境 
+- Ngrok环境
 
-- Python 3.9+
-- gewechat 服务（可通过Docker部署）
+### 推荐配置
+- 内存：2GB+
+- CPU：双核+
+- 存储：10GB+
+- 操作系统：Linux/Windows/MacOS
 
-### 安装步骤
+## 📦 主要依赖
 
-#### 1. 克隆仓库
-
-```bash
-git clone https://github.com/your-username/wxChatBot.git
-cd wxChatBot
-```
-
-#### 2. 创建并激活虚拟环境（推荐）
-
-```bash
-# 创建虚拟环境
-python -m venv venv
-
-# Windows 激活
-venv\Scripts\activate
-
-# Linux/Mac 激活
-source venv/bin/activate
-```
-
-#### 3. 安装依赖
-
-```bash
-pip install -r requirements.txt
-```
-
-### 配置说明
-
-#### 1. 配置文件
-
-复制示例配置文件并编辑：
-
-```bash
-cp config.json.example config.json
-```
-
-编辑 `config.json`，填入必要的配置信息：
-
-```json
-{
-  "gewechat_base_url": "http://your-server:2531/v2/api",
-  "gewechat_app_id": "your-app-id",
-  "gewechat_token": "",  // 留空，程序会自动获取
-  "gewechat_callback_url": "http://your-server:1145/v2/api/callback/collect",
-  "gewechat_download_url": "http://your-server:2532/download"
-}
-```
-
-#### 2. 部署 gewechat 服务
-
-本项目依赖于 gewechat 服务，需要先部署 gewechat：
-
-```bash
-# 启动 gewechat 服务
-docker-compose up -d
-```
-
-> **注意**：docker-compose.yml 中配置的是 gewechat 服务，而非本项目的容器化配置。
-
-## 💻 使用方法
-
-### 启动服务
-
-```bash
-python main.py
-```
-
-### 示例代码
-
-```python
-from Core.WxClient import WxChatClient
-from config import Config
-
-# 创建配置
-config = Config('./config.json')
-
-# 创建WxChatClient
-wx_client = WxChatClient(config)
-
-# 发送文本消息
-wx_client.send_text_message_by_name("好友昵称", "Hello, World!")
-```
-
-## 🔧 高级配置
-
-### 主要配置项
-
-| 配置项 | 说明 | 示例 |
+| 依赖包 | 版本 | 用途 |
 |-------|------|------|
-| `gewechat_base_url` | gewechat服务的API基础URL | `http://localhost:2531/v2/api` |
-| `gewechat_app_id` | 应用ID | `wx_usXP_BDz8cmVGlBi6WDJQ` |
-| `gewechat_token` | 访问令牌（可留空自动获取） | - |
-| `gewechat_callback_url` | 回调URL | `http://localhost:1145/v2/api/callback/collect` |
-| `gewechat_download_url` | 文件下载URL | `http://localhost:2532/download` |
+| web.py | >=0.62 | Web服务框架 |
+| requests | >=2.26.0 | HTTP请求库 |
+| gradio | >=3.50.2 | UI界面支持 |
+| pyngrok | >=6.0.0 | 内网穿透支持 |
 
-## 📝 开发指南
+## ⚙️ 配置说明
 
-### 代码规范
+系统通过`config.json`进行配置，支持以下主要配置项：
 
-- 遵循 PEP 8 编码规范
-- 使用类型注解提高代码可读性
-- 编写详细的文档注释
+### 微信配置
+- 应用ID和Token(自动生成)
+- 本地ip地址(可通过ipconfig查看)
+- 回调配置(一般不需要修改)
 
-### 模块扩展
+### Dify AI 配置
+- API密钥
+- 模型选择
+- 工作流配置
 
-1. 在 `Core` 目录下创建新模块
-2. 实现相应的接口
-3. 在 `main.py` 中集成新模块
+### 系统配置
+- 运行模式
+- 日志级别
+- 性能参数
+- 安全设置
+
+详细配置请参考`config.example.json`文件。配置好后将其修改成`config.json`即可
+
+## 🚀 开发计划
+
+### 近期计划
+- [ ] 完善ChatFlow相关功能
+- [ ] 完善设置网页页面
+- [ ] 微信发送语音开关
+
+### 中期计划
+- [ ] 支持上传文档
+- [ ] 支持上传视频、图片
+- [ ] 支持自定义
+
+### 长期计划
+- 未知 TAT
 
 ## 🤝 贡献指南
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
+我们欢迎各种形式的贡献，包括但不限于：
+
+- 提交问题和建议
+- 改进文档
+- 提交代码修复
+- 添加新功能
+
+请参考我们的贡献指南来了解如何参与项目开发。
 
 ## 📄 许可证
 
-本项目采用 [MIT 许可证](LICENSE)。
+本项目采用 MIT 许可证，查看 [LICENSE](LICENSE) 文件了解更多详细信息。
 
-## 🙏 致谢
+## 🌟 致谢
 
-- [gewechat](https://github.com/path/to/gewechat) - 提供微信通信接口
-- 所有贡献者和使用者 
+感谢以下开源项目的支持：
+
+- [Dify](https://dify.ai)
+- [Gewechat](https://github.com/Devo919/Gewechat)
+- [Ngrok](https://ngrok.com/)
+
+---
+
+<p align="center">如果这个项目对您有帮助，请考虑给它一个星标 ⭐️</p>
