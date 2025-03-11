@@ -32,7 +32,7 @@ class WxChatClient:
         path = parsed_url.path
         # 如果没有指定端口，使用默认端口80
         port = parsed_url.port or 80
-        logger.info(f"[gewechat] start callback server: {self.gewechat_callback_url}, using port {port}")
+        logger.info(f"正在启动回调服务器: {self.gewechat_callback_url}, 使用端口 {port}")
         urls = (path, "Core.WxClient.Query")
         app = web.application(urls, globals(), autoreload=False)
         
@@ -44,7 +44,7 @@ class WxChatClient:
         server_thread.start()
         
         # 等待服务器启动
-        logger.info("[gewechat] waiting for server to start (5 seconds)...")
+        logger.info("等待服务器启动（5秒）...")
         time.sleep(5)
         
         # 在新线程中设置回调地址
@@ -52,26 +52,26 @@ class WxChatClient:
             try:
                 callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
                 if callback_resp.get("ret") == 200:
-                    logger.success("[gewechat] callback set successfully")
+                    logger.success("回调地址设置成功")
                 else:
-                    logger.warning(f"[gewechat] set callback returned: {callback_resp}")
+                    logger.warning(f"回调地址设置返回异常状态: {callback_resp}")
                     self.client.logout(self.gewechat_app_id)
                     ClientFactory.reset()
                     # 重新登录
                     app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
                     if error_msg:
-                        logger.error(f"[gewechat] Relogin failed: {error_msg}")
+                        logger.error(f"重新登录失败: {error_msg}")
                     else:
-                        logger.success(f"[gewechat] Relogin successful, app_id: {app_id}")
+                        logger.success(f"重新登录成功，应用ID: {app_id}")
                     # 重新设置回调
                     callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
                     if callback_resp.get("ret") == 200:
-                        logger.success("[gewechat] callback set successfully after relogin")
+                        logger.success("重新登录后回调地址设置成功")
                     else:
-                        logger.warning(f"[gewechat] set callback after relogin returned: {callback_resp}")
+                        logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
             except Exception as e:
-                logger.error(f"[gewechat] Error setting callback: {e}")
-                logger.info("[gewechat] Continuing anyway as the callback might still work...")
+                logger.error(f"设置回调地址时出错: {e}")
+                logger.info("继续运行，回调可能仍然有效...")
         
         # 启动回调设置线程
         callback_thread = threading.Thread(target=setup_callback, daemon=True)
@@ -82,7 +82,7 @@ class WxChatClient:
             while True:
                 time.sleep(1)  # 每秒检查一次
         except KeyboardInterrupt:
-            logger.info("[gewechat] Server stopping...")
+            logger.info("服务器正在停止...")
 
 
 class Query:
@@ -101,42 +101,41 @@ class Query:
         
         # gewechat服务发送的回调测试消息
         if isinstance(data, dict) and 'testMsg' in data and 'token' in data:
-            logger.debug(f"[gewechat] 收到gewechat服务发送的回调测试消息: {data}")
+            logger.debug(f"收到回调测试消息: {data}")
             return "success"
             
         # 解析消息
         gewechat_msg = GeWeChatMessage(data, self.client)
-        # logger.info(f"收到微信消息: {gewechat_msg}")
         
         # 过滤不需要处理的消息
         
         # 微信客户端的状态同步消息
         if gewechat_msg.ctype == ContextType.STATUS_SYNC:
-            logger.debug(f"[gewechat] 忽略状态同步消息")
+            logger.debug("忽略状态同步消息")
             return "success"
 
         # 忽略非用户消息（如公众号、系统通知等）
         if gewechat_msg.ctype == ContextType.NON_USER_MSG:
-            logger.debug(f"[gewechat] 忽略非用户消息，来自 {gewechat_msg.from_user_id}: {gewechat_msg.content}")
+            logger.debug(f"忽略非用户消息，来自 {gewechat_msg.from_user_id}: {gewechat_msg.content}")
             return "success"
 
         # 忽略来自自己的消息
         if gewechat_msg.my_msg:
-            logger.debug(f"[gewechat] 忽略自己发送的消息: {gewechat_msg.content}")
+            logger.debug(f"忽略自己发送的消息: {gewechat_msg.content}")
             return "success"
 
         # 忽略过期的消息
         if int(gewechat_msg.create_time) < int(time.time()) - 60 * 5:  # 跳过5分钟前的历史消息
-            logger.debug(f"[gewechat] 忽略过期消息，来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
+            logger.debug(f"忽略过期消息（5分钟前），来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
 
         # 处理有效消息
         try:
             # 直接将消息传递给channel处理，让channel决定如何处理不同类型的消息
-            logger.info(f"处理消息: {gewechat_msg.content}")
+            logger.info(f"正在处理消息: {gewechat_msg.content}")
             result = self.channel.compose_context(gewechat_msg.content)
-            logger.info(f"消息处理结果: {result}")
+            logger.info(f"消息处理完成，结果: {result}")
         except Exception as e:
-            logger.error(f"处理消息时出错: {str(e)}")
+            logger.error(f"消息处理过程中出现错误: {str(e)}")
             
         return "success"
