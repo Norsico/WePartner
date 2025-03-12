@@ -8,6 +8,7 @@ import os
 import threading
 import time
 from pyngrok import ngrok
+from config import Config
 from typing import List, Dict, Tuple
 
 from Core.Logger import Logger
@@ -21,6 +22,7 @@ class SettingsApp:
         """初始化设置应用"""
         self.settings_manager = SettingsManager()
         self.dify_manager = DifyManager()
+        self.config = Config()
         self.interface = None
         self.public_url = None
         self.ngrok_process = None
@@ -207,11 +209,14 @@ class SettingsApp:
         self.interface = self._create_interface()
         
         # 检查是否需要使用Ngrok
-        is_remote_server = self.settings_manager.get_settings().get("is_remote_server", False)
+        # is_remote_server = self.settings_manager.get_settings().get("is_remote_server", False)
+        is_remote_server = self.config.get("is_remote_server", False)
         
         if not is_remote_server:
             # 在本地模式下使用Ngrok
-            ngrok_auth_token = self.settings_manager.get_settings().get("ngrok_auth_token")
+            # ngrok_auth_token = self.settings_manager.get_settings().get("ngrok_auth_token")
+            
+            ngrok_auth_token = self.config.get("ngrok_auth_token")
             
             if ngrok_auth_token:
                 try:
@@ -255,7 +260,8 @@ class SettingsApp:
                 self.public_url = f"http://localhost:{port}"
         else:
             # 在远程服务器模式下，直接使用服务器URL
-            server_host = self.settings_manager.get_settings().get("server_host", "localhost")
+            # server_host = self.settings_manager.get_settings().get("server_host", "localhost")
+            server_host = self.config.get("server_host", "localhost")
             self.public_url = f"http://{server_host}:{port}"
             
         # 在新线程中启动Gradio界面

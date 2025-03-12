@@ -1,6 +1,7 @@
 from Core.Logger import Logger
 from Core.bridge.context import ContextType, Context
 from Core.commands.command_manager import CommandManager
+from Core.web.settings_manager import SettingsManager
 import os
 import re
 
@@ -43,10 +44,13 @@ class Channel:
         else:
             # 处理普通消息
             logging.info("检测到普通消息")
-
-            from Core.difyAI.dify_manager import DifyManager
-            dify_manager = DifyManager()
-            dify_manager.get_instance_by_name("test")
+            # 从settings.json中获取当前选中的chatflow
+            settings_manager = SettingsManager()
+            current_settings = settings_manager.get_settings()
+            current_chatflow = current_settings.get("selected_chatflow", {})
+            chatflow_description = current_chatflow.get("description", "")
+            # 调试输出
+            logging.debug(f"当前选中的chatflow: {chatflow_description}")
 
 
             # 检查是否启用了自动回复

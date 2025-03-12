@@ -42,25 +42,26 @@ class SystemInitializer:
         """
         logger.info("正在检查系统依赖...")
         all_installed = True
-        
-        for package in self.REQUIRED_PACKAGES:
-            try:
-                __import__(package)
-                logger.debug(f"依赖检查: {package} - 已安装")
-            except ImportError:
-                all_installed = False
-                logger.warning(f"缺少必要依赖: {package}，开始安装...")
-                try:
-                    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-                    logger.success(f"成功安装依赖: {package}")
-                except Exception as e:
-                    logger.error(f"安装依赖 {package} 失败: {str(e)}")
-                    logger.info(f"请手动安装: pip install {package}")
-                    return False
-        
-        if all_installed:
-            logger.success("所有依赖检查完成")
         return all_installed
+        
+        # for package in self.REQUIRED_PACKAGES:
+        #     try:
+        #         __import__(package)
+        #         logger.debug(f"依赖检查: {package} - 已安装")
+        #     except ImportError:
+        #         all_installed = False
+        #         logger.warning(f"缺少必要依赖: {package}，开始安装...")
+        #         try:
+        #             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+        #             logger.success(f"成功安装依赖: {package}")
+        #         except Exception as e:
+        #             logger.error(f"安装依赖 {package} 失败: {str(e)}")
+        #             logger.info(f"请手动安装: pip install {package}")
+        #             return False
+        
+        # if all_installed:
+        #     logger.success("所有依赖检查完成")
+        # return all_installed
     
     def check_environment(self) -> bool:
         """
