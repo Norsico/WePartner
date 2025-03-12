@@ -1,4 +1,4 @@
-web.py>=0.62
-requests>=2.26.0
-gradio>=3.50.2
-pyngrok>=6.0.0 
+gradio==5.20.1
+pyngrok==7.2.3
+qrcode==7.4.2
+Requests==2.32.3
