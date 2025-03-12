@@ -23,15 +23,8 @@ class DifyChatflow:
         self.api_key = api_key
         self.description = description
         self.base_url = base_url.rstrip('/')
+        self.config_file = config_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "dify_config.json")
         
-        # 确保配置文件路径正确
-        if config_file is None:
-            # 使用当前文件所在目录
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            self.config_file = os.path.join(current_dir, "dify_config.json")
-        else:
-            self.config_file = config_file
-            
         self.headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json'
@@ -44,52 +37,47 @@ class DifyChatflow:
             if os.path.exists(self.config_file):
                 with open(self.config_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    # 确保chatflow键存在
-                    if "chatflow" not in data:
-                        data["chatflow"] = {}
-                    
-                    # 如果API Key不存在，为其创建空字典
-                    if self.api_key not in data["chatflow"]:
-                        data["chatflow"][self.api_key] = {
-                            "description": self.description or "未指定用途",
-                            "created_at": self._get_current_date(),
-                            "conversations": {}
-                        }
-                    # 兼容旧版本配置
-                    if "conversations" not in data["chatflow"][self.api_key]:
-                        old_conversations = {k: v for k, v in data["chatflow"][self.api_key].items() 
-                                          if k not in ["description", "created_at"]}
-                        data["chatflow"][self.api_key] = {
-                            "description": data["chatflow"][self.api_key].get("description", self.description or "未指定用途"),
-                            "created_at": data["chatflow"][self.api_key].get("created_at", self._get_current_date()),
-                            "conversations": old_conversations
-                        }
-                    return data
             else:
-                print(f"配置文件不存在，将创建新文件: {self.config_file}")
-                data = {
-                    "chatflow": {
-                        self.api_key: {
-                            "description": self.description or "未指定用途",
-                            "created_at": self._get_current_date(),
-                            "conversations": {}
-                        }
-                    }
-                }
-                with open(self.config_file, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
-                return data
+                data = {"chatflow": {}}
+
+            # 确保必要的结构存在
+            if "chatflow" not in data:
+                data["chatflow"] = {}
+            if self.api_key not in data["chatflow"]:
+                data["chatflow"][self.api_key] = self._create_default_config()
+            elif "conversations" not in data["chatflow"][self.api_key]:
+                # 保留现有信息，添加缺失的字段
+                current_config = data["chatflow"][self.api_key]
+                default_config = self._create_default_config()
+                default_config.update(current_config)
+                data["chatflow"][self.api_key] = default_config
+
+            # 更新基础URL
+            data["chatflow"][self.api_key]["base_url"] = self.base_url
+            
+            # 保存更新后的配置
+            self._save_config(data)
+            return data
         except Exception as e:
             print(f"加载配置文件失败: {str(e)}")
-            return {
-                "chatflow": {
-                    self.api_key: {
-                        "description": self.description or "未指定用途",
-                        "created_at": self._get_current_date(),
-                        "conversations": {}
-                    }
-                }
-            }
+            return {"chatflow": {self.api_key: self._create_default_config()}}
+
+    def _create_default_config(self) -> Dict:
+        """创建默认配置"""
+        return {
+            "description": self.description or "未指定用途",
+            "created_at": self._get_current_date(),
+            "base_url": self.base_url,
+            "conversations": {}
+        }
+
+    def _save_config(self, data: Dict):
+        """保存配置到文件"""
+        try:
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"保存配置文件失败: {str(e)}")
 
     def _get_current_date(self) -> str:
         """获取当前日期"""
@@ -98,11 +86,7 @@ class DifyChatflow:
 
     def _save_conversations(self):
         """保存对话信息到配置文件"""
-        try:
-            with open(self.config_file, 'w', encoding='utf-8') as f:
-                json.dump(self.conversations, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"保存配置文件失败: {str(e)}")
+        self._save_config(self.conversations)
 
     def save_conversation(self, conversation_id: str, name: str = None):
         """保存对话信息

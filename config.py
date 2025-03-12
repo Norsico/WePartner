@@ -198,10 +198,10 @@ class Config:
         # 使用工厂获取客户端实例
         client = ClientFactory.get_client(self)
         
-        # 如果不是仅初始化模式，并且有app_id，则尝试登录
-        if not self.is_init and self.get('gewechat_app_id'):
-            ClientFactory.login_if_needed(client, self.get('gewechat_app_id'))
-            
+        # 如果不是初始化模式，并且没有app_id，则登录
+        if not self.is_init and not self.get('gewechat_app_id'):
+            logging.info(f"尝试登录: {self.get('gewechat_app_id')}")
+            ClientFactory.login_if_needed(client, self.get('gewechat_app_id'), self)
         return client
 
     def __str__(self) -> str:

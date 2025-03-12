@@ -1,0 +1,11 @@
+{
+  "selected_chatflow": {
+    "description": "",
+    "api_key": "",
+    "conversation": {
+      "name": "",
+      "id": ""
+    }
+  },
+  "voice_reply_enabled": false
+} 
