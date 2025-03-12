@@ -43,6 +43,12 @@ class Channel:
         else:
             # 处理普通消息
             logging.info("检测到普通消息")
+
+            from Core.difyAI.dify_manager import DifyManager
+            dify_manager = DifyManager()
+            dify_manager.get_instance_by_name("test")
+
+
             # 检查是否启用了自动回复
             if not self.config.get('auto_reply_enabled', False):
                 logging.info("自动回复未启用，忽略普通消息")

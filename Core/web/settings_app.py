@@ -8,225 +8,178 @@ import os
 import threading
 import time
 from pyngrok import ngrok
+from typing import List, Dict, Tuple
 
 from Core.Logger import Logger
-from config import Config
+from Core.difyAI.dify_manager import DifyManager
+from .settings_manager import SettingsManager
 
 logger = Logger()
 
-
 class SettingsApp:
-    def __init__(self, config_file='./config.json'):
-        """
-        初始化设置应用
-        
-        Args:
-            config_file: 配置文件路径
-        """
-        self.config_file = config_file
-        self.config = Config(file_path=config_file)
+    def __init__(self):
+        """初始化设置应用"""
+        self.settings_manager = SettingsManager()
+        self.dify_manager = DifyManager()
         self.interface = None
         self.public_url = None
         self.ngrok_process = None
         self.settings_path = "/wxChatBot/settings"
         self.is_running = False
         
-    def _load_config(self):
-        """加载当前配置"""
-        return self.config.data
-
-    def _save_config(self, config_data):
-        """保存配置"""
-        for key, value in config_data.items():
-            if key in self.config.data and self.config.data[key] == value:
-                continue  # 跳过未修改的值
-            self.config.set(key, value)
-        return "配置已保存，所有修改已生效。"
+    def _load_chatflow_info(self) -> List[Dict]:
+        """加载所有chatflow信息"""
+        return self.dify_manager.list_instances()
+        
+    def _get_chatflow_by_description(self, description: str) -> Dict:
+        """根据描述获取chatflow信息"""
+        instances = self._load_chatflow_info()
+        for instance in instances:
+            if instance.get("description") == description:
+                return instance
+        return {}
         
     def _create_interface(self):
         """创建Gradio界面"""
         with gr.Blocks(title="wxChatBot 设置", theme=gr.themes.Soft()) as interface:
+            # 标题和说明
             gr.Markdown(
                 """
-                # wxChatBot 配置管理
+                # 🤖 wxChatBot 配置管理
                 
-                在这里您可以方便地配置和管理wxChatBot的各项设置。所有修改会立即生效，无需重启机器人。
+                在这里您可以配置wxChatBot的聊天和语音设置。所有修改会立即生效。
                 """
             )
             
-            config_data = self._load_config()
+            # 加载当前设置
+            current_settings = self.settings_manager.get_settings()
+            current_chatflow = current_settings.get("selected_chatflow", {})
             
-            with gr.Tabs():
-                with gr.TabItem("基本设置"):
-                    with gr.Group():
-                        gr.Markdown("### 用户设置")
-                        with gr.Row():
-                            master_name = gr.Textbox(
-                                value=config_data.get("master_name", "filehelper"),
-                                label="主人用户名",
-                                info="接收通知和命令的微信账号名称"
-                            )
+            with gr.Row():
+                with gr.Column(scale=2):
+                    # Chatflow选择
+                    chatflow_info = self._load_chatflow_info()
+                    descriptions = [info.get("description", "") for info in chatflow_info if info.get("description")]
                     
-                    with gr.Group():
-                        gr.Markdown("### 自动回复设置")
-                        with gr.Row():
-                            auto_reply_enabled = gr.Checkbox(
-                                value=config_data.get("auto_reply_enabled", False),
-                                label="启用自动回复",
-                                info="是否自动回复普通消息"
-                            )
-                        
-                        with gr.Row():
-                            default_reply = gr.Textbox(
-                                value=config_data.get("default_reply", "收到您的消息，稍后回复。"),
-                                label="默认回复消息",
-                                info="自动回复的默认文本",
-                                lines=3
-                            )
-                
-                with gr.TabItem("微信API设置"):
-                    with gr.Group():
-                        gr.Markdown("### Gewechat API配置")
-                        with gr.Row():
-                            gewechat_base_url = gr.Textbox(
-                                value=config_data.get("gewechat_base_url", ""),
-                                label="Gewechat API地址",
-                                info="Gewechat服务的基础URL"
-                            )
-                        
-                        with gr.Row():
-                            gewechat_app_id = gr.Textbox(
-                                value=config_data.get("gewechat_app_id", ""),
-                                label="Gewechat APP ID",
-                                info="Gewechat应用的ID"
-                            )
-                            
-                            gewechat_token = gr.Textbox(
-                                value=config_data.get("gewechat_token", ""),
-                                label="Gewechat Token",
-                                info="留空则自动获取",
-                                type="password"
-                            )
+                    selected_chatflow = gr.Dropdown(
+                        choices=descriptions,
+                        value=current_chatflow.get("description", ""),
+                        label="选择聊天机器人",
+                        info="选择要使用的Dify聊天机器人"
+                    )
                     
-                    with gr.Group():
-                        gr.Markdown("### 回调和下载配置")
-                        with gr.Row():
-                            gewechat_callback_url = gr.Textbox(
-                                value=config_data.get("gewechat_callback_url", ""),
-                                label="回调URL",
-                                info="接收微信消息的回调URL"
-                            )
-                        
-                        with gr.Row():
-                            gewechat_download_url = gr.Textbox(
-                                value=config_data.get("gewechat_download_url", ""),
-                                label="下载URL",
-                                info="文件下载的URL"
-                            )
-                
-                with gr.TabItem("系统设置"):
-                    with gr.Group():
-                        gr.Markdown("### 运行环境设置")
-                        with gr.Row():
-                            is_remote_server = gr.Checkbox(
-                                value=config_data.get("is_remote_server", False),
-                                label="远程服务器模式",
-                                info="是否运行在远程服务器上（如果是本地运行，将使用Ngrok进行内网穿透）"
-                            )
-                        
-                        with gr.Row():
-                            server_host = gr.Textbox(
-                                value=config_data.get("server_host", "localhost"),
-                                label="服务器主机名",
-                                info="远程服务器的主机名或IP，仅在远程服务器模式下使用"
-                            )
+                    # API Key显示
+                    api_key_text = gr.Textbox(
+                        value=current_chatflow.get("api_key", ""),
+                        label="API Key",
+                        info="当前选中的机器人的API Key",
+                        interactive=False
+                    )
                     
-                    with gr.Group():
-                        gr.Markdown("### Ngrok设置")
-                        with gr.Row():
-                            ngrok_auth_token = gr.Textbox(
-                                value=config_data.get("ngrok_auth_token", ""),
-                                label="Ngrok认证令牌",
-                                info="用于内网穿透的Ngrok认证令牌",
-                                type="password"
-                            )
-                
-                with gr.TabItem("高级设置"):
-                    with gr.Group():
-                        gr.Markdown("### 日志设置")
-                        with gr.Row():
-                            debug_mode = gr.Checkbox(
-                                value=config_data.get("debug_mode", False),
-                                label="调试模式",
-                                info="启用调试日志"
-                            )
-                        
-                        with gr.Row():
-                            log_level = gr.Dropdown(
-                                choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                                value=config_data.get("log_level", "INFO"),
-                                label="日志级别",
-                                info="日志记录级别"
-                            )
+                    # 对话选择
+                    current_conv = current_chatflow.get("conversation", {})
+                    conversation_radio = gr.Radio(
+                        choices=[],
+                        value=current_conv.get("name", ""),
+                        label="选择对话",
+                        info="选择一个要使用的对话"
+                    )
+                    
+                with gr.Column(scale=1):
+                    # 语音设置
+                    voice_enabled = gr.Checkbox(
+                        value=current_settings.get("voice_reply_enabled", False),
+                        label="启用语音回复",
+                        info="是否将回复转换为语音"
+                    )
             
             # 保存按钮和结果显示
             with gr.Row():
-                save_button = gr.Button("保存配置", variant="primary", size="lg")
-                reset_button = gr.Button("重置", variant="secondary")
+                save_button = gr.Button("💾 保存设置", variant="primary", scale=2)
+                reset_button = gr.Button("🔄 重置", variant="secondary", scale=1)
             
-            result_text = gr.Textbox(label="操作结果", interactive=False)
-            
-            # 提交事件
-            save_button.click(
-                fn=lambda m, a, d, g, ga, gt, gc, gd, r, sh, n, dm, ll: self._save_config({
-                    "master_name": m,
-                    "auto_reply_enabled": a,
-                    "default_reply": d,
-                    "gewechat_base_url": g,
-                    "gewechat_app_id": ga,
-                    "gewechat_token": gt,
-                    "gewechat_callback_url": gc,
-                    "gewechat_download_url": gd,
-                    "is_remote_server": r,
-                    "server_host": sh,
-                    "ngrok_auth_token": n,
-                    "debug_mode": dm,
-                    "log_level": ll
-                }),
-                inputs=[
-                    master_name, auto_reply_enabled, default_reply,
-                    gewechat_base_url, gewechat_app_id, gewechat_token, gewechat_callback_url, gewechat_download_url,
-                    is_remote_server, server_host, ngrok_auth_token, debug_mode, log_level
-                ],
-                outputs=result_text
+            result_text = gr.Textbox(
+                label="操作结果",
+                interactive=False
             )
             
-            # 重置按钮事件
-            def reset_form():
-                return (
-                    config_data.get("master_name", "filehelper"),
-                    config_data.get("auto_reply_enabled", False),
-                    config_data.get("default_reply", "收到您的消息，稍后回复。"),
-                    config_data.get("gewechat_base_url", ""),
-                    config_data.get("gewechat_app_id", ""),
-                    config_data.get("gewechat_token", ""),
-                    config_data.get("gewechat_callback_url", ""),
-                    config_data.get("gewechat_download_url", ""),
-                    config_data.get("is_remote_server", False),
-                    config_data.get("server_host", "localhost"),
-                    config_data.get("ngrok_auth_token", ""),
-                    config_data.get("debug_mode", False),
-                    config_data.get("log_level", "INFO"),
-                    "表单已重置为当前配置"
-                )
+            # 更新chatflow信息
+            def update_chatflow_info(description: str) -> Tuple[str, List[str]]:
+                instance = self._get_chatflow_by_description(description)
+                api_key = instance.get("api_key", "")
+                conversations = instance.get("conversations", {})
+                return api_key, list(conversations.keys())
+            
+            selected_chatflow.change(
+                fn=update_chatflow_info,
+                inputs=[selected_chatflow],
+                outputs=[api_key_text, conversation_radio]
+            )
+            
+            # 保存设置
+            def save_settings(description: str, conversation_name: str, voice_enabled: bool) -> str:
+                if not description:
+                    return "❌ 请选择一个聊天机器人"
+                if not conversation_name:
+                    return "❌ 请选择一个对话"
                 
+                # 获取完整信息
+                instance = self._get_chatflow_by_description(description)
+                api_key = instance.get("api_key", "")
+                conversations = instance.get("conversations", {})
+                conversation_id = conversations.get(conversation_name, "")
+                
+                # 更新设置
+                success = self.settings_manager.update_settings({
+                    "selected_chatflow": {
+                        "description": description,
+                        "api_key": api_key,
+                        "conversation": {
+                            "name": conversation_name,
+                            "id": conversation_id
+                        }
+                    },
+                    "voice_reply_enabled": voice_enabled
+                })
+                
+                return "✅ 设置已保存！" if success else "❌ 保存设置失败，请重试"
+            
+            save_button.click(
+                fn=save_settings,
+                inputs=[selected_chatflow, conversation_radio, voice_enabled],
+                outputs=[result_text]
+            )
+            
+            # 重置表单
+            def reset_form():
+                current_settings = self.settings_manager.get_settings()
+                current_chatflow = current_settings.get("selected_chatflow", {})
+                description = current_chatflow.get("description", "")
+                api_key = current_chatflow.get("api_key", "")
+                conversation = current_chatflow.get("conversation", {})
+                
+                # 获取对话列表
+                instance = self._get_chatflow_by_description(description)
+                conversations = list(instance.get("conversations", {}).keys())
+                
+                return (
+                    description,
+                    api_key,
+                    conversations,
+                    conversation.get("name", ""),
+                    current_settings.get("voice_reply_enabled", False),
+                    "🔄 已重置为当前设置"
+                )
+            
             reset_button.click(
                 fn=reset_form,
                 inputs=[],
                 outputs=[
-                    master_name, auto_reply_enabled, default_reply,
-                    gewechat_base_url, gewechat_app_id, gewechat_token, gewechat_callback_url, gewechat_download_url,
-                    is_remote_server, server_host, ngrok_auth_token, debug_mode, log_level,
+                    selected_chatflow,
+                    api_key_text,
+                    conversation_radio,
+                    conversation_radio,
+                    voice_enabled,
                     result_text
                 ]
             )
@@ -254,11 +207,11 @@ class SettingsApp:
         self.interface = self._create_interface()
         
         # 检查是否需要使用Ngrok
-        is_remote_server = self.config.get("is_remote_server", False)
+        is_remote_server = self.settings_manager.get_settings().get("is_remote_server", False)
         
         if not is_remote_server:
             # 在本地模式下使用Ngrok
-            ngrok_auth_token = self.config.get("ngrok_auth_token")
+            ngrok_auth_token = self.settings_manager.get_settings().get("ngrok_auth_token")
             
             if ngrok_auth_token:
                 try:
@@ -302,7 +255,7 @@ class SettingsApp:
                 self.public_url = f"http://localhost:{port}"
         else:
             # 在远程服务器模式下，直接使用服务器URL
-            server_host = self.config.get("server_host", "localhost")
+            server_host = self.settings_manager.get_settings().get("server_host", "localhost")
             self.public_url = f"http://{server_host}:{port}"
             
         # 在新线程中启动Gradio界面
