@@ -53,21 +53,21 @@ class Channel:
             logging.debug(f"当前选中的chatflow: {chatflow_description}")
 
 
-            # 检查是否启用了自动回复
-            if not self.config.get('auto_reply_enabled', False):
-                logging.info("自动回复未启用，忽略普通消息")
-                return "ignored"
+            # # 检查是否启用了自动回复
+            # if not self.config.get('auto_reply_enabled', False):
+            #     logging.info("自动回复未启用，忽略普通消息")
+            #     return "ignored"
                 
-            try:
-                # 发送默认回复
-                default_reply = self.config.get('default_reply', '收到您的消息，稍后回复。')
-                master_name = self.config.get('master_name')
-                self.send_text_message_by_name(master_name, default_reply)
-                logging.info(f"已发送默认回复")
-                return "success"
-            except Exception as e:
-                logging.error(f"处理消息时出错: {str(e)}")
-                return "error"
+            # try:
+            #     # 发送默认回复
+            #     default_reply = self.config.get('default_reply', '收到您的消息，稍后回复。')
+            #     master_name = self.config.get('master_name')
+            #     self.send_text_message_by_name(master_name, default_reply)
+            #     logging.info(f"已发送默认回复")
+            #     return "success"
+            # except Exception as e:
+            #     logging.error(f"处理消息时出错: {str(e)}")
+            #     return "error"
 
     def send_text_message_by_name(self, name, message):
         """

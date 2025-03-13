@@ -33,6 +33,7 @@ ENV/
 config.json
 wxChatBot.code-workspace
 TODO
+config.json
 
 # Local configuration
 *.log 
