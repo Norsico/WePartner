@@ -32,6 +32,7 @@ ENV/
 *.swo
 config.json
 wxChatBot.code-workspace
+TODO
 
 # Local configuration
 *.log 
