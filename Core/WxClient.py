@@ -55,6 +55,7 @@ class WxChatClient:
                     logger.success("回调地址设置成功")
                 else:
                     logger.warning(f"回调地址设置返回异常状态: {callback_resp}")
+                    logger.info("继续运行，回调可能仍然有效...")
                     self.client.logout(self.gewechat_app_id)
                     ClientFactory.reset()
                     # 重新登录

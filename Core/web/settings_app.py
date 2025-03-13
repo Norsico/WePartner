@@ -76,10 +76,9 @@ class SettingsApp:
                     selected_chatflow = gr.Dropdown(
                         choices=descriptions,
                         value=current_description if current_description in descriptions else None,
-                        label="选择聊天机器人",
-                        info="选择要使用的Dify聊天机器人",
-                        container=True,
-                        placeholder="请选择一个聊天机器人..."
+                        label="Dify聊天机器人",
+                        info="请选择一个聊天机器人...",
+                        container=True  
                     )
                     
                     # API Key显示
@@ -96,6 +95,7 @@ class SettingsApp:
                     current_conv_name = current_conv.get("name", "")
                     
                     conversation_radio = gr.Radio(
+                        
                         choices=initial_conversations,
                         value=current_conv_name if current_conv_name in initial_conversations else None,
                         label="选择对话",

@@ -1,4 +1,4 @@
-gradio==5.20.1
+gradio==4.44.1
 pyngrok==7.2.3
 qrcode==7.4.2
 Requests==2.32.3
