@@ -1,15 +1,15 @@
 {
   "chatflow": {
-    "app-I4J0Rp2LfRKGXWXKV2LCko2x": {
-      "description": "test1",
+    "test1": {
+      "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
       "created_at": "2025-03-11",
       "conversations": {
         "测试对话_1": "7ebfaf59-9689-4a4b-87a6-c57da9708aae"
       },
       "base_url": "http://localhost/v1"
     },
-    "app-I4J0Rp2LfRKGXxxxxdx": {
-      "description": "test2",
+    "test2": {
+      "api_key": "app-I4J0Rp2LfRKGXxxxxdx",
       "created_at": "2025-03-11",
       "conversations": {
         "测试对话_2": "7ebfaf59-9689-4a4b-87a6-cxxxxx"

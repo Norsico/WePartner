@@ -43,29 +43,30 @@ class DifyChatflow:
             # 确保必要的结构存在
             if "chatflow" not in data:
                 data["chatflow"] = {}
-            if self.api_key not in data["chatflow"]:
-                data["chatflow"][self.api_key] = self._create_default_config()
-            elif "conversations" not in data["chatflow"][self.api_key]:
+            if self.description not in data["chatflow"]:
+                data["chatflow"][self.description] = self._create_default_config()
+            elif "conversations" not in data["chatflow"][self.description]:
                 # 保留现有信息，添加缺失的字段
-                current_config = data["chatflow"][self.api_key]
+                current_config = data["chatflow"][self.description]
                 default_config = self._create_default_config()
                 default_config.update(current_config)
-                data["chatflow"][self.api_key] = default_config
+                data["chatflow"][self.description] = default_config
 
-            # 更新基础URL
-            data["chatflow"][self.api_key]["base_url"] = self.base_url
+            # 更新基础URL和API Key
+            data["chatflow"][self.description]["base_url"] = self.base_url
+            data["chatflow"][self.description]["api_key"] = self.api_key
             
             # 保存更新后的配置
             self._save_config(data)
             return data
         except Exception as e:
             print(f"加载配置文件失败: {str(e)}")
-            return {"chatflow": {self.api_key: self._create_default_config()}}
+            return {"chatflow": {self.description: self._create_default_config()}}
 
     def _create_default_config(self) -> Dict:
         """创建默认配置"""
         return {
-            "description": self.description or "未指定用途",
+            "api_key": self.api_key,
             "created_at": self._get_current_date(),
             "base_url": self.base_url,
             "conversations": {}
@@ -98,24 +99,24 @@ class DifyChatflow:
         if "chatflow" not in self.conversations:
             self.conversations["chatflow"] = {}
             
-        if self.api_key not in self.conversations["chatflow"]:
-            self.conversations["chatflow"][self.api_key] = {
-                "description": self.description or "未指定用途",
+        if self.description not in self.conversations["chatflow"]:
+            self.conversations["chatflow"][self.description] = {
+                "api_key": self.api_key,
                 "created_at": self._get_current_date(),
                 "conversations": {}
             }
             
         # 生成对话名称
-        conversation_name = name or f"对话_{len(self.conversations['chatflow'][self.api_key]['conversations']) + 1}"
+        conversation_name = name or f"对话_{len(self.conversations['chatflow'][self.description]['conversations']) + 1}"
         
         # 确保对话名称唯一
         base_name = conversation_name
         counter = 1
-        while conversation_name in self.conversations["chatflow"][self.api_key]["conversations"]:
+        while conversation_name in self.conversations["chatflow"][self.description]["conversations"]:
             counter += 1
             conversation_name = f"{base_name}_{counter}"
             
-        self.conversations["chatflow"][self.api_key]["conversations"][conversation_name] = conversation_id
+        self.conversations["chatflow"][self.description]["conversations"][conversation_name] = conversation_id
         self._save_conversations()
 
     def get_conversation_id(self, name: str) -> str:
@@ -127,7 +128,7 @@ class DifyChatflow:
         Returns:
             str: 对话ID，如果不存在则返回None
         """
-        return self.conversations.get("chatflow", {}).get(self.api_key, {}).get("conversations", {}).get(name)
+        return self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {}).get(name)
 
     def get_conversation_name_by_id(self, conversation_id: str) -> str:
         """根据对话ID获取对话名称
@@ -138,7 +139,7 @@ class DifyChatflow:
         Returns:
             str: 对话名称，如果不存在则返回None
         """
-        conversations = self.conversations.get("chatflow", {}).get(self.api_key, {}).get("conversations", {})
+        conversations = self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {})
         for name, conv_id in conversations.items():
             if conv_id == conversation_id:
                 return name
@@ -150,23 +151,22 @@ class DifyChatflow:
         Returns:
             Dict[str, str]: 对话名称到对话ID的映射
         """
-        return self.conversations.get("chatflow", {}).get(self.api_key, {}).get("conversations", {})
+        return self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {})
 
     def get_api_key_info(self) -> Dict:
         """获取当前API Key的信息"""
-        if "chatflow" in self.conversations and self.api_key in self.conversations["chatflow"]:
+        if "chatflow" in self.conversations and self.description in self.conversations["chatflow"]:
             return {
-                "description": self.conversations["chatflow"][self.api_key].get("description", ""),
-                "created_at": self.conversations["chatflow"][self.api_key].get("created_at", ""),
-                "conversation_count": len(self.conversations["chatflow"][self.api_key].get("conversations", {}))
+                "created_at": self.conversations["chatflow"][self.description].get("created_at", ""),
+                "conversation_count": len(self.conversations["chatflow"][self.description].get("conversations", {}))
             }
         return {}
 
     def update_api_key_description(self, description: str):
         """更新API Key的描述信息"""
-        if "chatflow" in self.conversations and self.api_key in self.conversations["chatflow"]:
+        if "chatflow" in self.conversations and self.description in self.conversations["chatflow"]:
             self.description = description
-            self.conversations["chatflow"][self.api_key]["description"] = description
+            self.conversations["chatflow"][self.description]["description"] = description
             self._save_conversations()
 
     def chat(self, 
@@ -253,7 +253,7 @@ class DifyChatflow:
             
             # 如果删除成功，同时从配置文件中移除
             if result.get("result") == "success":
-                conversations = self.conversations.get("chatflow", {}).get(self.api_key, {}).get("conversations", {})
+                conversations = self.conversations.get("chatflow", {}).get(self.description, {})
                 # 找到并删除对话
                 name_to_delete = None
                 for conv_name, conv_id in conversations.items():
@@ -262,7 +262,7 @@ class DifyChatflow:
                         break
                         
                 if name_to_delete:
-                    del self.conversations["chatflow"][self.api_key]["conversations"][name_to_delete]
+                    del self.conversations["chatflow"][self.description]["conversations"][name_to_delete]
                     self._save_conversations()
                 return True
             return False

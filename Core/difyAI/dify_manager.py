@@ -23,8 +23,8 @@ class DifyManager:
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
                 if "chatflow" in config:
-                    for api_key, info in config["chatflow"].items():
-                        description = info.get("description", "")
+                    for description, info in config["chatflow"].items():
+                        api_key = info.get("api_key", "")
                         base_url = info.get("base_url", "http://localhost/v1")
                         self.create_instance(api_key, description, base_url)
 
@@ -39,8 +39,10 @@ class DifyManager:
         Returns:
             DifyChatflow: 创建的实例
         """
-        if api_key in self.instances:
-            return self.instances[api_key]
+        # 检查是否已存在相同描述的实例
+        existing_instance = self.get_instance_by_name(description)
+        if existing_instance:
+            return existing_instance
         
         instance = DifyChatflow(
             api_key=api_key,
@@ -48,25 +50,25 @@ class DifyManager:
             base_url=base_url,
             config_file=self.config_file
         )
-        self.instances[api_key] = instance
+        self.instances[description] = instance
         return instance
 
     def get_instance(self, key: str) -> Optional[DifyChatflow]:
         """获取指定的DifyChatflow实例
         
         Args:
-            key: 可以是API密钥或实例描述名称
+            key: 实例描述名称或API密钥
             
         Returns:
             Optional[DifyChatflow]: 找到的实例，如果不存在返回None
         """
-        # 首先尝试作为API Key查找
+        # 首先尝试通过描述名称查找
         if key in self.instances:
             return self.instances[key]
         
-        # 如果不是API Key，尝试通过描述名称查找
+        # 如果不是描述名称，尝试通过API Key查找
         for instance in self.instances.values():
-            if instance.description == key:
+            if instance.api_key == key:
                 return instance
         
         return None
@@ -80,10 +82,7 @@ class DifyManager:
         Returns:
             Optional[DifyChatflow]: 找到的实例，如果不存在返回None
         """
-        for instance in self.instances.values():
-            if instance.description == name:
-                return instance
-        return None
+        return self.instances.get(name)
 
     def get_instance_by_api_key(self, api_key: str) -> Optional[DifyChatflow]:
         """通过API密钥获取DifyChatflow实例
@@ -94,19 +93,22 @@ class DifyManager:
         Returns:
             Optional[DifyChatflow]: 找到的实例，如果不存在返回None
         """
-        return self.instances.get(api_key)
+        for instance in self.instances.values():
+            if instance.api_key == api_key:
+                return instance
+        return None
 
-    def remove_instance(self, api_key: str) -> bool:
+    def remove_instance(self, name: str) -> bool:
         """移除指定的DifyChatflow实例
         
         Args:
-            api_key: 要移除的实例的API密钥
+            name: 要移除的实例的描述名称
             
         Returns:
             bool: 是否成功移除
         """
-        if api_key in self.instances:
-            del self.instances[api_key]
+        if name in self.instances:
+            del self.instances[name]
             return True
         return False
 
@@ -117,9 +119,10 @@ class DifyManager:
             List[Dict]: 实例信息列表
         """
         result = []
-        for api_key, instance in self.instances.items():
+        for description, instance in self.instances.items():
             info = instance.get_api_key_info()
-            info["api_key"] = api_key
+            info["description"] = description
+            info["api_key"] = instance.api_key
             info["base_url"] = instance.base_url
             result.append(info)
         return result
