@@ -13,6 +13,7 @@ from typing import List, Dict, Tuple
 from Core.Logger import Logger
 from Core.difyAI.dify_manager import DifyManager
 from config import Config
+from .settings_manager import SettingsManager
 
 logger = Logger()
 
@@ -20,6 +21,7 @@ class SettingsApp:
     def __init__(self):
         """初始化设置应用"""
         self.config = Config()
+        self.settings_manager = SettingsManager()
         self.dify_manager = DifyManager()
         self.interface = None
         self.public_url = None
@@ -29,7 +31,17 @@ class SettingsApp:
         
     def _load_chatflow_info(self) -> List[Dict]:
         """加载所有chatflow信息"""
-        return self.dify_manager.list_instances()
+        instances = self.dify_manager.list_instances()
+        # 确保每个实例都包含完整的conversations信息
+        for instance in instances:
+            description = instance.get("description", "")
+            if description:
+                dify_instance = self.dify_manager.get_instance_by_name(description)
+                if dify_instance:
+                    conversations = dify_instance.list_conversations()
+                    logger.info(f"加载对话列表 - 描述: {description}, 对话: {conversations}")
+                    instance["conversations"] = conversations
+        return instances
         
     def _get_chatflow_by_description(self, description: str) -> Dict:
         """根据描述获取chatflow信息"""
@@ -55,8 +67,9 @@ class SettingsApp:
                 """
             )
             
-            # 加载当前设置
-            current_chatflow = self.config.get("selected_chatflow", {})
+            # 加载当前设置和chatflow信息
+            current_settings = self.settings_manager.get_settings()
+            current_chatflow = current_settings.get("selected_chatflow", {})
             current_description = current_chatflow.get("description", "")
             
             with gr.Row():
@@ -68,10 +81,20 @@ class SettingsApp:
                     # 获取初始API Key和对话列表
                     initial_api_key = ""
                     initial_conversations = []
+                    current_conv_name = ""
+                    
                     if current_description and current_description in descriptions:
-                        instance = self._get_chatflow_by_description(current_description)
-                        initial_api_key = instance.get("api_key", "")
-                        initial_conversations = list(instance.get("conversations", {}).keys())
+                        # 从chatflow_info中获取当前选中的chatflow信息
+                        for info in chatflow_info:
+                            if info.get("description") == current_description:
+                                initial_api_key = info.get("api_key", "")
+                                initial_conversations = list(info.get("conversations", {}).keys()) if info.get("conversations") else []
+                                # 如果当前有选中的对话，检查是否在对话列表中
+                                current_conv = current_chatflow.get("conversation", {})
+                                temp_conv_name = current_conv.get("name", "")
+                                if temp_conv_name in initial_conversations:
+                                    current_conv_name = temp_conv_name
+                                break
                     
                     selected_chatflow = gr.Dropdown(
                         choices=descriptions,
@@ -91,30 +114,26 @@ class SettingsApp:
                     )
                     
                     # 对话选择
-                    current_conv = current_chatflow.get("conversation", {})
-                    current_conv_name = current_conv.get("name", "")
-                    
-                    conversation_radio = gr.Radio(
-                        
+                    conversation_select = gr.Dropdown(
                         choices=initial_conversations,
                         value=current_conv_name if current_conv_name in initial_conversations else None,
                         label="选择对话",
                         info="选择一个要使用的对话",
-                        container=True
+                        container=True,
+                        allow_custom_value=True
                     )
                     
                     # 语音设置
                     voice_enabled = gr.Checkbox(
-                        value=self.config.get("voice_reply_enabled", False),
+                        value=self.settings_manager.is_voice_reply_enabled(),
                         label="启用语音回复",
                         info="是否将AI回复转换为语音",
                         container=True
-                    )
+                            )
             
             # 保存按钮和结果显示
             with gr.Row():
                 save_button = gr.Button("💾 保存设置", variant="primary", scale=2)
-                reset_button = gr.Button("🔄 重置", variant="secondary", scale=1)
             
             result_text = gr.Textbox(
                 label="操作结果",
@@ -126,16 +145,30 @@ class SettingsApp:
             def update_chatflow_info(description: str) -> Tuple[str, List[str]]:
                 if not description:
                     return "", []
-                instance = self._get_chatflow_by_description(description)
-                api_key = instance.get("api_key", "")
-                conversations = instance.get("conversations", {})
-                conversation_list = list(conversations.keys())
+                
+                logger.info(f"更新chatflow信息 - 描述: {description}")
+                
+                # 获取chatflow实例
+                instance = self.dify_manager.get_instance_by_name(description)
+                if not instance:
+                    logger.warning(f"未找到chatflow实例: {description}")
+                    return "", []
+                
+                # 获取对话列表
+                conversations = instance.list_conversations()
+                logger.info(f"获取到对话列表: {conversations}")
+                
+                # 确保返回正确的格式
+                api_key = instance.api_key
+                conversation_list = list(conversations.keys()) if isinstance(conversations, dict) else []
+                
+                logger.info(f"返回结果 - API Key: {api_key}, 对话列表: {conversation_list}")
                 return api_key, conversation_list
             
             selected_chatflow.change(
                 fn=update_chatflow_info,
                 inputs=[selected_chatflow],
-                outputs=[api_key_text, conversation_radio],
+                outputs=[api_key_text, conversation_select],
                 queue=False
             )
             
@@ -146,69 +179,47 @@ class SettingsApp:
                 if not conversation_name:
                     return "❌ 请选择一个对话"
                 
-                # 获取完整信息
-                instance = self._get_chatflow_by_description(description)
-                api_key = instance.get("api_key", "")
-                conversations = instance.get("conversations", {})
-                conversation_id = conversations.get(conversation_name, "")
+                # 如果conversation_name是列表，取第一个元素
+                if isinstance(conversation_name, list):
+                    conversation_name = conversation_name[0] if conversation_name else ""
+                    
+                logger.info(f"保存设置 - 描述: {description}, 对话名称: {conversation_name}, 语音: {voice_enabled}")
                 
-                if not conversation_id:
-                    return "❌ 无法获取对话ID，请重新选择对话"
-                
-                # 更新配置
-                self.config.set("selected_chatflow", {
-                    "description": description,
-                    "api_key": api_key,
-                    "conversation": {
-                        "name": conversation_name,
-                        "id": conversation_id
-                    }
-                })
-                
-                # 更新语音设置
-                self.config.set("voice_reply_enabled", voice_enabled)
-                
-                return "✅ 设置已保存！"
+                try:
+                    # 获取chatflow实例
+                    instance = self.dify_manager.get_instance_by_name(description)
+                    if not instance:
+                        return "❌ 无法找到选中的聊天机器人信息"
+                    
+                    # 获取对话列表
+                    conversations = instance.list_conversations()
+                    logger.info(f"当前对话列表: {conversations}")
+                    
+                    # 获取对话ID
+                    conversation_id = conversations.get(conversation_name) if isinstance(conversations, dict) else None
+                    if not conversation_id:
+                        return "❌ 无法获取对话ID，请重新选择对话"
+                    
+                    logger.info(f"找到对话ID: {conversation_id}")
+                    
+                    # 更新chatflow设置
+                    if not self.settings_manager.set_selected_chatflow(description, instance.api_key, conversation_name, conversation_id):
+                        return "❌ 保存chatflow设置失败"
+                    
+                    # 更新语音设置
+                    if not self.settings_manager.set_voice_reply_enabled(voice_enabled):
+                        return "❌ 保存语音设置失败"
+                    
+                    return "✅ 设置已保存！"
+                    
+                except Exception as e:
+                    logger.error(f"保存设置时出错: {str(e)}")
+                    return f"❌ 保存设置失败: {str(e)}"
             
             save_button.click(
                 fn=save_settings,
-                inputs=[selected_chatflow, conversation_radio, voice_enabled],
+                inputs=[selected_chatflow, conversation_select, voice_enabled],
                 outputs=[result_text],
-                queue=False
-            )
-            
-            # 重置表单
-            def reset_form():
-                current_chatflow = self.config.get("selected_chatflow", {})
-                description = current_chatflow.get("description", "")
-                api_key = current_chatflow.get("api_key", "")
-                conversation = current_chatflow.get("conversation", {})
-                voice_enabled = self.config.get("voice_reply_enabled", False)
-                
-                # 获取对话列表
-                instance = self._get_chatflow_by_description(description)
-                conversations = list(instance.get("conversations", {}).keys())
-                
-                return (
-                    description,
-                    api_key,
-                    conversations,
-                    conversation.get("name", ""),
-                    voice_enabled,
-                    "🔄 已重置为当前设置"
-                )
-            
-            reset_button.click(
-                fn=reset_form,
-                inputs=[],
-                outputs=[
-                    selected_chatflow,
-                    api_key_text,
-                    conversation_radio,
-                    conversation_radio,
-                    voice_enabled,
-                    result_text
-                ],
                 queue=False
             )
             

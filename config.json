@@ -9,9 +9,10 @@
     "is_remote_server": false,
     "ngrok_auth_token": "2tn5cUo5m7VrA4uYM3pY2GukYVj_3WkXHuJyb2nfLZLwsj1BH",
     "auto_reply_enabled": false,
-    "start_time": 1741865757.8084767,
+    "start_time": 1741935854.6985285,
     "debug_mode": true,
     "log_level": "DEBUG",
     "default_reply": "收到您的消息，稍后回复。",
-    "server_host": "localhost"
+    "server_host": "localhost",
+    "call_back_success_falg": true
 }

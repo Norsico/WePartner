@@ -128,7 +128,10 @@ class DifyChatflow:
         Returns:
             str: 对话ID，如果不存在则返回None
         """
-        return self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {}).get(name)
+        conversations = self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {})
+        if isinstance(conversations, dict):
+            return conversations.get(name)
+        return None
 
     def get_conversation_name_by_id(self, conversation_id: str) -> str:
         """根据对话ID获取对话名称
@@ -151,7 +154,14 @@ class DifyChatflow:
         Returns:
             Dict[str, str]: 对话名称到对话ID的映射
         """
-        return self.conversations.get("chatflow", {}).get(self.description, {}).get("conversations", {})
+        try:
+            if self.description in self.conversations.get("chatflow", {}):
+                conversations = self.conversations["chatflow"][self.description].get("conversations", {})
+                return conversations if isinstance(conversations, dict) else {}
+            return {}
+        except Exception as e:
+            print(f"获取对话列表失败: {str(e)}")
+            return {}
 
     def get_api_key_info(self) -> Dict:
         """获取当前API Key的信息"""

@@ -56,20 +56,22 @@ class WxChatClient:
                 else:
                     logger.warning(f"回调地址设置返回异常状态: {callback_resp}")
                     logger.info("继续运行，回调可能仍然有效...")
-                    self.client.logout(self.gewechat_app_id)
-                    ClientFactory.reset()
-                    # 重新登录
-                    app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
-                    if error_msg:
-                        logger.error(f"重新登录失败: {error_msg}")
-                    else:
-                        logger.success(f"重新登录成功，应用ID: {app_id}")
-                    # 重新设置回调
-                    callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
-                    if callback_resp.get("ret") == 200:
-                        logger.success("重新登录后回调地址设置成功")
-                    else:
-                        logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
+                    if not self.config.get("call_back_success_falg"):
+                        self.client.logout(self.gewechat_app_id)
+                        ClientFactory.reset()
+                        # 重新登录
+                        app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
+                        if error_msg:
+                            logger.error(f"重新登录失败: {error_msg}")
+                        else:
+                            logger.success(f"重新登录成功，应用ID: {app_id}")
+                        # 重新设置回调
+                        callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
+                        if callback_resp.get("ret") == 200:
+                            logger.success("重新登录后回调地址设置成功")
+                        else:
+                            logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
+                            logger.warning(f"可能还可以使用，请发送消息测试，如果还不行，可以尝试重新登录微信")
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
                 logger.info("继续运行，回调可能仍然有效...")

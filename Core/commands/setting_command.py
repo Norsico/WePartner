@@ -47,15 +47,7 @@ class SettingCommand(BaseCommand):
             settings_url = settings_app.start()
             
             # 发送设置链接
-            welcome_text = f"""
-wxChatBot 设置界面已启动！
-
-请访问以下链接进行设置:
-{settings_url}
-
-您可以在这个网页上管理机器人的所有设置。
-设置保存后会立即生效，无需重启机器人。
-            """
+            welcome_text = f"设置界面url: {settings_url}"
             
             self.channel.send_text_message_by_name(master_name, welcome_text)
             logging.success(f"已发送设置Web界面链接: {settings_url}")
