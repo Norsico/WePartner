@@ -15,6 +15,7 @@ class DifyManager:
         self.config_dir = config_dir
         self.config_file = os.path.join(config_dir, "dify_config.json")
         self.instances: Dict[str, DifyChatflow] = {}
+        self.dify_config = {}
         self._load_config()
 
     def _load_config(self):
@@ -22,11 +23,16 @@ class DifyManager:
         if os.path.exists(self.config_file):
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
+                self.dify_config = config
                 if "chatflow" in config:
                     for description, info in config["chatflow"].items():
                         api_key = info.get("api_key", "")
                         base_url = info.get("base_url", "http://localhost/v1")
                         self.create_instance(api_key, description, base_url)
+    
+    def get_dify_config(self):
+        """获取Dify配置"""
+        return self.dify_config
 
     def create_instance(self, api_key: str, description: str = None, base_url: str = "http://localhost/v1") -> DifyChatflow:
         """创建新的DifyChatflow实例
