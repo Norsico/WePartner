@@ -1,7 +1,6 @@
 {
     "master_name": "your_nickname",
     "dify_api_base": "http://your_dify_server/v1",
-    "current_workflow": "chat",
     "gewechat_base_url": "http://your_gewechat_server:2531/v2/api",
     "gewechat_token": "",
     "gewechat_app_id": "",
@@ -9,8 +8,6 @@
     "gewechat_download_url": "http://your_gewechat_server:2532/download",
     "is_remote_server": false,
     "ngrok_auth_token": "your_ngrok_token",
-    "auto_reply_enabled": false,
-    "default_reply": "收到您的消息，稍后回复。",
     "debug_mode": false,
     "log_level": "INFO",
     "server_host": "localhost"

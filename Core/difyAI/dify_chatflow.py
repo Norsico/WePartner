@@ -3,6 +3,9 @@ import requests
 import os
 from typing import Dict, List
 from dataclasses import dataclass
+from Core.Logger import Logger
+
+logger = Logger()
 
 @dataclass
 class FileInfo:
@@ -219,6 +222,8 @@ class DifyChatflow:
                 } for f in (files or [])
             ]
         }
+        logger.debug(f"请求参数: {payload}")
+        logger.info("正在发送请求...")
 
         try:
             response = requests.post(url, json=payload, headers=self.headers)
@@ -306,27 +311,21 @@ if __name__ == '__main__':
     # 初始化客户端
     client = DifyChatflow(
         api_key=api_key,
-        description="用于测试的API Key",
+        description="test1",
         base_url=base_url
     )
     
     try:
         # 列出当前API Key下的所有对话
         conversations = client.list_conversations()
-        print("\n当前API Key的对话列表:")
-        if conversations:
-            for name, conv_id in conversations.items():
-                print(f"名称: {name}, ID: {conv_id}")
-        else:
-            print("暂无对话")
-        print()
+        print(f"当前API Key的对话列表: {conversations}")
         
-        # # 开始新对话
-        # response = client.chat(query="hello", conversation_name="新对话")
-        # print(f"AI回复: {response.get('answer')}\n")
+        # 开始新对话
+        response = client.chat(query="hello", conversation_name="新对话")
+        print(f"AI回复: {response.get('answer')}\n")
         
         # # 继续已有对话
-        # response = client.chat(query="下午好", conversation_name="测试对话_1")
+        # response = client.chat(query="晚上好", conversation_name="测试对话_1")
         # print(f"AI回复: {response.get('answer')}\n")
         
         # # 再次列出对话
@@ -334,9 +333,10 @@ if __name__ == '__main__':
         # for name, conv_id in client.list_conversations().items():
         #     print(f"名称: {name}, ID: {conv_id}")
         # print()
+
         
-        # 删除对话（使用新方法）
-        client.delete_conversation_by_name("测试对话_1")
+        # # 删除对话（使用新方法）
+        # client.delete_conversation_by_name("测试对话_1")
             
     except Exception as e:
         print(f"错误: {str(e)}")

@@ -2,8 +2,7 @@ from Core.Logger import Logger
 from Core.bridge.context import ContextType, Context
 from Core.commands.command_manager import CommandManager
 from Core.web.settings_manager import SettingsManager
-import os
-import re
+from Core.voice.audio_convert import mp3_to_silk
 from Core.difyAI.dify_manager import DifyManager
 
 logging = Logger()
@@ -57,23 +56,30 @@ class Channel:
 
             dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
 
-            print(f"当前选中的chatflow: {dify_client.list_conversations()}")
+            logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
 
-            # # 检查是否启用了自动回复
-            # if not self.config.get('auto_reply_enabled', False):
-            #     logging.info("自动回复未启用，忽略普通消息")
-            #     return "ignored"
+            # 继续已有对话
+            response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", ""))
+            logging.info(f"AI回复: {response.get('answer')}\n")
                 
-            # try:
-            #     # 发送默认回复
-            #     default_reply = self.config.get('default_reply', '收到您的消息，稍后回复。')
-            #     master_name = self.config.get('master_name')
-            #     self.send_text_message_by_name(master_name, default_reply)
-            #     logging.info(f"已发送默认回复")
-            #     return "success"
-            # except Exception as e:
-            #     logging.error(f"处理消息时出错: {str(e)}")
-            #     return "error"
+            try:
+                # 发送回复
+                master_name = self.config.get('master_name')
+                if voice_reply_enabled:
+                    # 如果是mp3文件，转换为silk格式
+                    silk_path = response.get('answer') + '.silk'
+                    duration = mp3_to_silk(response.get('answer'), silk_path)
+                    callback_url = self.config.get("gewechat_callback_url")
+                    silk_url = callback_url + "?file=" + silk_path
+                    self.client.post_voice(self.app_id, master_name, silk_url, duration)
+                    logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
+                else:
+                    self.send_text_message_by_name(master_name, response.get('answer'))
+                logging.info(f"已发送回复")
+                return "success"
+            except Exception as e:
+                logging.error(f"处理消息时出错: {str(e)}")
+                return "error"
 
     def send_text_message_by_name(self, name, message):
         """

@@ -19,8 +19,6 @@ class Config:
     # 默认配置
     DEFAULT_CONFIG = {
         "master_name": "filehelper",
-        "auto_reply_enabled": False,
-        "default_reply": "收到您的消息，稍后回复。",
         "is_remote_server": False,
         "server_host": "localhost",
         "debug_mode": False,

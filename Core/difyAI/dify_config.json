@@ -4,16 +4,8 @@
       "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
       "created_at": "2025-03-11",
       "conversations": {
-        "测试对话_1": "7ebfaf59-9689-4a4b-87a6-c57da9708aae"
-      },
-      "base_url": "http://localhost/v1"
-    },
-    "test2": {
-      "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
-      "created_at": "2025-03-11",
-      "conversations": {
-        "测试对话_2": "7ebfaf59-9689-4a4b-87a6-c57da9708aae",
-        "测试对话_3": "7ebfaf59-9689-4a4b-87a6-c57da9708aae"
+        "测试对话_1": "7ebfaf59-9689-4a4b-87a6-c57da9708aae",
+        "新对话": "97b87a1c-488d-42a9-9fc4-c57164cdba40"
       },
       "base_url": "http://localhost/v1"
     }
