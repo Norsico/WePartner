@@ -2,7 +2,7 @@ from Core.Logger import Logger
 from Core.bridge.context import ContextType, Context
 from Core.commands.command_manager import CommandManager
 from Core.web.settings_manager import SettingsManager
-from Core.voice.audio_convert import mp3_to_silk
+from Core.voice.audio_convert import wav_to_silk
 from Core.difyAI.dify_manager import DifyManager
 
 logging = Logger()
@@ -59,18 +59,22 @@ class Channel:
             logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
 
             # 继续已有对话
-            response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", ""))
-            logging.info(f"AI回复: {response.get('answer')}\n")
+            # response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", "")).get('answer')
+            response = "测试"
+            logging.info(f"AI回复: {response}\n")
                 
             try:
                 # 发送回复
                 master_name = self.config.get('master_name')
                 if voice_reply_enabled:
                     # 如果是mp3文件，转换为silk格式
-                    silk_path = "./test_voice.wav" + '.silk'
-                    duration = mp3_to_silk(response.get('answer'), silk_path)
+                    silk_path = "E:/Cursor-Main/wxChatBot/test_voice.wav" + '.silk'
+                    print(silk_path)
+                    duration = wav_to_silk("E:/Cursor-Main/wxChatBot/test_voice.wav", silk_path)
+                    print(duration)
                     callback_url = self.config.get("gewechat_callback_url")
                     silk_url = callback_url + "?file=" + silk_path
+                    print(silk_url)
                     self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
                     logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
                 else:

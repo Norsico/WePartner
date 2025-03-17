@@ -223,7 +223,7 @@ class DifyChatflow:
             ]
         }
         logger.debug(f"请求参数: {payload}")
-        logger.info("正在发送请求...")
+        logger.info("正在生成回复...")
 
         try:
             response = requests.post(url, json=payload, headers=self.headers)
