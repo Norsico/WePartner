@@ -42,9 +42,8 @@ class SettingCommand(BaseCommand):
         master_name = self.config.get('master_name')
         
         try:
-            # 获取设置应用实例并启动
-            settings_app = get_settings_app()
-            settings_url = settings_app.start()
+            # 获取设置界面url
+            settings_url = self.config.get('settings_url')
             
             # 发送设置链接
             welcome_text = f"设置界面url: {settings_url}"

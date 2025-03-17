@@ -1,11 +1,11 @@
 {
   "selected_chatflow": {
-    "description": "test1",
+    "description": "test2",
     "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
     "conversation": {
-      "name": "测试对话_1",
+      "name": "测试对话_3",
       "id": "7ebfaf59-9689-4a4b-87a6-c57da9708aae"
     }
   },
-  "voice_reply_enabled": false
+  "voice_reply_enabled": true
 }

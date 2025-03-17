@@ -202,9 +202,11 @@ class SettingsApp:
         thread = threading.Thread(target=run_interface, daemon=True)
         thread.start()
         
-        time.sleep(2)
+        time.sleep(5)
         self.is_running = True
         logger.success(f"设置界面已启动，访问URL: {self.public_url} \n或者 {self.interface.share_url}")
+
+        self.public_url = self.interface.share_url
         
         return self.interface.share_url
         
