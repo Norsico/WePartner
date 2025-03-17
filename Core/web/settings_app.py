@@ -204,9 +204,9 @@ class SettingsApp:
         
         time.sleep(2)
         self.is_running = True
-        logger.success(f"设置界面已启动，访问URL: {self.public_url}")
+        logger.success(f"设置界面已启动，访问URL: {self.public_url} \n或者 {self.interface.share_url}")
         
-        return self.public_url
+        return self.interface.share_url
         
 # 单例模式，确保全局只有一个设置应用实例
 _instance = None
