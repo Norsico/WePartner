@@ -9,9 +9,6 @@ import threading
 import time
 from pyngrok import ngrok
 from typing import List, Dict
-from pydantic import BaseModel
-from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -21,10 +18,6 @@ from Core.Logger import Logger
 from Core.difyAI.dify_manager import DifyManager
 from Core.web.settings_manager import SettingsManager
 
-# 配置Pydantic模型
-class Settings(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
 
 logger = Logger()
 
@@ -41,36 +34,9 @@ class SettingsApp:
         self.is_running = False
         self.chatflow_info = self.dify_manager.get_dify_config()
         self.settings = self.settings_manager.get_settings()
-
-    def _get_default_chatflow(self):
-        """获取默认chatflow"""
-        return self.settings.get('selected_chatflow', {}).get('description')
-
-    def _get_default_conversation(self):
-        """获取默认对话"""
-        return self.settings.get('selected_chatflow', {}).get('conversation', {}).get('name')
-
-        
-    def _get_chatflow_by_description(self, description: str) -> Dict:
-        """根据描述获取chatflow信息"""
-        instance = self.dify_manager.get_instance_by_name(description)
-        if instance:
-            info = instance.get_api_key_info()
-            info["description"] = description
-            info["api_key"] = instance.api_key
-            info["base_url"] = instance.base_url
-            info["conversations"] = instance.list_conversations()
-            return info
-        return {}
         
     def _create_interface(self):
         """创建Gradio界面"""
-        def initialize_state():
-            """初始化状态，获取最新的settings"""
-            return {
-                "selected_chatflow": self._get_default_chatflow(),
-                "selected_conversation": self._get_default_conversation()
-            }
         
         def update_conversations(chatflow_name):
             """根据选择的chatflow更新对话列表"""
@@ -127,10 +93,6 @@ class SettingsApp:
                 return "语音设置保存失败，请检查日志"
 
         with gr.Blocks(title="wxChatBot 设置", theme=gr.themes.Soft(), analytics_enabled=False) as interface:
-
-            # 动态初始化状态
-            state = gr.State(value=initialize_state)
-
             # 标题和说明
             gr.Markdown(
                 """
@@ -152,15 +114,15 @@ class SettingsApp:
                         gr.Markdown("### 选择Chatflow")
                         chatflow_radio = gr.Radio(
                             choices=chatflow_names,
-                            value=state.value["selected_chatflow"],
+                            value=self.settings.get('selected_chatflow', {}).get('description'),
                             label="可用的Chatflow列表"
                         )
                     
                         # 对话列表
                         gr.Markdown("### 选择对话")
                         conversation_radio = gr.Radio(
-                            choices=list(self.chatflow_info.get('chatflow', {}).get(state.value["selected_chatflow"], {}).get('conversations', {}).keys()),
-                            value=state.value["selected_conversation"],
+                            choices=list(self.chatflow_info.get('chatflow', {}).get(self.settings.get('selected_chatflow', {}).get('description'), {}).get('conversations', {}).keys()),
+                            value=self.settings.get('selected_chatflow', {}).get('conversation', {}).get('name'),
                             label="可用的对话列表"
                         )
                         
@@ -214,76 +176,27 @@ class SettingsApp:
             
         return interface
         
-    def start(self, port=7860):
+    def start(self, port=7863):
         """启动设置应用"""
         if self.is_running:
             return self.public_url
             
         # 创建界面
         self.interface = self._create_interface()
-        
-        # 检查是否需要使用Ngrok
-        is_remote_server = self.config.get("is_remote_server", False)
-        
-        if not is_remote_server:
-            # 在本地模式下使用Ngrok
-            ngrok_auth_token = self.config.get("ngrok_auth_token")
-            
-            if ngrok_auth_token:
-                try:
-                    # 设置Ngrok认证
-                    ngrok.set_auth_token(ngrok_auth_token)
-                    
-                    # 先关闭所有现有的Ngrok隧道
-                    try:
-                        tunnels = ngrok.get_tunnels()
-                        for tunnel in tunnels:
-                            logger.info(f"关闭现有Ngrok隧道: {tunnel.public_url}")
-                            ngrok.disconnect(tunnel.public_url)
-                    except Exception as disconnect_err:
-                        logger.warning(f"关闭现有Ngrok隧道时出错: {str(disconnect_err)}")
-                    
-                    # 添加重试机制
-                    max_retries = 3
-                    retry_count = 0
-                    
-                    while retry_count < max_retries:
-                        try:
-                            # 启动Ngrok隧道
-                            public_url = ngrok.connect(port, bind_tls=True).public_url
-                            break
-                        except Exception as connect_err:
-                            retry_count += 1
-                            if retry_count >= max_retries:
-                                raise
-                            logger.warning(f"Ngrok连接失败，正在重试 ({retry_count}/{max_retries}): {str(connect_err)}")
-                            time.sleep(2)
-                    
-                    self.public_url = public_url
-                    logger.success(f"Ngrok隧道已建立，公共URL: {self.public_url}")
-                except Exception as e:
-                    logger.error(f"Ngrok隧道建立失败: {str(e)}")
-                    self.public_url = f"http://localhost:{port}"
-            else:
-                logger.warning("未设置Ngrok认证令牌，使用本地URL")
-                self.public_url = f"http://localhost:{port}"
-        else:
-            # 在远程服务器模式下，直接使用服务器URL
-            server_host = self.config.get("server_host", "localhost")
-            self.public_url = f"http://{server_host}:{port}"
+
+        # 在远程服务器模式下，直接使用服务器URL
+        server_host = self.config.get("server_host", "localhost")
+        self.public_url = f"http://{server_host}:{port}"
             
         # 在新线程中启动Gradio界面
         def run_interface():
             self.interface.launch(
                 server_name="0.0.0.0",
                 server_port=port,
-                share=False,
+                share=True,
                 inbrowser=False,
                 debug=False,
-                root_path=self.settings_path if self.settings_path != "/" else None,
-                show_error=True,
-                allowed_paths=[],
-                ssl_verify=False
+                root_path=self.settings_path if self.settings_path != "/" else None
             )
             
         thread = threading.Thread(target=run_interface, daemon=True)
@@ -295,17 +208,6 @@ class SettingsApp:
         
         return self.public_url
         
-    def stop(self):
-        """停止设置应用"""
-        if not self.is_running:
-            return
-            
-        if self.ngrok_process:
-            ngrok.disconnect(self.public_url)
-            
-        self.is_running = False
-        logger.info("设置界面已关闭")
-
 # 单例模式，确保全局只有一个设置应用实例
 _instance = None
 
