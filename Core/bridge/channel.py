@@ -67,11 +67,11 @@ class Channel:
                 master_name = self.config.get('master_name')
                 if voice_reply_enabled:
                     # 如果是mp3文件，转换为silk格式
-                    silk_path = response.get('answer') + '.silk'
+                    silk_path = "./test_voice.wav" + '.silk'
                     duration = mp3_to_silk(response.get('answer'), silk_path)
                     callback_url = self.config.get("gewechat_callback_url")
                     silk_url = callback_url + "?file=" + silk_path
-                    self.client.post_voice(self.app_id, master_name, silk_url, duration)
+                    self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
                     logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
                 else:
                     self.send_text_message_by_name(master_name, response.get('answer'))
