@@ -9,6 +9,9 @@ import threading
 import time
 from pyngrok import ngrok
 from typing import List, Dict
+from pydantic import BaseModel
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -18,6 +21,10 @@ from Core.Logger import Logger
 from Core.difyAI.dify_manager import DifyManager
 from Core.web.settings_manager import SettingsManager
 
+# 配置Pydantic模型
+class Settings(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
 
 logger = Logger()
 
@@ -273,7 +280,10 @@ class SettingsApp:
                 share=False,
                 inbrowser=False,
                 debug=False,
-                root_path=self.settings_path if self.settings_path != "/" else None
+                root_path=self.settings_path if self.settings_path != "/" else None,
+                show_error=True,
+                allowed_paths=[],
+                ssl_verify=False
             )
             
         thread = threading.Thread(target=run_interface, daemon=True)

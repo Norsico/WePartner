@@ -6,13 +6,13 @@
     "gewechat_token": "3140d2c2c50a4747aa9c38d902b75902",
     "gewechat_app_id": "wx_Nnldl-rsXjLWzQkMm8VrG",
     "gewechat_callback_url": "http://172.26.128.1:1145/v2/api/callback/collect",
-    "is_remote_server": true,
+    "is_remote_server": false,
     "ngrok_auth_token": "2tn5cUo5m7VrA4uYM3pY2GukYVj_3WkXHuJyb2nfLZLwsj1BH",
     "auto_reply_enabled": false,
-    "start_time": 1742180240.6332686,
+    "start_time": 1742182411.1584232,
     "debug_mode": true,
     "log_level": "DEBUG",
     "default_reply": "收到您的消息，稍后回复。",
     "server_host": "localhost",
-    "call_back_success_falg": true
+    "call_back_success_falg": false
 }
