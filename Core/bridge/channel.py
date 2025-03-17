@@ -4,6 +4,7 @@ from Core.commands.command_manager import CommandManager
 from Core.web.settings_manager import SettingsManager
 import os
 import re
+from Core.difyAI.dify_manager import DifyManager
 
 logging = Logger()
 
@@ -22,6 +23,8 @@ class Channel:
         
         # 初始化命令管理器
         self.command_manager = CommandManager(self)
+        self.settings_manager = SettingsManager()
+        self.current_settings = self.settings_manager.get_settings()
 
     def compose_context(self, message):
         """
@@ -45,13 +48,16 @@ class Channel:
             # 处理普通消息
             logging.info("检测到普通消息")
             # 从settings.json中获取当前选中的chatflow
-            settings_manager = SettingsManager()
-            current_settings = settings_manager.get_settings()
-            current_chatflow = current_settings.get("selected_chatflow", {})
-            chatflow_description = current_chatflow.get("description", "")
+            chatflow_description = self.current_settings.get("selected_chatflow", {}).get("description", "")
+            # 获取是否启用了语音回复
+            voice_reply_enabled = self.current_settings.get("voice_reply_enabled", False)
             # 调试输出
             logging.debug(f"当前选中的chatflow: {chatflow_description}")
+            logging.debug(f"是否启用了语音回复: {voice_reply_enabled}")
 
+            dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
+
+            print(f"当前选中的chatflow: {dify_client.list_conversations()}")
 
             # # 检查是否启用了自动回复
             # if not self.config.get('auto_reply_enabled', False):
