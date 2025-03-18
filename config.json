@@ -8,6 +8,8 @@
     "ngrok_auth_token": "2tn5cUo5m7VrA4uYM3pY2GukYVj_3WkXHuJyb2nfLZLwsj1BH",
     "server_host": "localhost",
     "settings_url": "https://941074f950f2213edf.gradio.live",
+    "GPT-SoVITS_url": "http://127.0.0.1:9880",
+    "text_language": "zh",
     "call_back_success_falg": true,
     "is_remote_server": false,
     "debug_mode": true,

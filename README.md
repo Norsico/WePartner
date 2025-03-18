@@ -136,7 +136,7 @@ wxChatBot/
 
 - [Dify](https://dify.ai)
 - [Gewechat](https://github.com/Devo919/Gewechat)
-- [Ngrok](https://ngrok.com/)
+- [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
 
 ---
 
