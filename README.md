@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/Python-3.7+-green)
+![Python](https://img.shields.io/badge/Python-3.11+-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 ![Dify](https://img.shields.io/badge/Dify-Powered-purple)
 ![WeChat](https://img.shields.io/badge/WeChat-Work-brightgreen)
@@ -13,16 +13,13 @@
 
 <p align="center">wxChatBot 是一个强大的基于Dify和Gewechat的智能聊天机器人。通过集成 Dify AI 平台，提供高效、智能的消息处理和自动回复服务。支持ChatFlow，可自定义编排AI作业任务，原生自带永久记忆功能，支持GPT-SoVITS自定义音色，支持发送微信语音气泡</p>
 
-<div align="center">
-  <img src="docs/images/wxchat_demo.jpg" alt="微信聊天演示" width="300" style="display: inline-block; margin: 0 5px;">
-  <img src="docs/images/settings_chatflow.jpg" alt="功能展示" width="300" style="display: inline-block; margin: 0 5px;">
-  <img src="docs/images/settings_voice.jpg" alt="语音设置界面" width="300" style="display: inline-block; margin: 0 5px;">
-  <br>
-  <p>微信聊天演示 | ChatFlow功能配置界面 | 语音设置界面</p>
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 5px; max-width: 100%; overflow-x: auto;">
+  <img src="docs/images/wxchat_demo.jpg" alt="微信聊天演示" width="32%" style="max-width: 32%;">
+  <img src="docs/images/settings_chatflow.jpg" alt="功能展示" width="32%" style="max-width: 32%;">
+  <img src="docs/images/settings_voice.jpg" alt="语音设置界面" width="32%" style="max-width: 32%;">
 </div>
+<p align="center">微信聊天演示 | ChatFlow功能配置界面 | 语音设置界面</p>
 
-<img src="docs/images/app_run.png" alt="程序运行日志" width="600">
-<p align="center">程序运行日志</p>
 
 ## ✨ 功能特性
 
@@ -51,6 +48,30 @@
 - 完善的日志记录与监控系统
 
 ## 🚀 快速开始
+
+## 📁 项目结构
+
+```
+wxChatBot/
+├── Core/                  # 核心功能模块
+│   ├── bridge/            # 通信桥接层
+│   ├── commands/          # 命令系统
+│   ├── difyAI/            # Dify AI集成
+│   ├── factory/           # 服务工厂
+│   ├── voice/             # 语音处理模块
+│   └── web/               # Web管理界面
+├── gewechat/              # 微信API集成
+│   ├── api/               # API接口封装
+│   ├── util/              # 工具接口层
+│   └── data/              # 数据存储
+├── voice_model/           # 语音模型文件
+├── logs/                  # 日志文件
+├── tmp/                   # 临时文件目录
+├── config.py              # 配置管理
+├── main.py                # 主程序入口
+├── config.example.json    # 配置文件示例
+└── requirements.txt       # 项目依赖
+```
 
 ### 环境要求
 - Python 3.11+
@@ -91,60 +112,32 @@ python main.py
 <p>系统启动界面</p>
 </div>
 
-## 📁 项目结构
-
-```
-wxChatBot/
-├── Core/                  # 核心功能模块
-│   ├── bridge/            # 通信桥接层
-│   ├── commands/          # 命令系统
-│   ├── difyAI/            # Dify AI集成
-│   ├── factory/           # 服务工厂
-│   ├── voice/             # 语音处理模块
-│   └── web/               # Web管理界面
-├── gewechat/              # 微信API集成
-│   ├── api/               # API接口封装
-│   ├── util/              # 工具接口层
-│   └── data/              # 数据存储
-├── voice_model/           # 语音模型文件
-├── logs/                  # 日志文件
-├── tmp/                   # 临时文件目录
-├── config.py              # 配置管理
-├── main.py                # 主程序入口
-├── config.example.json    # 配置文件示例
-└── requirements.txt       # 项目依赖
-```
 
 ## ⚙️ 配置说明
 
-系统通过`config.json`进行配置，主要配置项包括：
+初次运行，请修改`config.json`，主要配置项包括：
 
-### 基本配置
-- `master_name`: 管理员微信昵称
-- `debug_mode`: 调试模式开关
-- `log_level`: 日志级别(DEBUG/INFO/WARNING/ERROR)
-- `server_host`: 服务器主机地址
+```json
+{
+    "master_name": "N", // 你大号的微信的名称(注意不是备注，是账号名称，最好别重名)
+    "dify_api_base": "http://localhost/v1", // dify的baseurl,一般不需要改
+    "gewechat_base_url": "http://your_local_ip:2531/v2/api", // gewechat的baseurl,把your_local_ip改成你的电脑IPv4地址,下面同理
+    "gewechat_token": "", // 初次创建应用，留空，这里自动填写
+    "gewechat_app_id": "", // 初次创建应用，留空，这里自动填写
+    "gewechat_callback_url": "http://your_local_ip:1145/v2/api/callback/collect", // 一般不需要改
+    "server_host": "localhost", // 应该也不需要修改
+    "settings_url": "", // 自动生成
+    "GPT-SoVITS_url": "http://127.0.0.1:9880", // GPT-SoVITS的url,一般默认即可
+    "text_language": "ja", // 模型发送的语音语言(如果为中文之外的语言，需要在Dify端修改提示词)
+    "call_back_success_falg": false, // 登陆后如果发送消息没反应，把这个变为false即可重新登录，记得登陆后成功了修改为true
+    "is_remote_server": false, // 是否为远程服务器，本地部署的就填false
+    "debug_mode": true, // 可以不改
+    "log_level": "DEBUG", // 可以不该
+    "start_time": 1742287344.8490422 // 自动生成
+}
+```
+如果你不太知道怎么填写，可以参考项目中的config.example.json
 
-### 微信配置
-- `gewechat_base_url`: Gewechat服务器地址
-- `gewechat_token`: 认证令牌
-- `gewechat_app_id`: 应用ID
-- `gewechat_callback_url`: 回调URL
-- `gewechat_download_url`: 文件下载URL
-
-### Dify AI 配置
-- `dify_api_base`: Dify API服务器地址
-
-### 高级配置
-- `is_remote_server`: 是否为远程服务器
-- `ngrok_auth_token`: Ngrok认证Token(内网穿透使用)
-
-详细配置请参考`config.example.json`文件。配置后将其重命名为`config.json`即可使用。
-
-<div align="center">
-<img src="docs/images/settings_voice.jpg" alt="系统架构图" width="600">
-<p>系统语音设置界面</p>
-</div>
 
 ##  主要依赖
 
@@ -153,26 +146,28 @@ wxChatBot/
 | gradio | >=5.21.0 | Web界面框架 |
 | web.py | >=0.62 | Web服务框架 |
 | requests | >=2.32.3 | HTTP请求库 |
-| pyngrok | >=7.2.3 | 内网穿透支持 |
 | qrcode | >=7.4.2 | 二维码生成 |
 | pilk/pysilk | 最新 | 语音处理支持 |
 
 ## 🚀 开发计划
 
 ### 近期计划
-- [ ] 完善ChatFlow相关功能
-- [ ] 优化Web设置界面
+- [x] 完善ChatFlow相关功能
+- [x] 优化Web设置界面
 - [x] 微信发送语音开关
+- [ ] 正式发布V1.0.0版本
+- [ ] 更新视频教程
 
-### 中期计划
+### 后期计划
+- [ ] 增加web端的功能(支持新建对话、删除对话、修改提示词等等)
+- [ ] 一键部署
 - [ ] 支持文档上传及处理
-- [ ] 支持视频、图片多媒体处理
-- [ ] 支持自定义触发规则
+- [ ] 支持视频、图片识别等
+- [ ] 表情包发送
+- [ ] 用户可以发语音(语音识别)
+- [ ] 支持群聊
+- [ ] QQ移植
 
-### 长期计划
-- [ ] 多平台集成支持
-- [ ] AI知识库建设
-- [ ] 插件商店
 
 ## 🤝 贡献指南
 
