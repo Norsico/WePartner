@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="README.md">中文</a> | 
-  <a href="docs/en/README.md">English</a>
+  <a href="../en/README.md">English</a>
 </div>
 
 <div align="center">
