@@ -1,8 +1,8 @@
 from Core.Logger import Logger
-from Core.bridge.context import ContextType, Context
 from Core.commands.command_manager import CommandManager
 from Core.web.settings_manager import SettingsManager
 from Core.voice.audio_convert import wav_to_silk
+from Core.voice.audio_gen import AudioGen
 from Core.difyAI.dify_manager import DifyManager
 
 logging = Logger()
@@ -59,23 +59,20 @@ class Channel:
             logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
 
             # 继续已有对话
-            # response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", "")).get('answer')
-            response = "测试"
-            logging.info(f"AI回复: {response}\n")
+            response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", "")).get('answer')
+            logging.info(f"AI生成的回复: {response}\n")
                 
             try:
                 # 发送回复
                 master_name = self.config.get('master_name')
                 if voice_reply_enabled:
-                    # 如果是mp3文件，转换为silk格式
-                    MP3_PATH = r"E:\Cursor-Main\wxChatBot\tmp\test_voice.wav"
-                    silk_path = MP3_PATH + '.silk'
-                    print(silk_path)
-                    duration = wav_to_silk(MP3_PATH, silk_path)
-                    print(duration)
+                    # 使用GPT-SoVITS生成语音，转换为silk格式后即可发送
+                    audio_gen = AudioGen()
+                    audio_path = audio_gen.generate_voice(response)
+                    silk_path = audio_path + '.silk'
+                    duration = wav_to_silk(audio_path, silk_path)
                     callback_url = self.config.get("gewechat_callback_url")
                     silk_url = callback_url + "?file=" + silk_path
-                    print(silk_url)
                     self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
                     logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
                 else:

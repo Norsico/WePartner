@@ -20,6 +20,7 @@ class AudioGen:
         self.language = self.config.get("text_language")
         self.tmp_dir = TmpDir()
 
+
     def generate_voice(self, text):
         # 获取tmp文件夹路径
         temp_dir = self.tmp_dir.path()
