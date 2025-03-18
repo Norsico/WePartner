@@ -13,21 +13,23 @@
 
 <p align="center">wxChatBot 是一个强大的基于微信的智能聊天机器人，通过集成 Dify AI 平台，提供高效、智能的消息处理和自动回复服务。支持ChatFlow，可自定义编排AI作业任务，原生自带永久记忆功能，支持GPT-SoVITS自定义音色，支持发送微信语音气泡</p>
 
-<div align="center">
-
-<img src="docs/images/wxchat_demo.jpg" alt="微信聊天演示" width="600">
-<p>微信聊天演示</p>
-
-<img src="docs/images/settings_chatflow.jpg" alt="功能展示" width="600">
-<p>ChatFlow功能配置界面</p>
-
-<img src="docs/images/settings_voice.jpg" alt="语音设置界面" width="600">
-<p>语音设置界面</p>
+<div align="center" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+  <div style="flex: 1; min-width: 30%;">
+    <img src="docs/images/wxchat_demo.jpg" alt="微信聊天演示" width="300">
+    <p>微信聊天演示</p>
+  </div>
+  <div style="flex: 1; min-width: 30%;">
+    <img src="docs/images/settings_chatflow.jpg" alt="功能展示" width="300">
+    <p>ChatFlow功能配置界面</p>
+  </div>
+  <div style="flex: 1; min-width: 30%;">
+    <img src="docs/images/settings_voice.jpg" alt="语音设置界面" width="300">
+    <p>语音设置界面</p>
+  </div>
+</div>
 
 <img src="docs/images/app_run.png" alt="程序运行日志" width="600">
-<p>程序运行日志</p>
-
-</div>
+<p align="center">程序运行日志</p>
 
 ## ✨ 功能特性
 
