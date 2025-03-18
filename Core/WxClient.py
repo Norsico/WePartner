@@ -2,7 +2,7 @@ import json
 import threading
 import time
 from urllib.parse import urlparse
-
+import os
 import web
 
 from Core.GewechatMessage import GeWeChatMessage
@@ -96,6 +96,29 @@ class Query:
         self.client = ClientFactory.get_client(self.config)
         # 创建通道对象
         self.channel = Channel(self.client, self.config)
+
+    def GET(self):
+        # 搭建简单的文件服务器，用于向gewechat服务传输语音等文件，但只允许访问tmp目录下的文件
+        params = web.input(file="")
+        file_path = params.file
+        if file_path:
+            # 使用os.path.abspath清理路径
+            clean_path = os.path.abspath(file_path)
+            # 获取tmp目录的绝对路径
+            tmp_dir = os.path.abspath("tmp")
+            # 检查文件路径是否在tmp目录下
+            if not clean_path.startswith(tmp_dir):
+                logger.error(
+                    f"[gewechat] Forbidden access to file outside tmp directory: file_path={file_path}, clean_path={clean_path}, tmp_dir={tmp_dir}")
+                raise web.forbidden()
+
+            if os.path.exists(clean_path):
+                with open(clean_path, 'rb') as f:
+                    return f.read()
+            else:
+                logger.error(f"[gewechat] File not found: {clean_path}")
+                raise web.notfound()
+        return "gewechat callback server is running"
 
     def POST(self):
         """处理微信回调消息"""

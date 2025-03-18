@@ -34,7 +34,8 @@ config.json
 wxChatBot.code-workspace
 TODO
 config.json
-.gradio
+.gradio/
+tmp
 
 # Local configuration
 *.log 
