@@ -330,11 +330,22 @@ brew install ffmpeg
 🎯 你的支持将用于：🎓 制作开源教程和文档 · 💡 开发更多实用功能 · 🌍 建设开源社区 · 🔥 探索AI应用新可能
 </div>
 
-<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
-  <img src="../images/wechat_qr.jpg" alt="微信支付" width="32%" style="max-width: 32%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-  <img src="../images/alipay_qr.jpg" alt="支付宝" width="32%" style="max-width: 32%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<div align="center">
+  <table border="0">
+    <tr>
+      <td align="center">
+        <img src="../images/wechat_qr.jpg" alt="微信支付" width="180px" style="border-radius: 5px;">
+        <br>
+        <b>微信支付</b>
+      </td>
+      <td align="center">
+        <img src="../images/alipay_qr.jpg" alt="支付宝" width="180px" style="border-radius: 5px;">
+        <br>
+        <b>支付宝</b>
+      </td>
+    </tr>
+  </table>
 </div>
-<p align="center"><b>微信支付 | 支付宝</b></p>
 
 ### 🔒 赞助计划
 

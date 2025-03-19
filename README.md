@@ -357,16 +357,14 @@ brew install ffmpeg
 <div align="center">
 🎓 制作开源教程和文档 · 💡 开发更多实用功能 · 🌍 建设开源社区 · 🔥 探索AI应用新可能
 </div>
-<div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin: 20px 0;">
-  <div style="text-align: center;">
-    <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="180px" style="border-radius: 10px;">
-    <p><b>微信支付</b></p>
-  </div>
-  <div style="text-align: center;">
-    <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="180px" style="border-radius: 10px;">
-    <p><b>支付宝</b></p>
-  </div>
+
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
+  <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="32%" style="max-width: 32%;">
+  <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="32%" style="max-width: 32%;">
 </div>
+<p align="center"><b>微信支付 | 支付宝</b></p>
+
+
 
 ### 🔒 赞助计划
 
