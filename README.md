@@ -349,7 +349,7 @@ brew install ffmpeg
 ## ❤️ 赞助支持
 
 ### 💝 支持我
-你的支持是持续改进这个项目的动力！
+你的支持是持续改进这个项目的动力！感谢!!
 
 <div align="center">
 🎯 你的支持将用于：
@@ -362,12 +362,13 @@ brew install ffmpeg
   <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="32%" style="max-width: 32%;">
   <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="32%" style="max-width: 32%;">
 </div>
-<p align="center"><b>微信支付 | 支付宝</b></p>
+<p align="center"><b>微信 | 支付宝</b></p>
 
 
 
 ### 🔒 赞助计划
 
+<div align="center">
 <table>
   <thead>
     <tr>
@@ -402,6 +403,7 @@ brew install ffmpeg
     </tr>
   </tbody>
 </table>
+</div>
 
 <div align="center" style="margin: 20px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
   <p><b>💼 商务合作/赞助咨询：</b>微信 <code>Norcoo</code> （备注：wxChatBot）</p>
@@ -444,7 +446,7 @@ brew install ffmpeg
 
 ### 🎯 开发指南
 
-- 项目代码完善后将提供详细的开发指南
+- 项目代码完善后将提供详细的开发指南(施工中~)
 
 ### 🔄 更新日志
 
