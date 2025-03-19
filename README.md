@@ -35,7 +35,7 @@
 
 ## 👋 前言唠唠嗑
 
-哈喽！欢迎~欢迎~
+哈喽！欢迎,欢迎~
 这个项目最初是受到 [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) 的启发
 
 在部署过程中，我发现了几个需要改进的地方：
