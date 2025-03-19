@@ -359,8 +359,8 @@ brew install ffmpeg
 </div>
 
 <div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
-  <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="32%" style="max-width: 32%;">
-  <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="32%" style="max-width: 32%;">
+  <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="200px" height="200px" style="max-width: 200px;">
+  <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="200px" height="200px" style="max-width: 200px;">
 </div>
 <p align="center"><b>微信 | 支付宝</b></p>
 
