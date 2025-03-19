@@ -474,8 +474,10 @@ brew install ffmpeg
 
 - [Dify](https://dify.ai) - 提供强大的AI能力支持
 - [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) - 项目灵感来源
+- [KouriChat](https://github.com/KouriChat/KouriChat) - 提供了很多创新、有趣的思路
 - [Gewechat](https://github.com/Devo919/Gewechat) - 微信接口实现
 - [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) - 语音合成技术支持
+
 
 ## 📜 项目声明
 - 本项目仅供技术研究与学习交流
