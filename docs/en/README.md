@@ -330,16 +330,11 @@ Your support is the driving force for continuously improving this project!
 🎯 Your support will be used for: 🎓 Creating open-source tutorials and documentation · 💡 Developing more practical features · 🌍 Building the open-source community · 🔥 Exploring new AI application possibilities
 </div>
 
-<div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin: 20px 0;">
-  <div style="text-align: center;">
-    <img src="../images/wechat_qr.jpg" alt="WeChat Pay" width="180px" style="border-radius: 10px;">
-    <p><b>WeChat Pay</b></p>
-  </div>
-  <div style="text-align: center;">
-    <img src="../images/alipay_qr.jpg" alt="Alipay" width="180px" style="border-radius: 10px;">
-    <p><b>Alipay</b></p>
-  </div>
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
+  <img src="../images/wechat_qr.jpg" alt="WeChat Pay" width="32%" style="max-width: 32%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="../images/alipay_qr.jpg" alt="Alipay" width="32%" style="max-width: 32%; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </div>
+<p align="center"><b>WeChat Pay | Alipay</b></p>
 
 ### 🔒 Sponsorship Plan
 
