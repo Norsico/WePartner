@@ -197,6 +197,13 @@ python main.py
 - [Gewechat](https://github.com/Devo919/Gewechat) - 微信接口实现
 - [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) - 语音合成技术支持
 
+## 📜 项目声明
+- 本项目仅供技术研究与学习交流
+- 严禁用于任何违法或违反道德的场景
+- 生成内容不代表开发者立场和观点
+- 使用者需对自身行为负全责
+- 开发者不对因使用本项目产生的任何问题承担责任
+
 ---
 
 <p align="center">如果这个项目对您有帮助，请考虑给它一个星标 ⭐️</p>

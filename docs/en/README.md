@@ -89,6 +89,13 @@ python main.py
 
 This project is licensed under the MIT License. See the [LICENSE](../../LICENSE) file for more details.
 
+## 📜 Disclaimer
+- This project is for technical research and learning exchange only
+- Prohibited for use in any illegal or unethical scenarios
+- Generated content does not represent the developer's position or views
+- Users are responsible for their own actions
+- Developers are not responsible for any issues arising from the use of this project
+
 ---
 
 <p align="center">If this project is helpful to you, please consider giving it a star ⭐️</p> 
