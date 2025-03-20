@@ -277,14 +277,11 @@ brew install ffmpeg
 |-------|------|------|
 | `gradio` | 5.21.0 | Web interface framework for building settings pages |
 | `web.py` | 0.62 | Web service framework, handles callbacks and API requests |
-| `pyngrok` | 7.2.3 | Intranet penetration tool for remote access |
 | `requests` | 2.32.3 | HTTP request library for communicating with various services |
 | `ffmpeg-python` | 0.2.0 | Audio format conversion, processes voice messages |
 | `pilk` | 0.2.4 | WeChat voice encoding processing |
 | `pysilk` | 0.0.1 | SILK format audio processing |
 | `qrcode` | 7.4.2 | QR code generation for WeChat login |
-| `coloredlogs` | 15.0.1 | Log beautification, provides colored log output |
-| `tqdm` | 4.67.1 | Progress bar display, optimizes user experience |
 
 > 💡 **Installation Tip**:
 > - Recommended to use Anaconda environment for dependency installation:

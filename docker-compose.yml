@@ -1,10 +1,14 @@
+version: '3'
+
 services:
-  gewe:
-    image: gewe
-    container_name: gewe
-    restart: always
-    volumes:
-      - ./gewechat/data:/root/temp
+  wxchatbot:
+    build: .
+    container_name: wxchatbot
     ports:
-      - "2531:2531"
-      - "2532:2532"
+      - "7860:7860"  # Gradio默认端口
+      - "1145:1145"  # 回调URL端口
+    volumes:
+      - ./config.json:/app/config.json
+      - ./logs:/app/logs
+      - ./tmp:/app/tmp
+    restart: unless-stopped 

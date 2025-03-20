@@ -7,7 +7,6 @@ import sys
 import gradio as gr
 import threading
 import time
-from pyngrok import ngrok
 from typing import List, Dict
 
 # 添加项目根目录到Python路径
@@ -29,7 +28,6 @@ class SettingsApp:
         self.dify_manager = DifyManager()
         self.interface = None
         self.public_url = None
-        self.ngrok_process = None
         self.settings_path = "/wxChatBot/settings"
         self.is_running = False
         self.chatflow_info = self.dify_manager.get_dify_config()

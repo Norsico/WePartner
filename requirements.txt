@@ -1,16 +1,15 @@
 # Web服务相关
 gradio==5.21.0  # Web界面框架
 web.py==0.62   # Web服务和回调处理
-pyngrok==7.2.3 # 内网穿透支持
 requests==2.32.3  # HTTP请求
 
 # 语音处理
 ffmpeg-python==0.2.0  # 音频转换
 pilk==0.2.4    # 微信语音编码
 pysilk==0.0.1  # SILK格式支持
+pydub==0.25.1  # 音频处理
 
 # 工具库
 qrcode==7.4.2  # 微信登录二维码
-coloredlogs==15.0.1  # 日志美化
-tqdm==4.67.1   # 进度条显示
+typing-extensions==4.9.0  # 类型提示扩展
 

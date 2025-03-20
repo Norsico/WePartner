@@ -22,9 +22,13 @@ class SystemInitializer:
     # 必需的Python包
     REQUIRED_PACKAGES = [
         "gradio",
-        "pyngrok",
         "requests",
-        "web.py"
+        "web.py",
+        "pydub",
+        "pilk",
+        "pysilk",
+        "ffmpeg-python",
+        "qrcode",
     ]
     
     def __init__(self):
