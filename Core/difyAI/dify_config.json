@@ -8,6 +8,14 @@
         "新对话": "97b87a1c-488d-42a9-9fc4-c57164cdba40"
       },
       "base_url": "http://localhost/v1"
+    },
+    "chatflowTest_Chinese": {
+      "api_key": "app-RWHLJdgsMmxCG7fM0PfL3UG6",
+      "created_at": "2025-03-25",
+      "base_url": "http://localhost/v1",
+      "conversations": {
+        "ch_test_chat_1": "aeb74346-b58e-4773-8650-bed259071cf7"
+      }
     }
   }
 }

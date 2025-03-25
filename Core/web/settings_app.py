@@ -88,14 +88,19 @@ class SettingsApp:
                 conversation_radio_updated = gr.Radio(choices=conversations, value=None)
             else:
                 conversation_radio_updated = gr.Radio(choices=[], value=None)
-                
+            
+            # 更新语音设置
+            voice_enabled = self.settings.get('voice_reply_enabled', False)
+            voice_checkbox_updated = gr.Checkbox(value=voice_enabled)
+            
             return (
                 chatflow_radio_updated,
                 delete_chatflow_radio_updated,
                 conv_chatflow_radio_updated,
                 del_conv_chatflow_radio_updated,
                 "数据已刷新",
-                conversation_radio_updated
+                conversation_radio_updated,
+                voice_checkbox_updated
             )
 
         def update_conversations(chatflow_name):
@@ -442,7 +447,8 @@ class SettingsApp:
                     conv_chatflow_radio, 
                     del_conv_chatflow_radio,
                     refresh_result,
-                    conversation_radio
+                    conversation_radio,
+                    voice_checkbox
                 ]
             ).then(
                 fn=update_conversations,
@@ -464,7 +470,8 @@ class SettingsApp:
                     conv_chatflow_radio, 
                     del_conv_chatflow_radio,
                     refresh_result,
-                    conversation_radio
+                    conversation_radio,
+                    voice_checkbox
                 ]
             )
 
@@ -481,7 +488,8 @@ class SettingsApp:
                     conv_chatflow_radio, 
                     del_conv_chatflow_radio,
                     refresh_result,
-                    conversation_radio
+                    conversation_radio,
+                    voice_checkbox
                 ]
             )
 
@@ -499,7 +507,8 @@ class SettingsApp:
                     conv_chatflow_radio, 
                     del_conv_chatflow_radio,
                     refresh_result,
-                    conversation_radio
+                    conversation_radio,
+                    voice_checkbox
                 ]
             )
 
@@ -523,7 +532,27 @@ class SettingsApp:
                     conv_chatflow_radio, 
                     del_conv_chatflow_radio,
                     refresh_result,
-                    conversation_radio
+                    conversation_radio,
+                    voice_checkbox
+                ]
+            ).then(
+                fn=update_conversations,
+                inputs=[del_conv_chatflow_radio],
+                outputs=[del_conv_radio]
+            )
+            
+            # 页面加载时自动刷新数据
+            interface.load(
+                fn=refresh_data,
+                inputs=[],
+                outputs=[
+                    chatflow_radio, 
+                    delete_chatflow_radio, 
+                    conv_chatflow_radio, 
+                    del_conv_chatflow_radio,
+                    refresh_result,
+                    conversation_radio,
+                    voice_checkbox
                 ]
             ).then(
                 fn=update_conversations,
