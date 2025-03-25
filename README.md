@@ -88,6 +88,31 @@ wxauto不支持发送语音气泡，虽然稳定性强，但是很多可个性�
 - 无缝对接个人微信，轻松接入微信生态
 - 支持文本和语音回复（原生语音泡，非文件形式）
 - 通过简单指令（如`#设置`）获取管理界面
+- 支持管理chatflow（新增）
+- 支持管理chat记录（新增）
+<div align="center" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 100%;">
+  <div style="flex: 1; min-width: 48%; max-width: 48%;">
+    <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <p><b>chatflow管理页(新建)</b></p>
+  </div>
+  
+  <div style="flex: 1; min-width: 48%; max-width: 48%;">
+    <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <p><b>chatflow管理页(删除)</b></p>
+  </div>
+</div>
+
+<div align="center" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 100%; margin-top: 20px;">
+  <div style="flex: 1; min-width: 48%; max-width: 48%;">
+    <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <p><b>chat管理页(新建)</b></p>
+  </div>
+  
+  <div style="flex: 1; min-width: 48%; max-width: 48%;">
+    <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <p><b>chat管理页(删除)</b></p>
+  </div>
+</div>
 
 ### 🔊 语音功能
 - 基于GPT-SoVITS技术，支持自定义语音模型
@@ -339,7 +364,7 @@ brew install ffmpeg
 - [x] 优化Web设置界面
 - [x] 微信发送语音开关
 - [ ] 正式发布V1.0.0版本
-- [ ] Docker一键部署
+- [ ] 一键部署(自带环境)
 - [ ] 视频教程
 
 ### 后期计划

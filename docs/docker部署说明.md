@@ -1,4 +1,4 @@
-# wxChatBot Docker部署说明
+# wxChatBot Docker部署说明（目前不太推荐Docker部署，因为没经过充分测试，推荐使用Anaconda环境部署）
 
 ## 准备工作
 
