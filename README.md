@@ -148,14 +148,7 @@ cd wxChatBot
 ```bash
 pip install -r requirements.txt
 ```
-
-#### 3. 修改配置文件（见下方配置说明）
-```bash
-# 编辑config.json填入必要信息
-config.json
-```
-
-#### 4. 通过Docker构建Dify (可参考: [Dify](https://github.com/langgenius/dify))
+#### 3. 通过Docker构建Dify (可参考: [Dify](https://github.com/langgenius/dify))
 ```bash
 git clone https://github.com/langgenius/dify.git
 cd dify
@@ -164,23 +157,29 @@ cp .env.example .env
 docker compose up -d
 ```
 
-#### 5. 通过Docker构建GeweChat (可参考: [Gewechat](https://github.com/Devo919/Gewechat))
-##### 5.1 拉取镜像
+#### 4. 通过Docker构建GeweChat (可参考: [Gewechat](https://github.com/Devo919/Gewechat))
+##### 4.1 拉取镜像
 ```bash
 docker pull registry.cn-hangzhou.aliyuncs.com/gewe/gewe:latest
 docker tag registry.cn-hangzhou.aliyuncs.com/gewe/gewe gewe
 ```
 
-##### 5.2 运行镜像容器
+##### 4.2 运行镜像容器
 ```bash
 mkdir -p /root/temp
 docker update --restart=always gewe
 docker run -itd -v /root/temp:/root/temp -p 2531:2531 -p 2532:2532 --privileged=true --name=gewe gewe /usr/sbin/init
 ```
 
-##### 5.3 将容器设置成开机运行
+##### 4.3 将容器设置成开机运行
 ```bash
 docker update --restart=always gewe
+```
+
+#### 5. 修改配置文件（见下方配置说明）
+```bash
+# 编辑config.json填入必要信息
+config.json
 ```
 
 #### 6. 启动项目主程序
@@ -227,11 +226,25 @@ python main.py
 ### 💡 微信回调配置
 - 首次运行时，系统会自动配置Gewechat的回调地址
 - 新设备在次日凌晨可能会自动掉线（微信安全机制）
+- 有时候隔了一天也有可能发消息后没反应
 - 解决方案：
   1. 将`config.json`中的`call_back_success_falg`设为`false`
   2. 重新扫码登录
-  3. 登录成功后将`call_back_success_falg`改回`true`
-- 如果不介意每次都扫码，可以保持`false`状态，避免回调地址出现问题
+  3. 登录成功后将自动`call_back_success_falg`改回`true`
+
+### ⭐️ 发送`#设置`后显示为:None
+- 原因:Gradio缺少依赖项，一般这个都会有问题，初次启动程序的时候控制台有如下类似内容:
+```bash
+Could not create share link. Missing file: xxx/Lib/site-packages/gradio/frpc_windows_amd64_v0.3
+Please check your internet connection. This can happen if your antivirus software blocks the download of this file. You can install manually by following these steps:
+1. Download this file: https://cdn-media.huggingface.co/frpc-gradio-0.3/frpc_windows_amd64.exe
+2. Rename the downloaded file to: frpc_windows_amd64_v0.3
+3. Move the file to this location: xxx/Lib/site-packages/gradio
+```
+- 解决方案:
+  1. 下载[frpc_windows_amd64](https://cdn-media.huggingface.co/frpc-gradio-0.3/frpc_windows_amd64.exe)
+  2. 重命名该文件为:`frpc_windows_amd64_v0.3`(注意是完全改成这个名字，没有后缀.exe)
+  3. 移动该文件到: `xxx/Lib/site-packages/gradio`, 其中`xxx`可以在控制台看到，就是你的python环境的位置
 
 ### ❗Gewechat创建失败(作者在这里踩了许多坑了)
 如果遇到gewechat创建设备失败，unexpected EOF错误，请排查网络是否是以下情况：

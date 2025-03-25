@@ -72,6 +72,7 @@ class WxChatClient:
                         else:
                             logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
                             logger.warning(f"可能还可以使用，请发送消息测试，如果还不行，可以尝试重新登录微信")
+                        self.config.set("call_back_success_falg", True)
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
                 logger.info("继续运行，回调可能仍然有效...")

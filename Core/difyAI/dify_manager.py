@@ -34,19 +34,64 @@ class DifyManager:
 
     def _load_config(self):
         """加载配置文件并初始化所有已保存的DifyChatflow实例"""
+        self.instances = {}  # 清空实例列表，确保重新加载
+        
         if os.path.exists(self.config_file):
-            with open(self.config_file, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-                self.dify_config = config
-                if "chatflow" in config:
-                    for description, info in config["chatflow"].items():
-                        api_key = info.get("api_key", "")
-                        base_url = info.get("base_url", "http://localhost/v1")
-                        self.create_instance(api_key, description, base_url)
+            try:
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    self.dify_config = config
+                    if "chatflow" in config:
+                        for description, info in config["chatflow"].items():
+                            api_key = info.get("api_key", "")
+                            base_url = info.get("base_url", "http://localhost/v1")
+                            self.create_instance(api_key, description, base_url)
+                print(f"加载配置文件成功，Chatflow数量: {len(self.dify_config.get('chatflow', {}))}")
+                
+                # 打印一下每个chatflow中的对话
+                for cf_name, cf_info in self.dify_config.get('chatflow', {}).items():
+                    convs = list(cf_info.get('conversations', {}).keys())
+                    print(f"Chatflow={cf_name}, 对话列表={convs}")
+            except Exception as e:
+                print(f"加载配置文件失败: {str(e)}")
+                self.dify_config = {"chatflow": {}}
     
     def get_dify_config(self):
         """获取Dify配置"""
         return self.dify_config
+
+    def save_dify_config(self, config: Dict) -> bool:
+        """保存Dify配置到文件
+        
+        Args:
+            config: 要保存的配置字典
+            
+        Returns:
+            bool: 是否保存成功
+        """
+        try:
+            self.dify_config = config
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            
+            # 清空并重新初始化实例列表
+            self.instances = {}
+            if "chatflow" in config:
+                for description, info in config["chatflow"].items():
+                    api_key = info.get("api_key", "")
+                    base_url = info.get("base_url", "http://localhost/v1")
+                    self.create_instance(api_key, description, base_url)
+            
+            print(f"保存配置文件成功，新的Chatflow数量: {len(config.get('chatflow', {}))}")
+            # 打印一下每个chatflow中的对话
+            for cf_name, cf_info in config.get('chatflow', {}).items():
+                convs = list(cf_info.get('conversations', {}).keys())
+                print(f"保存后: Chatflow={cf_name}, 对话列表={convs}")
+                
+            return True
+        except Exception as e:
+            print(f"保存配置文件失败: {str(e)}")
+            return False
 
     def create_instance(self, api_key: str, description: str = None, base_url: str = "http://localhost/v1") -> DifyChatflow:
         """创建新的DifyChatflow实例

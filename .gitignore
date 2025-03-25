@@ -21,7 +21,7 @@ var/
 *.egg
 
 # Virtual Environment
-venv/
+.venv/
 ENV/
 .env/
 
@@ -30,12 +30,10 @@ ENV/
 .vscode/
 *.swp
 *.swo
-config.json
 wxChatBot.code-workspace
 TODO
-config.json
 .gradio/
 tmp
-
+config.json
 # Local configuration
 *.log 
