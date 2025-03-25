@@ -91,17 +91,14 @@ wxauto不支持发送语音气泡，虽然稳定性强，但是很多可个性�
 - 支持管理chatflow（新增）
 - 支持管理chat记录（新增）
 
-<div align="center">
-  <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; max-width: 100%;">
-    <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="45%" style="max-width: 45%;">
-    <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="45%" style="max-width: 45%;">
-  </div>
-  <div style="display: flex; justify-content: center; gap: 10px; max-width: 100%;">
-    <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="45%" style="max-width: 45%;">
-    <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="45%" style="max-width: 45%;">
-  </div>
-  <p><b>chatflow管理页(新建/删除) | chat管理页(新建/删除)</b></p>
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
+  <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="24%" style="max-width: 24%;">
 </div>
+<p align="center"><b>chatflow管理页(新建) | chatflow管理页(删除) | chat管理页(新建) | chat管理页(删除)</b></p>
+
 ### 🔊 语音功能
 - 基于GPT-SoVITS技术，支持自定义语音模型
 - 少量语音样本即可高度还原声音特征
