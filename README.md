@@ -90,30 +90,18 @@ wxauto不支持发送语音气泡，虽然稳定性强，但是很多可个性�
 - 通过简单指令（如`#设置`）获取管理界面
 - 支持管理chatflow（新增）
 - 支持管理chat记录（新增）
-<div align="center" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 100%;">
-  <div style="flex: 1; min-width: 48%; max-width: 48%;">
-    <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <p><b>chatflow管理页(新建)</b></p>
-  </div>
-  
-  <div style="flex: 1; min-width: 48%; max-width: 48%;">
-    <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <p><b>chatflow管理页(删除)</b></p>
-  </div>
-</div>
 
-<div align="center" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 100%; margin-top: 20px;">
-  <div style="flex: 1; min-width: 48%; max-width: 48%;">
-    <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <p><b>chat管理页(新建)</b></p>
+<div align="center">
+  <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; max-width: 100%;">
+    <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="45%" style="max-width: 45%;">
+    <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="45%" style="max-width: 45%;">
   </div>
-  
-  <div style="flex: 1; min-width: 48%; max-width: 48%;">
-    <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="100%" style="border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <p><b>chat管理页(删除)</b></p>
+  <div style="display: flex; justify-content: center; gap: 10px; max-width: 100%;">
+    <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="45%" style="max-width: 45%;">
+    <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="45%" style="max-width: 45%;">
   </div>
+  <p><b>chatflow管理页(新建/删除) | chat管理页(新建/删除)</b></p>
 </div>
-
 ### 🔊 语音功能
 - 基于GPT-SoVITS技术，支持自定义语音模型
 - 少量语音样本即可高度还原声音特征
