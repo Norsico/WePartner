@@ -241,6 +241,73 @@ python main.py
   1. 将`config.json`中的`call_back_success_falg`设为`false`
   2. 重新扫码登录
   3. 登录成功后将自动`call_back_success_falg`改回`true`
+- 新版本增加了回调设置的自动判断，省去了这一步
+- 为减少回调设置误判的可能性，请在小号扫码登录后，在小号上点击进入与大号的聊天界面以触发状态同步消息
+- 一般来说，在扫码登录过后，回调设置都会成功
+
+### 📦 FFmpeg安装指南
+根据您的操作系统选择合适的安装方式（鼠标单击环境打开折叠）：
+
+<details>
+<summary><b>Windows 系统</b></summary>
+
+```bash
+# 方式1：使用Anaconda
+conda install -c conda-forge ffmpeg
+
+# 方式2：手动安装，前往https://github.com/BtbN/FFmpeg-Builds/releases
+# 然后下载ffmpeg-master-latest-win64-gpl.zip
+# 解压到某个文件夹内(我这里解压到了本项目的voice_model文件夹中，然后重命名其为ffmpeg)
+# 然后需要添加环境变量，将ffmpeg中的名为bin的文件夹添加到系统环境变量中即可
+# 验证方法:
+ffmpeg -version
+
+# 方式3：使用Chocolatey
+choco install ffmpeg
+```
+</details>
+
+<details>
+<summary><b>.venv 虚拟环境/pip安装</b></summary>
+
+```bash
+# 1. 打开cmd, 进入项目文件夹
+# 2. 激活虚拟环境 
+.venv\Scripts\activate
+# 3. 使用pip安装ffmpeg
+pip install ffmpeg-python
+# 4. 同上方Windows安装一样，需要设置环境变量
+set PATH=你的ffmpeg安装的绝对路径\bin;%PATH%
+```
+</details>
+
+<details>
+<summary><b>Linux 系统</b></summary>
+
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install ffmpeg
+
+# CentOS/RHEL
+sudo yum install ffmpeg
+```
+</details>
+
+<details>
+<summary><b>macOS 系统</b></summary>
+
+```bash
+# 使用Homebrew
+brew install ffmpeg
+```
+</details>
+
+> ⚠️ **重要提示**：
+> - 推荐使用Anaconda环境，实测这样安装更加简单
+> - 安装完成后请确保FFmpeg已添加到系统环境变量
+> - 如遇到"路径不存在"错误，请检查环境变量配置
+> - Windows用户可在系统变量Path中添加FFmpeg所在目录
+
 
 ### ⭐️ 发送`#设置`后显示为:None
 - 原因:Gradio缺少依赖项，一般这个都会有问题，初次启动程序的时候控制台有如下类似内容:
@@ -277,47 +344,6 @@ Please check your internet connection. This can happen if your antivirus softwar
   - 在Dify模型配置界面中选择对应选项
   - 可根据需求进行深度定制
 
-### 📦 FFmpeg安装指南
-根据您的操作系统选择合适的安装方式：
-
-<details>
-<summary><b>Windows 系统</b></summary>
-
-```bash
-# 方式1：使用Anaconda
-conda install -c conda-forge ffmpeg
-
-# 方式2：使用Chocolatey
-choco install ffmpeg
-```
-</details>
-
-<details>
-<summary><b>Linux 系统</b></summary>
-
-```bash
-# Ubuntu/Debian
-sudo apt update && sudo apt install ffmpeg
-
-# CentOS/RHEL
-sudo yum install ffmpeg
-```
-</details>
-
-<details>
-<summary><b>macOS 系统</b></summary>
-
-```bash
-# 使用Homebrew
-brew install ffmpeg
-```
-</details>
-
-> ⚠️ **重要提示**：
-> - 推荐使用Anaconda环境，实测这样安装更加简单
-> - 安装完成后请确保FFmpeg已添加到系统环境变量
-> - 如遇到"路径不存在"错误，请检查环境变量配置
-> - Windows用户可在系统变量Path中添加FFmpeg所在目录
 
 ## 📊 主要依赖
 
@@ -469,6 +495,10 @@ brew install ffmpeg
 - 项目代码完善后将提供详细的开发指南(施工中~)
 
 ### 🔄 更新日志
+
+**2025-03-25**
+- 完善网页部分的更新处理机制，实现热更改配置，自动刷新
+- 新增:可通过网页配置chatflow以及chat记录的增加和删除
 
 **2025-03-19**
 - 完善README文档内容和排版

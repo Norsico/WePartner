@@ -84,7 +84,7 @@ class SystemInitializer:
             
         # 检查操作系统
         system_info = platform.system()
-        if system_info not in ["Windows", "Linux", "Darwin"]:
+        if system_info not in ["Windows", "Linux", "MacOS"]:
             logger.error(f"不支持的操作系统: {system_info}")
             return False
             
@@ -121,8 +121,14 @@ class SystemInitializer:
         try:
             # 创建配置对象
             self.config = Config('./config.json')
+
+            # 判断时间是否超过8小时
+            if self.is_time_difference_over_8_hours(self.config.get('start_time'), time.time()):
+                logger.warning("时间超过8小时，重新登录一下，防止出现回调异常bug")
+                # 将"call_back_success_falg"设置为false
+                self.config.set('call_back_success_falg', False)
             
-            # 记录启动时间
+            # 更新启动时间
             self.start_time = time.time()
             self.config.set('start_time', self.start_time)
             
@@ -197,10 +203,31 @@ class SystemInitializer:
         # 初始化配置
         if not self.init_config():
             return False, None
-            
+        
         # 初始化微信客户端
         if not self.init_wx_client():
             return False, None
         
         logger.success("系统初始化完成")
-        return True, self.wx_client 
+        return True, self.wx_client
+
+    @staticmethod
+    def is_time_difference_over_8_hours(timestamp1, timestamp2):
+        """
+        判断两个时间戳之间的时间差是否超过8小时。
+        
+        参数:
+        timestamp1 (float): 第一个时间戳
+        timestamp2 (float): 第二个时间戳
+        
+        返回:
+        bool: 如果时间差超过8小时，返回True；否则返回False
+        """
+        # 计算时间差（以秒为单位）
+        time_difference = abs(timestamp2 - timestamp1)
+        
+        # 将时间差转换为小时
+        time_difference_hours = time_difference / 3600
+        
+        # 判断时间差是否超过8小时
+        return time_difference_hours > 8

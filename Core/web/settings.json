@@ -1,11 +1,11 @@
 {
   "selected_chatflow": {
-    "description": "chatflowTest_Chinese",
-    "api_key": "app-RWHLJdgsMmxCG7fM0PfL3UG6",
+    "description": "test1",
+    "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
     "conversation": {
-      "name": "ch_test_chat_1",
-      "id": "aeb74346-b58e-4773-8650-bed259071cf7"
+      "name": "新对话",
+      "id": "97b87a1c-488d-42a9-9fc4-c57164cdba40"
     }
   },
-  "voice_reply_enabled": false
+  "voice_reply_enabled": true
 }

@@ -24,6 +24,10 @@ var/
 .venv/
 ENV/
 .env/
+voice_model/
+
+# logs
+logs/
 
 # IDE
 .idea/

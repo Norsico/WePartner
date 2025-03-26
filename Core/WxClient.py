@@ -13,6 +13,7 @@ from Core.factory.client_factory import ClientFactory
 from config import Config
 
 logger = logging = Logger()
+is_callback_success = False
 
 
 class WxChatClient:
@@ -63,6 +64,7 @@ class WxChatClient:
                         app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
                         if error_msg:
                             logger.error(f"重新登录失败: {error_msg}")
+                            self.config.set("call_back_success_falg", False)
                         else:
                             logger.success(f"重新登录成功，应用ID: {app_id}")
                         # 重新设置回调
@@ -71,7 +73,9 @@ class WxChatClient:
                             logger.success("重新登录后回调地址设置成功")
                         else:
                             logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
-                            logger.warning(f"可能还可以使用，请发送消息测试，如果还不行，可以尝试重新登录微信")
+                            logger.warning(f"正在测试回调是否有效...")
+                            # 测试回调是否有效
+                            self.test_callback()
                         self.config.set("call_back_success_falg", True)
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
@@ -87,6 +91,23 @@ class WxChatClient:
                 time.sleep(1)  # 每秒检查一次
         except KeyboardInterrupt:
             logger.info("服务器正在停止...")
+
+    def test_callback(self):
+        # 新建线程发送消息测试回调是否有效
+        def send_test_msg():
+            self.channel.send_text_message_by_name(self.config.get("master_name"), "测试回调(6秒等待)...")
+            time.sleep(6)
+            global is_callback_success
+            if is_callback_success:
+                logger.success("回调测试成功")
+                self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置成功")
+            else:
+                logger.error("回调测试失败")
+                self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置失败")
+
+        # 新建线程发送消息测试回调是否有效
+        test_thread = threading.Thread(target=send_test_msg, daemon=True)
+        test_thread.start()
 
 
 class Query:
@@ -123,6 +144,8 @@ class Query:
 
     def POST(self):
         """处理微信回调消息"""
+        global is_callback_success
+
         web_data = web.data()
         data = json.loads(web_data)
         
@@ -139,6 +162,7 @@ class Query:
         # 微信客户端的状态同步消息
         if gewechat_msg.ctype == ContextType.STATUS_SYNC:
             logger.debug("忽略状态同步消息")
+            is_callback_success = True
             return "success"
 
         # 忽略非用户消息（如公众号、系统通知等）
@@ -149,6 +173,7 @@ class Query:
         # 忽略来自自己的消息
         if gewechat_msg.my_msg:
             logger.debug(f"忽略自己发送的消息: {gewechat_msg.content}")
+            is_callback_success = True
             return "success"
 
         # 忽略过期的消息

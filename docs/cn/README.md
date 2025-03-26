@@ -1,9 +1,12 @@
 # wxChatBot
 
+---
+
 <div align="center">
-  <a href="README.md">中文</a> | 
-  <a href="../en/README.md">English</a>
+  <p>⭐️ 如果这个项目对你有帮助，欢迎点个Star支持一下！ ⭐️</p>
 </div>
+
+---
 
 <div align="center">
 
@@ -16,25 +19,35 @@
 
 </div>
 
-<p align="center">wxChatBot 是一个基于Dify和Gewechat开发的智能聊天机器人项目。它通过集成 Dify AI 平台，提供高效、智能的消息处理和自动回复服务。支持ChatFlow自定义编排AI任务，原生支持永久记忆功能，支持GPT-SoVITS自定义音色，能够发送原生微信语音气泡。</p>
+<div align="center">
+  <a href="README.md">中文</a> | 
+  <a href="docs/en/README.md">English</a>
+</div>
+
+<p align="center">wxChatBot 是一个基于Dify和Gewechat开发的智能聊天机器人项目。它通过集成 Dify AI 平台，提供高效、智能的消息处理和自动回复服务。支持ChatFlow自定义编排AI任务，原生支持永久记忆功能，支持GPT-SoVITS自定义音色，能够发送原生微信语音气泡</p>
 
 <div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
-  <img src="../images/wxchat_demo.jpg" alt="微信聊天演示" width="32%" style="max-width: 32%;">
-  <img src="../images/settings_chatflow.jpg" alt="功能展示" width="32%" style="max-width: 32%;">
-  <img src="../images/settings_voice.jpg" alt="语音设置界面" width="32%" style="max-width: 32%;">
+  <img src="docs/images/wxchat_demo.jpg" alt="微信聊天演示" width="32%" style="max-width: 32%;">
+  <img src="docs/images/settings_chatflow.jpg" alt="功能展示" width="32%" style="max-width: 32%;">
+  <img src="docs/images/settings_voice.jpg" alt="语音设置界面" width="32%" style="max-width: 32%;">
 </div>
 <p align="center"><b>微信聊天演示 | ChatFlow功能配置界面 | 语音设置界面</b></p>
 
-## 👋 前言
+## 👋 前言唠唠嗑
 
-你好！这个项目最初是受到 [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) 的启发。
+哈喽！欢迎,欢迎~
+这个项目最初是受到 [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) 的启发
 
 在部署过程中，我发现了几个需要改进的地方：
 - ChatFlow 功能支持有限
 - 本地部署时微信回调地址连接不稳定（尤其是没有公网IP的情况）
-- 语音模型只能调用大厂API，音色定制困难
+- 语音模型只能调用一些大厂预制API，定制音色麻烦
 
-于是我集成了 GPT-SoVITS 项目，实现了自定义语音音色的功能。这样用户可以根据自己的需求定制专属音色。
+于是我集成了 GPT-SoVITS，实现了自定义语音音色的功能。这样用户可以根据自己的需求定制专属音色
+
+其次是为什么选择Gewechat?
+当然是稳定且功能强大了！相较于itchat和wxauto，Gewechat实现微信个人号通道,使用ipad协议登录,相比itchat协议更稳定。
+wxauto不支持发送语音气泡，虽然稳定性强，但是很多可个性化的地方支持的不够完善。
 
 未来计划添加更多功能：
 - 📄 文档上传与智能问答
@@ -44,13 +57,13 @@
 理论上，Dify支持的功能都可以整合进来。这个项目可以变成：
 - 📚 专属知识库助手
 - 📝 个人生活管理工具
-- 📊 数据分析顾问
+- 📊 股票分析(仅作参考)
 
-这主要归功于Dify这个强大的开源项目，它负责复杂的AI处理，而本项目专注于接收和发送结果。
+这主要归功于Dify，它负责复杂的AI处理，而本项目专注于接收和发送结果
 
-我希望这个项目对新手也比较友好，但目前确实需要一定的技术基础。如果你成功部署了，希望你能从中学到有用的知识。
+我希望这个项目对新手也比较友好，但目前确实需要一定的技术基础。如果你成功部署了，希望你能从中学到有用的知识
 
-让我们一起探索AI应用的可能性吧！
+废话不多说，玩的开心~
 
 ## ✨ 功能特性
 
@@ -61,13 +74,13 @@
 - 支持插件和自定义函数扩展
 
 <div align="center">
-  <img src="../images/dify_home.png" alt="Dify主页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="docs/images/dify_home.png" alt="Dify主页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <p><b>Dify主页面</b></p>
   
-  <img src="../images/dify_model.png" alt="Dify模型配置页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="docs/images/dify_model.png" alt="Dify模型配置页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <p><b>模型配置界面</b></p>
   
-  <img src="../images/dify_chatflow.png" alt="Dify的Chatflow工作页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="docs/images/dify_chatflow.png" alt="Dify的Chatflow工作页" width="80%" style="max-width: 800px; margin: 20px 0; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <p><b>ChatFlow工作流配置</b></p>
 </div>
 
@@ -75,6 +88,16 @@
 - 无缝对接个人微信，轻松接入微信生态
 - 支持文本和语音回复（原生语音泡，非文件形式）
 - 通过简单指令（如`#设置`）获取管理界面
+- 支持管理chatflow（新增）
+- 支持管理chat记录（新增）
+
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
+  <img src="docs/images/chatflow_setting_1.png" alt="chatflow管理页(新建)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chatflow_setting_2.png" alt="chatflow管理页(删除)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chat_set_1.png" alt="chat管理页(新建)" width="24%" style="max-width: 24%;">
+  <img src="docs/images/chat_set_2.png" alt="chat管理页(删除)" width="24%" style="max-width: 24%;">
+</div>
+<p align="center"><b>chatflow管理页(新建) | chatflow管理页(删除) | chat管理页(新建) | chat管理页(删除)</b></p>
 
 ### 🔊 语音功能
 - 基于GPT-SoVITS技术，支持自定义语音模型
@@ -121,7 +144,7 @@ wxChatBot/
 - Gewechat的Docker环境
 
 ### 视频教程
-- 正在制作中，敬请期待
+- 在做了，在做了
 
 ### 安装步骤
 
@@ -135,14 +158,7 @@ cd wxChatBot
 ```bash
 pip install -r requirements.txt
 ```
-
-#### 3. 修改配置文件（见下方配置说明）
-```bash
-# 编辑config.json填入必要信息
-config.json
-```
-
-#### 4. 通过Docker构建Dify (可参考: [Dify](https://github.com/langgenius/dify))
+#### 3. 通过Docker构建Dify (可参考: [Dify](https://github.com/langgenius/dify))
 ```bash
 git clone https://github.com/langgenius/dify.git
 cd dify
@@ -151,23 +167,29 @@ cp .env.example .env
 docker compose up -d
 ```
 
-#### 5. 通过Docker构建GeweChat (可参考: [Gewechat](https://github.com/Devo919/Gewechat))
-##### 5.1 拉取镜像
+#### 4. 通过Docker构建GeweChat (可参考: [Gewechat](https://github.com/Devo919/Gewechat))
+##### 4.1 拉取镜像
 ```bash
 docker pull registry.cn-hangzhou.aliyuncs.com/gewe/gewe:latest
 docker tag registry.cn-hangzhou.aliyuncs.com/gewe/gewe gewe
 ```
 
-##### 5.2 运行镜像容器
+##### 4.2 运行镜像容器
 ```bash
 mkdir -p /root/temp
 docker update --restart=always gewe
 docker run -itd -v /root/temp:/root/temp -p 2531:2531 -p 2532:2532 --privileged=true --name=gewe gewe /usr/sbin/init
 ```
 
-##### 5.3 将容器设置成开机运行
+##### 4.3 将容器设置成开机运行
 ```bash
 docker update --restart=always gewe
+```
+
+#### 5. 修改配置文件（见下方配置说明）
+```bash
+# 编辑config.json填入必要信息
+config.json
 ```
 
 #### 6. 启动项目主程序
@@ -177,7 +199,7 @@ python main.py
 
 启动成功后控制台输出如下:
 <div align="center">
-<img src="../images/app_run.png" alt="配置界面" width="80%" style="max-width: 800px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<img src="docs/images/app_run.png" alt="配置界面" width="80%" style="max-width: 800px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 <p><b>系统启动界面</b></p>
 </div>
 
@@ -186,27 +208,27 @@ python main.py
 
 初次运行，需要修改`config.json`文件，主要配置项包括：
 
-```json
+```bash
 {
-    "master_name": "", // 你的微信账号名称(注意是账号名称不是备注，建议使用不易重名的名称)
-    "dify_api_base": "http://localhost/v1", // dify的地址，一般不用修改
-    "gewechat_base_url": "http://your_local_ip:2531/v2/api", // 将your_local_ip替换为你的电脑IP地址
-    "gewechat_token": "", // 初次创建应用，留空，这里自动填写
-    "gewechat_app_id": "", // 初次创建应用，留空，这里自动填写
-    "gewechat_callback_url": "http://your_local_ip:1145/v2/api/callback/collect", // 一般不需要改
-    "server_host": "localhost", // 应该也不需要修改
-    "settings_url": "", // 自动生成
-    "GPT-SoVITS_url": "http://127.0.0.1:9880", // GPT-SoVITS的url,一般默认即可
-    "text_language": "ja", // 模型发送的语音语言(如果为中文之外的语言，需要在Dify端修改提示词)常用的:中文(zh),英文(en),日文(ja)
-    "call_back_success_falg": false, // 登陆后如果发送消息没反应，把这个变为false即可重新登录，记得登陆后成功了修改为true
-    "is_remote_server": false, // 是否为远程服务器，本地部署的就填false
-    "debug_mode": true, // 可以不改
-    "log_level": "DEBUG", // 可以不该
-    "start_time": 1742287344.8490422 // 自动生成
+    "master_name": "", # 你的微信账号名称(注意是账号名称不是备注，建议使用不易重名的名称)
+    "dify_api_base": "http://localhost/v1", # dify的地址，一般不用修改
+    "gewechat_base_url": "http://your_local_ip:2531/v2/api", # 将your_local_ip替换为你的电脑IP地址
+    "gewechat_token": "", # 初次创建应用，留空，这里自动填写
+    "gewechat_app_id": "", # 初次创建应用，留空，这里自动填写
+    "gewechat_callback_url": "http://your_local_ip:1145/v2/api/callback/collect", # 一般不需要改
+    "server_host": "localhost", # 应该也不需要修改
+    "settings_url": "", # 自动生成
+    "GPT-SoVITS_url": "http://127.0.0.1:9880", # GPT-SoVITS的url,一般默认即可
+    "text_language": "ja", # 模型发送的语音语言(如果为中文之外的语言，需要在Dify端修改提示词)常用的:中文(zh),英文(en),日文(ja)
+    "call_back_success_falg": false, # 推荐设置为false，这样会少很多莫名其妙的bug
+    "is_remote_server": false, # 是否为远程服务器，本地部署的就填false
+    "debug_mode": true, # 可以不改
+    "log_level": "DEBUG", # 可以不该
+    "start_time": 1742287344.8490422 # 自动生成
 }
 ```
 
-> 💡 **提示**：参考项目中的`config.example.json`获取完整配置示例。
+> 💡 **提示**：参考项目中的`config.example.json`获取完整配置示例
 
 
 ## ❗注意事项
@@ -214,11 +236,37 @@ python main.py
 ### 💡 微信回调配置
 - 首次运行时，系统会自动配置Gewechat的回调地址
 - 新设备在次日凌晨可能会自动掉线（微信安全机制）
+- 有时候隔了一天也有可能发消息后没反应
 - 解决方案：
   1. 将`config.json`中的`call_back_success_falg`设为`false`
   2. 重新扫码登录
-  3. 登录成功后将`call_back_success_falg`改回`true`
-- 如果不介意每次都扫码，可以保持`false`状态，避免回调地址出现问题
+  3. 登录成功后将自动`call_back_success_falg`改回`true`
+
+### ⭐️ 发送`#设置`后显示为:None
+- 原因:Gradio缺少依赖项，一般这个都会有问题，初次启动程序的时候控制台有如下类似内容:
+```bash
+Could not create share link. Missing file: xxx/Lib/site-packages/gradio/frpc_windows_amd64_v0.3
+Please check your internet connection. This can happen if your antivirus software blocks the download of this file. You can install manually by following these steps:
+1. Download this file: https://cdn-media.huggingface.co/frpc-gradio-0.3/frpc_windows_amd64.exe
+2. Rename the downloaded file to: frpc_windows_amd64_v0.3
+3. Move the file to this location: xxx/Lib/site-packages/gradio
+```
+- 解决方案:
+  1. 下载[frpc_windows_amd64](https://cdn-media.huggingface.co/frpc-gradio-0.3/frpc_windows_amd64.exe)
+  2. 重命名该文件为:`frpc_windows_amd64_v0.3`(注意是完全改成这个名字，没有后缀.exe)
+  3. 移动该文件到: `xxx/Lib/site-packages/gradio`, 其中`xxx`可以在控制台看到，就是你的python环境的位置
+
+### ❗Gewechat创建失败(作者在这里踩了许多坑了)
+如果遇到gewechat创建设备失败，unexpected EOF错误，请排查网络是否是以下情况：
+```bash
+1️. 代理：请关闭代理后尝试；
+
+2️. 国外服务器；
+
+3️. 回调地址为外网；
+
+4️. 异地服务器
+```
 
 ### 🛠️ 环境依赖
 - **Dify环境**：必须确保Dify正确部署，这是使用大模型能力的基础
@@ -301,7 +349,7 @@ brew install ffmpeg
 - [x] 优化Web设置界面
 - [x] 微信发送语音开关
 - [ ] 正式发布V1.0.0版本
-- [ ] Docker一键部署
+- [ ] 一键部署(自带环境)
 - [ ] 视频教程
 
 ### 后期计划
@@ -320,32 +368,27 @@ brew install ffmpeg
 
 ## ❤️ 赞助支持
 
-### 💝 支持一下
-如果这个项目对您有所帮助，您的支持是我持续改进的动力！
+### 💝 支持我
+你的支持是持续改进这个项目的动力！感谢!!
 
 <div align="center">
-🎯 你的支持将用于：🎓 制作开源教程和文档 · 💡 开发更多实用功能 · 🌍 建设开源社区 · 🔥 探索AI应用新可能
+🎯 你的支持将用于：
+</div>
+<div align="center">
+🎓 制作开源教程和文档 · 💡 开发更多实用功能 · 🌍 建设开源社区 · 🔥 探索AI应用新可能
 </div>
 
-<div align="center">
-  <table border="0">
-    <tr>
-      <td align="center">
-        <img src="../images/wechat_qr.jpg" alt="微信支付" width="180px" style="border-radius: 5px;">
-        <br>
-        <b>微信支付</b>
-      </td>
-      <td align="center">
-        <img src="../images/alipay_qr.jpg" alt="支付宝" width="180px" style="border-radius: 5px;">
-        <br>
-        <b>支付宝</b>
-      </td>
-    </tr>
-  </table>
+<div align="center" style="display: flex; justify-content: center; flex-wrap: nowrap; gap: 10px; max-width: 100%; overflow-x: auto;">
+  <img src="docs/images/wechat_qr.jpg" alt="微信支付" width="200px" height="200px" style="max-width: 200px;">
+  <img src="docs/images/alipay_qr.jpg" alt="支付宝" width="200px" height="200px" style="max-width: 200px;">
 </div>
+<p align="center"><b>微信 | 支付宝</b></p>
+
+
 
 ### 🔒 赞助计划
 
+<div align="center">
 <table>
   <thead>
     <tr>
@@ -380,9 +423,10 @@ brew install ffmpeg
     </tr>
   </tbody>
 </table>
+</div>
 
 <div align="center" style="margin: 20px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
-  <p><b>💼 商务合作/赞助咨询：</b>微信 <code>N19880667051</code> （备注：wxChatBot）</p>
+  <p><b>💼 商务合作/赞助咨询：</b>微信 <code>Norcoo</code> （备注：wxChatBot）</p>
 </div>
 
 ## 💬 核心交流群
@@ -394,7 +438,7 @@ brew install ffmpeg
 
 ## 🤝 贡献指南
 
-感谢你对项目的关注！欢迎各种形式的贡献。
+感谢你对项目的关注！欢迎各种形式的贡献
 
 ### 🌟 贡献方式
 
@@ -422,9 +466,13 @@ brew install ffmpeg
 
 ### 🎯 开发指南
 
-- 项目代码完善后将提供详细的开发指南
+- 项目代码完善后将提供详细的开发指南(施工中~)
 
 ### 🔄 更新日志
+
+**2025-03-25**
+- 完善网页部分的更新处理机制，实现热更改配置，自动刷新
+- 新增:可通过网页配置chatflow以及chat记录的增加和删除
 
 **2025-03-19**
 - 完善README文档内容和排版
@@ -438,11 +486,11 @@ brew install ffmpeg
 
 **2025-03-12**
 - 初始项目框架搭建
-- 基础功能实现
+- 基础功能测试
 
 ## 📄 许可证
 
-本项目使用 MIT 许可证。详情请参阅 [LICENSE](../../LICENSE) 文件。
+本项目使用 MIT 许可证。详情请参阅 [LICENSE](LICENSE) 文件
 
 ## 🌟 致谢
 
@@ -450,8 +498,10 @@ brew install ffmpeg
 
 - [Dify](https://dify.ai) - 提供强大的AI能力支持
 - [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) - 项目灵感来源
+- [KouriChat](https://github.com/KouriChat/KouriChat) - 提供了很多创新、有趣的思路
 - [Gewechat](https://github.com/Devo919/Gewechat) - 微信接口实现
 - [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) - 语音合成技术支持
+
 
 ## 📜 项目声明
 - 本项目仅供技术研究与学习交流
