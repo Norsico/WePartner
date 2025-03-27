@@ -1,11 +1,11 @@
 {
   "selected_chatflow": {
-    "description": "test1",
-    "api_key": "app-I4J0Rp2LfRKGXWXKV2LCko2x",
+    "description": "wxChatBot",
+    "api_key": "app-s45SiU5pHsQoow16fjUfMjuq",
     "conversation": {
-      "name": "新对话",
-      "id": "97b87a1c-488d-42a9-9fc4-c57164cdba40"
+      "name": "chatTest",
+      "id": "3549b9de-c6b8-4290-87e2-e534b121e9c1"
     }
   },
-  "voice_reply_enabled": true
+  "voice_reply_enabled": false
 }

@@ -33,9 +33,19 @@
 </div>
 <p align="center"><b>微信聊天演示 | ChatFlow功能配置界面 | 语音设置界面</b></p>
 
-## 👋 前言唠唠嗑
+## 🎉 最新发布
 
-哈喽！欢迎,欢迎~
+<div align=>
+<h3 style="font-size: 24px">📦 V1.0.0整合包</h3>
+
+<h4><a href="https://pan.baidu.com/s/1Kmr73UtaOweZcZLcLSitZw" style="font-size: 20px">百度网盘下载</a></h4>
+
+<h4 style="font-size: 15px">提取码：<code style="font-size: 15px">1145</code></h4>
+</div>
+
+## 👋 前言
+
+哈喽！
 这个项目最初是受到 [dify-on-wechat](https://github.com/hanfangyuan4396/dify-on-wechat) 的启发
 
 在部署过程中，我发现了几个需要改进的地方：
@@ -374,9 +384,9 @@ Please check your internet connection. This can happen if your antivirus softwar
 - [x] 完善ChatFlow相关功能
 - [x] 优化Web设置界面
 - [x] 微信发送语音开关
-- [ ] 正式发布V1.0.0版本
-- [ ] 一键部署(自带环境)
-- [ ] 视频教程
+- [x] 正式发布V1.0.0版本
+- [x] 一键部署的整合包(自带环境)
+- [ ] 视频/教程
 
 ### 后期计划
 - [ ] 可设置的主动发送消息功能

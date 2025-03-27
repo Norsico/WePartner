@@ -16,6 +16,14 @@
       "conversations": {
         "ch_test_chat_1": "aeb74346-b58e-4773-8650-bed259071cf7"
       }
+    },
+    "wxChatBot": {
+      "api_key": "app-s45SiU5pHsQoow16fjUfMjuq",
+      "created_at": "2025-03-26",
+      "base_url": "http://localhost/v1",
+      "conversations": {
+        "chatTest": "3549b9de-c6b8-4290-87e2-e534b121e9c1"
+      }
     }
   }
 }
