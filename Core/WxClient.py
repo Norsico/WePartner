@@ -11,7 +11,7 @@ from Core.bridge.context import ContextType
 from Core.bridge.channel import Channel
 from Core.factory.client_factory import ClientFactory
 from config import Config
-
+from Core.web.settings_manager import SettingsManager
 logger = logging = Logger()
 is_callback_success = False
 
@@ -118,6 +118,36 @@ class Query:
         self.client = ClientFactory.get_client(self.config)
         # 创建通道对象
         self.channel = Channel(self.client, self.config)
+        self.message_queue = []  # 消息队列
+        self.timer = None  # 定时器
+        self.queue_lock = threading.Lock()  # 队列锁
+        self.settings_manager = SettingsManager()
+
+    def process_message_queue(self):
+        """处理消息队列中的所有消息"""
+        with self.queue_lock:
+            if not self.message_queue:
+                return
+                
+            # 合并所有消息
+            combined_message = "\n".join([msg.content for msg in self.message_queue])
+            logger.info(f"处理合并后的消息: {combined_message}")
+            
+            try:
+                result = self.channel.compose_context(combined_message)
+                logger.info(f"消息处理完成，结果: {result}")
+            except Exception as e:
+                logger.error(f"消息处理过程中出现错误: {str(e)}")
+            
+            # 清空消息队列
+            self.message_queue.clear()
+        
+    def reset_timer(self):
+        """重置定时器"""
+        if self.timer is not None:
+            self.timer.cancel()
+        self.timer = threading.Timer(self.settings_manager.get_settings().get("timer_seconds"), self.process_message_queue)
+        self.timer.start()
 
     def GET(self):
         # 搭建简单的文件服务器，用于向gewechat服务传输语音等文件，但只允许访问tmp目录下的文件
@@ -183,10 +213,10 @@ class Query:
 
         # 处理有效消息
         try:
-            # 直接将消息传递给channel处理，让channel决定如何处理不同类型的消息
-            logger.info(f"正在处理消息: {gewechat_msg.content}")
-            result = self.channel.compose_context(gewechat_msg.content)
-            logger.info(f"消息处理完成，结果: {result}")
+            with self.queue_lock:
+                self.message_queue.append(gewechat_msg)
+                logger.info(f"收到新消息，加入队列: {gewechat_msg.content}")
+            self.reset_timer()
         except Exception as e:
             logger.error(f"消息处理过程中出现错误: {str(e)}")
             

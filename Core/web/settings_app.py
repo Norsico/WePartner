@@ -93,6 +93,17 @@ class SettingsApp:
             voice_enabled = self.settings.get('voice_reply_enabled', False)
             voice_checkbox_updated = gr.Checkbox(value=voice_enabled)
             
+            # 更新等待时间设置
+            timer_seconds = self.settings.get('timer_seconds', 5)
+            timer_slider_updated = gr.Slider(
+                minimum=1,
+                maximum=30,
+                value=timer_seconds,
+                step=1,
+                label="等待时间（秒）",
+                info="设置范围：1-30秒"
+            )
+            
             return (
                 chatflow_radio_updated,
                 delete_chatflow_radio_updated,
@@ -100,7 +111,8 @@ class SettingsApp:
                 del_conv_chatflow_radio_updated,
                 "数据已刷新",
                 conversation_radio_updated,
-                voice_checkbox_updated
+                voice_checkbox_updated,
+                timer_slider_updated
             )
 
         def update_conversations(chatflow_name):
@@ -280,6 +292,16 @@ class SettingsApp:
             # 返回结果和重置的表单值
             return result, "", "你好"
 
+        def save_timer_settings(timer_value):
+            """保存等待时间设置"""
+            try:
+                self.settings_manager.set_setting('timer_seconds', int(timer_value))
+                logger.success(f"已保存等待时间设置：{timer_value}秒")
+                return f"等待时间设置保存成功！当前设置为{timer_value}秒"
+            except Exception as e:
+                logger.error(f"保存等待时间设置失败：{str(e)}")
+                return "保存失败，请检查日志"
+
         with gr.Blocks(title="wxChatBot 设置", theme=gr.themes.Soft(), analytics_enabled=False) as interface:
             # 标题和说明
             with gr.Row():
@@ -347,6 +369,34 @@ class SettingsApp:
                         # 保存按钮和结果显示
                         voice_save_btn = gr.Button("保存语音设置", variant="primary", size="lg")
                         voice_result = gr.Textbox(label="保存结果", interactive=False)
+
+                # 其他设置页面
+                with gr.Tab("⚙️ 其他设置"):
+                    with gr.Column():
+                        gr.Markdown(
+                            """
+                            ### 消息聚合设置
+                            
+                            设置接收消息时的等待时间，在此时间内如果收到新消息，将重置计时器并将消息合并处理。
+                            """
+                        )
+                        
+                        # 获取当前timer_seconds设置
+                        timer_seconds = self.settings.get('timer_seconds', 5)
+                        
+                        # 等待时间设置
+                        timer_slider = gr.Slider(
+                            minimum=1,
+                            maximum=30,
+                            value=timer_seconds,
+                            step=1,
+                            label="等待时间（秒）",
+                            info="设置范围：1-30秒"
+                        )
+                        
+                        # 保存按钮和结果显示
+                        timer_save_btn = gr.Button("保存等待时间设置", variant="primary", size="lg")
+                        timer_result = gr.Textbox(label="保存结果", interactive=False)
 
                 # Chatflow管理页面
                 with gr.Tab("🔧 Chatflow管理"):
@@ -437,6 +487,13 @@ class SettingsApp:
                 outputs=[voice_result]
             )
 
+            # 等待时间设置事件
+            timer_save_btn.click(
+                fn=save_timer_settings,
+                inputs=[timer_slider],
+                outputs=[timer_result]
+            )
+
             # 刷新按钮事件
             refresh_btn.click(
                 fn=refresh_data,
@@ -448,7 +505,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             ).then(
                 fn=update_conversations,
@@ -471,7 +529,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             )
 
@@ -489,7 +548,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             )
 
@@ -508,7 +568,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             )
 
@@ -533,7 +594,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             ).then(
                 fn=update_conversations,
@@ -552,7 +614,8 @@ class SettingsApp:
                     del_conv_chatflow_radio,
                     refresh_result,
                     conversation_radio,
-                    voice_checkbox
+                    voice_checkbox,
+                    timer_slider
                 ]
             ).then(
                 fn=update_conversations,

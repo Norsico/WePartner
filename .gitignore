@@ -39,5 +39,6 @@ TODO
 .gradio/
 tmp
 config.json
+gen_audio.py
 # Local configuration
 *.log 

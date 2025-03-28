@@ -51,7 +51,8 @@ class SettingsManager:
                     "id": ""        # 对话ID
                 }
             },
-            "voice_reply_enabled": False  # 是否启用语音回复
+            "voice_reply_enabled": False,  # 是否启用语音回复
+            "timer_seconds": 5  # 消息聚合等待时间（秒）
         }
         
     def get_settings(self) -> Dict:
@@ -127,4 +128,22 @@ class SettingsManager:
             return True
         except Exception as e:
             print(f"设置语音回复失败: {str(e)}")
+            return False
+            
+    def set_setting(self, key: str, value: any) -> bool:
+        """设置单个配置项
+        
+        Args:
+            key: 配置项键名
+            value: 配置项值
+            
+        Returns:
+            bool: 是否设置成功
+        """
+        try:
+            self.settings[key] = value
+            self._save_settings(self.settings)
+            return True
+        except Exception as e:
+            print(f"设置配置项失败: {str(e)}")
             return False 
