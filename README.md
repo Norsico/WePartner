@@ -35,6 +35,8 @@
 
 ## 🎉 最新发布
 
+#### 教程链接:
+[视频教程-BiliBili](https://www.bilibili.com/video/BV1emo9YfEzL/?share_source=copy_web&vd_source=5fb896535080e8037a00c6ab3c7f412b) 
 <div align=>
 <h3 style="font-size: 24px">📦 V1.0.0整合包</h3>
 
@@ -154,7 +156,7 @@ wxChatBot/
 - Gewechat的Docker环境
 
 ### 视频教程
-- 在做了，在做了
+- [点击进入视频教程-BiliBili](https://www.bilibili.com/video/BV1emo9YfEzL/?share_source=copy_web&vd_source=5fb896535080e8037a00c6ab3c7f412b) 
 
 ### 安装步骤
 
@@ -386,7 +388,7 @@ Please check your internet connection. This can happen if your antivirus softwar
 - [x] 微信发送语音开关
 - [x] 正式发布V1.0.0版本
 - [x] 一键部署的整合包(自带环境)
-- [ ] 视频/教程
+- [x] 视频/教程
 
 ### 后期计划
 - [ ] 可设置的主动发送消息功能
