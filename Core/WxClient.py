@@ -239,15 +239,20 @@ class Query:
         if int(gewechat_msg.create_time) < int(time.time()) - 60 * 5:  # 跳过5分钟前的历史消息
             logger.debug(f"忽略过期消息（5分钟前），来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
-
-        # 处理有效消息
-        try:
-            with self.queue_lock:
-                self.message_queue.append(gewechat_msg)
-                logger.info(f"收到新消息，加入队列: {gewechat_msg.content}")
-                logger.debug(f"当前队列长度: {len(self.message_queue)}")
-            self.reset_timer()
-        except Exception as e:
-            logger.error(f"消息处理过程中出现错误: {str(e)}")
+        
+        if gewechat_msg.content.lower() in ["#设置", "#setting", "#config"]:
+            logger.info(f"收到设置命令: {gewechat_msg.content}")
+            self.channel.compose_context(gewechat_msg.content)
+            return "success"
+        else:
+            # 处理有效消息
+            try:
+                with self.queue_lock:
+                    self.message_queue.append(gewechat_msg)
+                    logger.info(f"收到新消息，加入队列: {gewechat_msg.content}")
+                    logger.debug(f"当前队列长度: {len(self.message_queue)}")
+                self.reset_timer()
+            except Exception as e:
+                logger.error(f"消息处理过程中出现错误: {str(e)}")
             
         return "success"
