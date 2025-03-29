@@ -1,6 +1,6 @@
 from Core.Logger import Logger
 from Core.commands.command_manager import CommandManager
-from Core.web.settings_manager import SettingsManager
+from Core.web_app.settings_manager import SettingsManager
 from Core.voice.audio_convert import wav_to_silk
 from Core.voice.audio_gen import AudioGen
 from Core.difyAI.dify_manager import DifyManager

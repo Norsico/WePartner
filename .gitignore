@@ -25,6 +25,7 @@ var/
 ENV/
 .env/
 voice_model/
+runtime
 
 # logs
 logs/
@@ -38,6 +39,7 @@ wxChatBot.code-workspace
 TODO
 .gradio/
 tmp
+start.bat
 config.json
 gen_audio.py
 # Local configuration

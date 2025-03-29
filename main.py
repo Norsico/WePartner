@@ -2,11 +2,14 @@
 wxChatBot 主程序入口
 """
 import os
-import signal
 import sys
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import signal
 from Core.Logger import Logger
 from Core.initializer import SystemInitializer
-from Core.web.web_init import WebInitializer
+from Core.web_app.web_init import WebInitializer
 from Core.bridge.temp_dir import TmpDir
 
 

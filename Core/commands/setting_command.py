@@ -4,7 +4,7 @@
 """
 from Core.commands.base_command import BaseCommand
 from Core.Logger import Logger
-from Core.web.settings_app import get_settings_app
+from Core.web_app.settings_app import get_settings_app
 
 logging = Logger()
 

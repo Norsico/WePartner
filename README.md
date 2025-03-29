@@ -35,14 +35,18 @@
 
 ## 🎉 最新发布
 
-#### 教程链接:
+### 教程链接:
 [视频教程-BiliBili](https://www.bilibili.com/video/BV1emo9YfEzL/?share_source=copy_web&vd_source=5fb896535080e8037a00c6ab3c7f412b) 
 <div align=>
 <h3 style="font-size: 24px">📦 V1.0.0整合包</h3>
 
-<h4><a href="https://pan.baidu.com/s/1Kmr73UtaOweZcZLcLSitZw" style="font-size: 20px">百度网盘下载</a></h4>
+<h4><a href="https://pan.baidu.com/s/1-PdbACZNJz9v4AveITqhVw" style="font-size: 20px">百度网盘下载</a></h4>
 
 <h4 style="font-size: 15px">提取码：<code style="font-size: 15px">1145</code></h4>
+
+整合包使用方法:
+解压后先双击setup.bat，安装可能会遗漏的包，检查环境配置
+结束后运行start-app.bat即可
 </div>
 
 ## 👋 前言
@@ -392,7 +396,7 @@ Please check your internet connection. This can happen if your antivirus softwar
 
 ### 后期计划
 - [ ] 可设置的主动发送消息功能
-- [ ] 用户可设置(自定义)在一定时间段内多次发送消息，Dify那边能够一次性处理
+- [x] 用户可设置(自定义)在一定时间段内多次发送消息，Dify那边能够一次性处理
 - [ ] 批处理操作(针对需要多次执行的指令)
 - [ ] 增加web端的功能(支持新建对话、删除对话、修改提示词等等)
 - [ ] 表情包发送

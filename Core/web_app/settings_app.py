@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from config import Config
 from Core.Logger import Logger
 from Core.difyAI.dify_manager import DifyManager
-from Core.web.settings_manager import SettingsManager
+from Core.web_app.settings_manager import SettingsManager
 from Core.difyAI.dify_chatflow import DifyChatflow
 
 

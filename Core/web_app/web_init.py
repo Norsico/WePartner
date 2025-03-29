@@ -2,7 +2,7 @@
 wxChatBot Web初始化模块
 负责初始化web服务和配置
 """
-from Core.web.settings_app import get_settings_app
+from Core.web_app.settings_app import get_settings_app
 from config import Config
 from Core.Logger import Logger
 

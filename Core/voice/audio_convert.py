@@ -29,9 +29,9 @@ try:
     # 更新环境变量 PATH
     os.environ["PATH"] = f"{ffmpeg_path};{os.environ['PATH']}"
     if not check_ffmpeg():
-        logger.warning("ffmpeg path will not be set. Try: pip install ffmpeg-python")
+        logger.warning("ffmpeg path will not be set. need /voice_model/ffmpeg/bin")
 except ImportError:
-    logger.warning("ffmpeg path will not be set. Try: pip install ffmpeg-python")
+    logger.warning("ffmpeg path will not be set. need /voice_model/ffmpeg/bin")
 
 def wav_to_silk(wav_path: str, silk_path: str) -> int:
     """Convert MP3 file to SILK format

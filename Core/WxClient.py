@@ -11,7 +11,7 @@ from Core.bridge.context import ContextType
 from Core.bridge.channel import Channel
 from Core.factory.client_factory import ClientFactory
 from config import Config
-from Core.web.settings_manager import SettingsManager
+from Core.web_app.settings_manager import SettingsManager
 logger = logging = Logger()
 is_callback_success = False
 
