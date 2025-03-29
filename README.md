@@ -512,6 +512,13 @@ Please check your internet connection. This can happen if your antivirus softwar
 
 ### 🔄 更新日志
 
+**2025-03-29**
+- 修复V1.0.0版本整合包环境出错的Bug，使用嵌入式python作为启动引擎
+- 初次下载项目需要运行整合包里的setup.py
+- 然后执行start-app.bat运行项目
+- 注意需要更改settings.json中的配置
+- 注意V1.0.0版本需要Dify和Gewechat这两个前置的Docker部署环境
+
 **2025-03-25**
 - 完善网页部分的更新处理机制，实现热更改配置，自动刷新
 - 新增:可通过网页配置chatflow以及chat记录的增加和删除
