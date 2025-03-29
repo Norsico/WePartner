@@ -193,7 +193,6 @@ docker tag registry.cn-hangzhou.aliyuncs.com/gewe/gewe gewe
 ##### 4.2 运行镜像容器
 ```bash
 mkdir -p /root/temp
-docker update --restart=always gewe
 docker run -itd -v /root/temp:/root/temp -p 2531:2531 -p 2532:2532 --privileged=true --name=gewe gewe /usr/sbin/init
 ```
 
