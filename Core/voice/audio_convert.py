@@ -36,7 +36,7 @@ except ImportError:
 def wav_to_silk(wav_path: str, silk_path: str) -> int:
     """Convert MP3 file to SILK format
     Args:
-        mp3_path: Path to input MP3 file
+        wav_path: Path to input WAV file
         silk_path: Path to output SILK file
     Returns:
         Duration of the SILK file in milliseconds

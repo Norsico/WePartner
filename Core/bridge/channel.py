@@ -71,33 +71,88 @@ class Channel:
             # 继续已有对话
             
             for r in res:
-                print(r)
+                if r['type'] == 'text':
+                    self.handle_text(r['content'])
+                elif r['type'] == 'voice':
+                    self.handle_voice(r['content'])
+
 
             # if res['type'] == 'text':
-            #     try:
-            #         # 发送回复
-            #         master_name = self.config.get('master_name')
-            #         if voice_reply_enabled:
-            #             # 使用GPT-SoVITS生成语音，转换为silk格式后即可发送
-            #             audio_gen = AudioGen()
-            #             audio_path = audio_gen.generate_voice(response)
-            #             silk_path = audio_path + '.silk'
-            #             duration = wav_to_silk(audio_path, silk_path)
-            #             callback_url = self.config.get("gewechat_callback_url")
-            #             silk_url = callback_url + "?file=" + silk_path
-            #             self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
-            #             logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
-            #         else:
-            #             self.send_text_message_by_name(master_name, response)
-            #         logging.info(f"已发送回复")
-            #         return "success"
-            #     except Exception as e:
-            #         logging.error(f"处理消息时出错: {str(e)}")
-            #         return "error"
+           
             return "success"
 
-                
+    def handle_text(self, text):
+        try:
+            # 发送回复
+            master_name = self.config.get('master_name')
+            self.send_text_message_by_name(master_name, text)
+            logging.info(f"已发送回复")
+            return "success"
             
+        except Exception as e:
+            logging.error(f"处理消息时出错: {str(e)}")
+            return "error"
+
+    def handle_voice(self, voice_url):
+        """
+        处理语音消息
+        
+        Args:
+            voice_url: 语音文件的URL
+            
+        Returns:
+            处理结果
+        """
+        try:
+            import os
+            import requests
+            import uuid
+            from Core.bridge.temp_dir import TmpDir
+            
+            # 创建临时目录
+            tmp_dir = TmpDir().path()
+
+            logging.debug(f"tmp_dir路径: {tmp_dir}")
+            # 生成唯一的文件名
+            file_name = f"{uuid.uuid4()}"
+            relative_voice_file = f"voice_{file_name}.wav"
+            audio_path = os.path.join(tmp_dir, relative_voice_file)
+            # 下载语音文件
+            logging.info(f"正在下载语音文件: {voice_url}")
+            response = requests.get(voice_url)
+            if response.status_code != 200:
+                logging.error(f"下载语音文件失败: {response.status_code}")
+                return "error"
+            # 保存为WAV文件
+            with open(audio_path, "wb") as f:
+                f.write(response.content)
+            audio_path = os.path.abspath(audio_path)
+            logging.info(f"语音文件已保存至: {audio_path}")
+
+            silk_path = audio_path + '.silk'
+            
+            # 转换为silk格式
+            duration = wav_to_silk(audio_path, silk_path)
+            
+            # 发送语音消息
+            master_name = self.config.get('master_name')
+            callback_url = self.config.get("gewechat_callback_url")
+            silk_url = callback_url + "?file=" + str(silk_path)
+            
+            wxid = self.get_wxid_by_name(master_name)
+            if not wxid:
+                logging.error(f"未找到用户 {master_name} 的wxid，无法发送语音")
+                return "error"
+                
+            # 发送语音消息
+            self.client.post_voice(self.gewechat_app_id, wxid, silk_url, duration)
+            logging.info(f"[gewechat] 已发送语音到 {master_name}: {silk_url}, 时长: {duration / 1000.0} 秒")
+            
+            return "success"
+            
+        except Exception as e:
+            logging.error(f"处理语音消息时出错: {str(e)}")
+            return "error"
 
     def send_text_message_by_name(self, name, message):
         """
