@@ -76,10 +76,12 @@ class WxChatClient:
                             logger.warning(f"正在测试回调是否有效...")
                             # 测试回调是否有效
                             self.test_callback()
-                        self.config.set("call_back_success_falg", True)
+                        
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
-                logger.info("继续运行，回调可能仍然有效...")
+                logger.info("正在测试回调是否有效...")
+                # 测试回调是否有效
+                self.test_callback()
         
         # 启动回调设置线程
         callback_thread = threading.Thread(target=setup_callback, daemon=True)
@@ -95,12 +97,13 @@ class WxChatClient:
     def test_callback(self):
         # 新建线程发送消息测试回调是否有效
         def send_test_msg():
-            self.channel.send_text_message_by_name(self.config.get("master_name"), "测试回调(6秒等待)...")
-            time.sleep(6)
+            self.channel.send_text_message_by_name(self.config.get("master_name"), "测试回调(8秒等待)...")
+            time.sleep(8)
             global is_callback_success
             if is_callback_success:
                 logger.success("回调测试成功")
                 self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置成功")
+                self.config.set("call_back_success_falg", True)
             else:
                 logger.error("回调测试失败")
                 self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置失败")

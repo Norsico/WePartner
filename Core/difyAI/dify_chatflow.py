@@ -1,11 +1,10 @@
 import json
 import requests
 import os
+import re
 from typing import Dict, List
 from dataclasses import dataclass
-from Core.Logger import Logger
 
-logger = Logger()
 
 @dataclass
 class FileInfo:
@@ -91,6 +90,7 @@ class DifyChatflow:
     def _save_conversations(self):
         """保存对话信息到配置文件"""
         self._save_config(self.conversations)
+
 
     def save_conversation(self, conversation_id: str, name: str = None):
         """保存对话信息
@@ -222,8 +222,8 @@ class DifyChatflow:
                 } for f in (files or [])
             ]
         }
-        logger.debug(f"请求参数: {payload}")
-        logger.info("正在生成回复...")
+        print(f"请求参数: {payload}")
+        print("正在生成回复...")
 
         try:
             response = requests.post(url, json=payload, headers=self.headers)
@@ -302,31 +302,80 @@ class DifyChatflow:
             raise Exception(f"未找到名称为 '{name}' 的对话")
         
         return self.delete_conversation(conversation_id=conversation_id, user=user)
+    
+    @staticmethod
+    def handle_response(response):
+        # 假设 response 是一个字典，包含返回的内容
+        content = response.get('answer', '')
+
+        results = []
+
+        # 检查返回的内容类型
+        if '<text>' in content:
+            # 提取文本内容
+            text_contents = re.findall(r'<text>(.*?)</text>', content, re.DOTALL)
+            if text_contents:
+                for text in text_contents:
+                    results.append({
+                        'type': 'text',
+                        'content': text.strip()
+                    })
+
+        if '<voice>' in content:
+            # 提取语音内容
+            voice_contents = re.findall(r'<voice>(.*?)</voice>', content, re.DOTALL)
+            if voice_contents:
+                for voice_url in voice_contents:
+                    # 使用正则表达式提取括号里的内容
+                    pattern = r'\((.*?)\)'
+                    matches = re.findall(pattern, voice_url)
+                    voice_file_url = f"http://localhost{matches[0]}"
+                    results.append({
+                        'type': 'voice',
+                        'content': voice_file_url.strip()
+                    })
+        
+        return results
 
 if __name__ == '__main__':
     # 测试代码
-    api_key = "app-I4J0Rp2LfRKGXWXKV2LCko2x"
+    api_key = "app-s45SiU5pHsQoow16fjUfMjuq"
     base_url = "http://localhost/v1"
     
     # 初始化客户端
     client = DifyChatflow(
         api_key=api_key,
-        description="test1",
+        description="voice_http_test",
         base_url=base_url
     )
     
     try:
-        # 列出当前API Key下的所有对话
-        conversations = client.list_conversations()
-        print(f"当前API Key的对话列表: {conversations}")
+        # # 列出当前API Key下的所有对话
+        # conversations = client.list_conversations()
+        # print(f"当前API Key的对话列表: {conversations}")
+
+        # 文本<text>
+        # 图片<image>
+        # 语音<voice>
+        # 文件<files>
         
         # 开始新对话
-        response = client.chat(query="hello", conversation_name="新对话")
-        print(f"AI回复: {response.get('answer')}\n")
-        
-        # # 继续已有对话
-        # response = client.chat(query="晚上好", conversation_name="测试对话_1")
+        # response = client.chat(query="哈喽", conversation_name="新对话")
         # print(f"AI回复: {response.get('answer')}\n")
+        
+        # 继续已有对话
+        response = client.chat(query="不要嘛", conversation_name="新对话")
+        # 使用正则表达式提取括号里的内容
+        res = client.handle_response(response)
+
+        print(res)
+
+
+        # pattern = r'\((.*?)\)'
+        # matches = re.findall(pattern, response.get('answer'))
+        # res = f"http://localhost{matches[0]}"
+        # print(f"AI回复:\n{res}")
+        # http://localhost/files/tools/b1f4d8c8-48c6-44ba-b067-af16a63ebdd3.bin?timestamp=1743308351&nonce=a8ef791e3bc1e268c4a81bf5a275b4d9&sign=Q-UnUSuXHsMydF9Ymt0Ku4a8vP6fS-ZiiFPkx05vaVY=
         
         # # 再次列出对话
         # print("\n更新后的对话列表:")

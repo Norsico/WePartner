@@ -6,12 +6,12 @@
     "gewechat_app_id": "wx_Nnldl-rsXjLWzQkMm8VrG",
     "gewechat_callback_url": "http://172.26.128.1:1145/v2/api/callback/collect",
     "server_host": "localhost",
-    "settings_url": null,
+    "settings_url": "https://718747145f41685b25.gradio.live",
     "GPT-SoVITS_url": "http://127.0.0.1:9880",
     "text_language": "ja",
-    "call_back_success_falg": false,
+    "call_back_success_falg": true,
     "is_remote_server": false,
     "debug_mode": true,
     "log_level": "DEBUG",
-    "start_time": 1743238747.6274788
+    "start_time": 1743315110.2013497
 }

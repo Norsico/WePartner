@@ -24,6 +24,14 @@
       "conversations": {
         "chatTest": "3549b9de-c6b8-4290-87e2-e534b121e9c1"
       }
+    },
+    "voice_http_test": {
+      "api_key": "app-s45SiU5pHsQoow16fjUfMjuq",
+      "created_at": "2025-03-30",
+      "base_url": "http://localhost/v1",
+      "conversations": {
+        "新对话": "bc2d45cd-2756-4d4d-985c-786f45fc6e8d"
+      }
     }
   }
 }

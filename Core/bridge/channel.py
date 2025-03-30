@@ -58,30 +58,46 @@ class Channel:
 
             logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
 
+            # 处理消息
+            response = dify_client.chat(query=message,
+                                         conversation_name=self.current_settings
+                                         .get("selected_chatflow", {})
+                                         .get("conversation", {})
+                                         .get("name", "")
+                                         )
+
+            res = dify_client.handle_response(response)
+
             # 继续已有对话
-            response = dify_client.chat(query=message, conversation_name=self.current_settings.get("selected_chatflow", {}).get("conversation", {}).get("name", "")).get('answer')
-            logging.info(f"AI生成的回复: {response}\n")
+            
+            for r in res:
+                print(r)
+
+            # if res['type'] == 'text':
+            #     try:
+            #         # 发送回复
+            #         master_name = self.config.get('master_name')
+            #         if voice_reply_enabled:
+            #             # 使用GPT-SoVITS生成语音，转换为silk格式后即可发送
+            #             audio_gen = AudioGen()
+            #             audio_path = audio_gen.generate_voice(response)
+            #             silk_path = audio_path + '.silk'
+            #             duration = wav_to_silk(audio_path, silk_path)
+            #             callback_url = self.config.get("gewechat_callback_url")
+            #             silk_url = callback_url + "?file=" + silk_path
+            #             self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
+            #             logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
+            #         else:
+            #             self.send_text_message_by_name(master_name, response)
+            #         logging.info(f"已发送回复")
+            #         return "success"
+            #     except Exception as e:
+            #         logging.error(f"处理消息时出错: {str(e)}")
+            #         return "error"
+            return "success"
+
                 
-            try:
-                # 发送回复
-                master_name = self.config.get('master_name')
-                if voice_reply_enabled:
-                    # 使用GPT-SoVITS生成语音，转换为silk格式后即可发送
-                    audio_gen = AudioGen()
-                    audio_path = audio_gen.generate_voice(response)
-                    silk_path = audio_path + '.silk'
-                    duration = wav_to_silk(audio_path, silk_path)
-                    callback_url = self.config.get("gewechat_callback_url")
-                    silk_url = callback_url + "?file=" + silk_path
-                    self.client.post_voice(self.gewechat_app_id, self.get_wxid_by_name(master_name), silk_url, duration)
-                    logging.info(f"[gewechat] Do send voice to {master_name}: {silk_url}, duration: {duration / 1000.0} seconds")
-                else:
-                    self.send_text_message_by_name(master_name, response)
-                logging.info(f"已发送回复")
-                return "success"
-            except Exception as e:
-                logging.error(f"处理消息时出错: {str(e)}")
-                return "error"
+            
 
     def send_text_message_by_name(self, name, message):
         """
