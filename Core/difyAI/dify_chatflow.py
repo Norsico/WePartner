@@ -4,6 +4,7 @@ import os
 import re
 from typing import Dict, List
 from dataclasses import dataclass
+from config import Config
 
 
 @dataclass
@@ -24,7 +25,10 @@ class DifyChatflow:
         """
         self.api_key = api_key
         self.description = description
-        self.base_url = base_url.rstrip('/')
+        self.config = Config()
+        # self.base_url = base_url.rstrip('/')
+        self.server_host = self.config.get("server_host", "localhost")
+        self.base_url = f"http://{self.server_host}/v1"
         self.config_file = config_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "dify_config.json")
         
         self.headers = {
