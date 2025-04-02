@@ -7,10 +7,12 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import signal
+import threading
 from Core.Logger import Logger
 from Core.initializer import SystemInitializer
 from Core.web_app.web_init import WebInitializer
 from Core.bridge.temp_dir import TmpDir
+from Core.song import song_api
 
 
 logger = Logger()
@@ -46,6 +48,14 @@ def signal_handler(sig, frame):
     cleanup_tmp_folder()
     sys.exit(0)
 
+def start_song_api_server():
+    """启动歌曲API服务器"""
+    try:
+        logger.info("正在启动歌曲API服务器...")
+        song_api.run()
+    except Exception as e:
+        logger.error(f"歌曲API服务器启动失败: {str(e)}")
+
 
 def main():
     """主程序入口"""
@@ -54,6 +64,12 @@ def main():
     # 注册信号处理程序
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+
+    # 启动歌曲API服务器线程
+    song_api_thread = threading.Thread(target=start_song_api_server, daemon=True)
+    song_api_thread.start()
+    logger.success("歌曲API服务器线程已启动")
+    
     
     initializer = SystemInitializer()
     web_initializer = WebInitializer('./config.json')

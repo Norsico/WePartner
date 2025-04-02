@@ -73,15 +73,16 @@ class WxChatClient:
                             logger.success("重新登录后回调地址设置成功")
                         else:
                             logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
-                            logger.warning(f"正在测试回调是否有效...")
+                            # logger.warning(f"正在测试回调是否有效...")
+                            logger.info("应该可以用...")
                             # 测试回调是否有效
-                            self.test_callback()
+                            # self.test_callback()
                         
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
-                logger.info("正在测试回调是否有效...")
+                logger.info("应该可以用...")
                 # 测试回调是否有效
-                self.test_callback()
+                # self.test_callback()
         
         # 启动回调设置线程
         callback_thread = threading.Thread(target=setup_callback, daemon=True)
@@ -210,6 +211,8 @@ class Query:
 
         web_data = web.data()
         data = json.loads(web_data)
+
+        # print(data)
         
         # gewechat服务发送的回调测试消息
         if isinstance(data, dict) and 'testMsg' in data and 'token' in data:
@@ -245,17 +248,37 @@ class Query:
         
         if gewechat_msg.content.lower() in ["#设置", "#setting", "#config"]:
             logger.info(f"收到设置命令: {gewechat_msg.content}")
-            self.channel.compose_context(gewechat_msg.content)
+            wxid = gewechat_msg.other_user_id
+            self.channel.compose_context(gewechat_msg.content, wxid)
             return "success"
-        else:
-            # 处理有效消息
-            try:
-                with self.queue_lock:
-                    self.message_queue.append(gewechat_msg)
-                    logger.info(f"收到新消息，加入队列: {gewechat_msg.content}")
-                    logger.debug(f"当前队列长度: {len(self.message_queue)}")
-                self.reset_timer()
-            except Exception as e:
-                logger.error(f"消息处理过程中出现错误: {str(e)}")
+        
+        # 群聊消息处理
+        if not gewechat_msg.my_msg:
+            wxid = gewechat_msg.other_user_id
+            if gewechat_msg.is_at:
+                # 处理有效消息
+                try:
+                    self.channel.compose_context(gewechat_msg.content, wxid)
+                    return "success"
+                except Exception as e:
+                    logger.error(f"消息处理过程中出现错误: {str(e)}")
+        
+        # 私信消息处理
+        if not gewechat_msg.my_msg:
+            if not gewechat_msg.is_group:
+                if gewechat_msg.ctype not in {
+                    ContextType.VOICE,             # 语言
+                    ContextType.IMAGE,             # 图片
+                    ContextType.NON_USER_MSG,      # 公众号消息
+                    ContextType.SHARING,           # 分享信息
+                    ContextType.EMOJI              # 表情包
+                    }:
+                    wxid = gewechat_msg.other_user_id
+                    # 处理有效消息
+                    try:
+                        self.channel.compose_context(gewechat_msg.content, wxid)
+                        return "success"
+                    except Exception as e:
+                        logger.error(f"消息处理过程中出现错误: {str(e)}")           
             
         return "success"

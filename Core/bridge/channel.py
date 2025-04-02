@@ -25,7 +25,7 @@ class Channel:
         self.settings_manager = SettingsManager()
         self.current_settings = self.settings_manager.get_settings()
 
-    def compose_context(self, message):
+    def compose_context(self, message, _wxid):
         """
         处理接收到的消息
         
@@ -72,20 +72,24 @@ class Channel:
             
             for r in res:
                 if r['type'] == 'text':
-                    self.handle_text(r['content'])
+                    self.handle_text(r['content'], _wxid)
                 elif r['type'] == 'voice':
-                    self.handle_voice(r['content'])
+                    self.handle_voice(r['content'], _wxid)
 
 
             # if res['type'] == 'text':
            
             return "success"
 
-    def handle_text(self, text):
+    def handle_text(self, text, _wxid):
         try:
             # 发送回复
             master_name = self.config.get('master_name')
-            self.send_text_message_by_name(master_name, text)
+            master_wxid = self.get_wxid_by_name(master_name)
+            # self.send_text_message_by_name(master_name, text)
+            print(f"微信id:{_wxid}")
+            print(f"master_wxid:{master_wxid}")
+            self.send_text_message_by_wxid(_wxid, text)
             logging.info(f"已发送回复")
             return "success"
             
@@ -93,7 +97,7 @@ class Channel:
             logging.error(f"处理消息时出错: {str(e)}")
             return "error"
 
-    def handle_voice(self, voice_url):
+    def handle_voice(self, voice_url, _wxid):
         """
         处理语音消息
         
@@ -139,13 +143,13 @@ class Channel:
             callback_url = self.config.get("gewechat_callback_url")
             silk_url = callback_url + "?file=" + str(silk_path)
             
-            wxid = self.get_wxid_by_name(master_name)
-            if not wxid:
-                logging.error(f"未找到用户 {master_name} 的wxid，无法发送语音")
-                return "error"
+            # wxid = self.get_wxid_by_name(master_name)
+            # if not wxid:
+            #     logging.error(f"未找到用户 {master_name} 的wxid，无法发送语音")
+            #     return "error"
                 
             # 发送语音消息
-            self.client.post_voice(self.gewechat_app_id, wxid, silk_url, duration)
+            self.client.post_voice(self.gewechat_app_id, _wxid, silk_url, duration)
             logging.info(f"[gewechat] 已发送语音到 {master_name}: {silk_url}, 时长: {duration / 1000.0} 秒")
             
             return "success"
@@ -153,6 +157,15 @@ class Channel:
         except Exception as e:
             logging.error(f"处理语音消息时出错: {str(e)}")
             return "error"
+        
+    def send_text_message_by_wxid(self, wxid, message):
+        # 发送消息
+        send_msg_result = self.client.post_text(self.gewechat_app_id, wxid, message)
+        if send_msg_result.get('ret') != 200:
+            logging.error(f"发送消息失败: {send_msg_result}")
+            return False
+        logging.success(f"发送消息成功: {message}")
+        return True
 
     def send_text_message_by_name(self, name, message):
         """

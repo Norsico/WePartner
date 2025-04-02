@@ -1,17 +1,17 @@
 {
-    "master_name": "filehelper",
+    "master_name": "N",
     "dify_api_base": "http://localhost/v1",
     "gewechat_base_url": "http://172.26.128.1:2531/v2/api",
     "gewechat_token": "3140d2c2c50a4747aa9c38d902b75902",
-    "gewechat_app_id": "wx_5SWxNJaBbobcg1WbHAXwi",
+    "gewechat_app_id": "wx_Nnldl-rsXjLWzQkMm8VrG",
     "gewechat_callback_url": "http://172.26.128.1:1145/v2/api/callback/collect",
     "server_host": "localhost",
-    "settings_url": "https://7184f5150ec9afb615.gradio.live",
+    "settings_url": "https://b7a46f4e4f58c29594.gradio.live",
     "GPT-SoVITS_url": "http://127.0.0.1:9880",
     "text_language": "ja",
-    "call_back_success_falg": false,
+    "call_back_success_falg": true,
     "is_remote_server": false,
     "debug_mode": true,
     "log_level": "DEBUG",
-    "start_time": 1743592662.5787618
+    "start_time": 1743567354.749536
 }

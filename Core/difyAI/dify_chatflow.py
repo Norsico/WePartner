@@ -206,6 +206,8 @@ class DifyChatflow:
         Returns:
             响应字典
         """
+        self.conversations = self._load_conversations()
+        
         # 如果提供了对话名称且未指定conversation_id，尝试获取对应的conversation_id
         if conversation_name and not conversation_id:
             conversation_id = self.get_conversation_id(conversation_name)
