@@ -2,10 +2,39 @@ from Core.Logger import Logger
 from Core.commands.command_manager import CommandManager
 from Core.web_app.settings_manager import SettingsManager
 from Core.voice.audio_convert import wav_to_silk
-from Core.voice.audio_gen import AudioGen
+import os
+
+# 获取当前脚本文件的绝对路径
+current_file_path = os.path.abspath(__file__)
+
+# 获取tmp路径
+tmp_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(current_file_path))), "tmp")
+
 from Core.difyAI.dify_manager import DifyManager
 
-logging = Logger()
+logging = logger = Logger()
+
+def cleanup_tmp_folder():
+    """清理tmp文件夹中的所有文件"""
+    logger.info("正在清理tmp文件夹...")
+    tmp_path = tmp_dir.path()
+    
+    try:
+        # 获取tmp文件夹中的所有文件
+        files = [f for f in os.listdir(tmp_path) if os.path.isfile(os.path.join(tmp_path, f))]
+        
+        # 删除每个文件
+        for file in files:
+            file_path = os.path.join(tmp_path, file)
+            try:
+                os.remove(file_path)
+                logger.debug(f"已删除临时文件: {file}")
+            except Exception as e:
+                logger.error(f"删除文件 {file} 时出错: {str(e)}")
+        
+        logger.success(f"已清理 {len(files)} 个临时文件")
+    except Exception as e:
+        logger.error(f"清理tmp文件夹时出错: {str(e)}")
 
 class Channel:
     def __init__(self, client, config):
@@ -72,6 +101,7 @@ class Channel:
                 host = self.config.get("api_base")
                 voice_u = r['content'].replace("localhost", host)
                 self.handle_voice(voice_u, _wxid)
+                cleanup_tmp_folder()
         # if res['type'] == 'text':
         return "success"
 
