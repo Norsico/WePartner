@@ -78,7 +78,7 @@ class LoginApi:
         if qr_response.get('ret') != 200:
             print_yellow(f"获取二维码失败:{qr_response}")
             if qr_response.get('data')['msg'] == 'EOF':
-                print_red("请关闭VPN后重试")
+                print_red("--------请关闭VPN后重试--------")
             return None, None
 
         qr_data = qr_response.get('data', {})
@@ -89,6 +89,34 @@ class LoginApi:
             return None, None
 
         return app_id, uuid
+    
+    def re_login(self, app_id):
+        """重新登录
+
+        Args:
+            app_id: 应用ID
+
+        Returns:
+            tuple: (app_id: str, qr_url: str, error_msg: str) 
+                成功时 error_msg 为空字符串，qr_url 是新的二维码链接
+                失败时 app_id 可能为空字符串，error_msg 包含错误信息
+        """
+        # 1. 退出登录
+        logout_response = self.logout(app_id)
+        if logout_response.get('ret') != 200:
+            print_red(f"退出登录失败: {logout_response}")
+            return app_id, "", f"退出登录失败: {logout_response}"
+
+        print_green("退出登录成功，正在重新获取二维码...")
+
+        # 2. 获取新的二维码
+        app_id, uuid = self._get_and_validate_qr(app_id)
+        if not app_id or not uuid:
+            return app_id, "", "获取二维码失败"
+
+        # 3. 生成新的二维码链接
+        qr_url = f"http://weixin.qq.com/x/{uuid}"
+        return app_id, qr_url, ""
 
     def login(self, app_id):
         """执行完整的登录流程
@@ -142,7 +170,7 @@ class LoginApi:
                 _, uuid = self._get_and_validate_qr(app_id)
                 if not uuid:
                     return app_id, "重新获取二维码失败"
-
+                
                 make_and_print_qr(f"http://weixin.qq.com/x/{uuid}")
                 continue
 

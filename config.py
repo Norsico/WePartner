@@ -16,22 +16,6 @@ class Config:
     配置管理类，负责加载、保存和验证配置
     """
     
-    # 默认配置
-    DEFAULT_CONFIG = {
-        "master_name": "filehelper",
-        "is_remote_server": False,
-        "server_host": "localhost",
-        "debug_mode": False,
-        "log_level": "INFO",
-        "start_time": None
-    }
-    
-    # 必需的配置项
-    REQUIRED_CONFIG = [
-        "gewechat_base_url",
-        "dify_api_base"
-    ]
-    
     def __init__(self, file_path="./config.json", is_init=False):
         """
         初始化Config类，指定配置文件路径。
@@ -50,28 +34,14 @@ class Config:
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, f"wxChatBot_{time.strftime('%Y%m%d')}.log")
         logging.set_log_file(log_file)
-        
-        # 如果文件存在，加载配置文件内容
-        if os.path.exists(self.file_path):
-            self.load()
-        else:
-            # 如果文件不存在，创建一个包含默认配置的文件
-            self.data = self.DEFAULT_CONFIG.copy()
-            logging.warning(f"配置文件 {self.file_path} 不存在，已创建包含默认配置的文件")
-            self.save()
-            
+        self.load()
         # 初始化配置
         self.init_config()
 
     def init_config(self):
         """
-        初始化配置，包括验证配置、设置日志级别和获取token
+        初始化配置、设置日志级别和获取token
         """
-        # # 验证必需的配置项
-        # missing_config = [key for key in self.REQUIRED_CONFIG if not self.data.get(key)]
-        # if missing_config:
-        #     logging.error(f"缺少必要的配置参数：{', '.join(missing_config)}")
-        #     return
             
         # 设置启动时间
         if not self.data.get('start_time'):
@@ -124,18 +94,10 @@ class Config:
         try:
             with open(self.file_path, "r", encoding="utf-8") as file:
                 self.data = json.load(file)
-                
-            # # 使用默认值填充缺失的配置项
-            # for key, value in self.DEFAULT_CONFIG.items():
-            #     if key not in self.data:
-            #         self.data[key] = value
-                    
         except json.JSONDecodeError as e:
             logging.error(f"加载配置文件时出错: {e}")
-            self.data = self.DEFAULT_CONFIG.copy()
         except Exception as e:
             logging.error(f"读取配置文件时出错: {e}")
-            self.data = self.DEFAULT_CONFIG.copy()
 
     def save(self):
         """将当前配置数据保存到文件中"""
@@ -205,26 +167,3 @@ class Config:
     def __str__(self) -> str:
         """返回配置数据的字符串表示"""
         return json.dumps(self.data, indent=4, ensure_ascii=False)
-
-    def validate(self) -> bool:
-        """
-        验证配置是否完整有效
-        
-        Returns:
-            bool: 配置是否有效
-        """
-
-        # # 检查必需的配置项
-        # for key in self.REQUIRED_CONFIG:
-        #     if not self.data.get(key):
-        #         logging.error(f"缺少必要的配置参数：{key}")
-        #         return False
-        
-        # # 验证URL格式
-        # for key in ['gewechat_base_url', 'dify_api_base', 'gewechat_callback_url']:
-        #     if url := self.data.get(key):
-        #         if not url.startswith(('http://', 'https://')):
-        #             logging.error(f"无效的URL格式：{key} = {url}")
-        #             return False
-        
-        return True

@@ -11,7 +11,7 @@ from Core.bridge.context import ContextType
 from Core.bridge.channel import Channel
 from Core.factory.client_factory import ClientFactory
 from config import Config
-from Core.web_app.settings_manager import SettingsManager
+from Core.api import serverapi
 logger = logging = Logger()
 is_callback_success = False
 
@@ -81,21 +81,18 @@ class WxChatClient:
                             logger.success("重新登录后回调地址设置成功")
                         else:
                             logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
-                            # logger.warning(f"正在测试回调是否有效...")
                             logger.info("应该可以用...")
-                            # 测试回调是否有效
-                            # self.test_callback()
                         
             except Exception as e:
                 logger.error(f"设置回调地址时出错: {e}")
                 logger.info("应该可以用...")
-                # 测试回调是否有效
-                # self.test_callback()
         
-        # 启动回调设置线程
+        # 启动回调设置线程  
         callback_thread = threading.Thread(target=setup_callback, daemon=True)
         callback_thread.start()
         
+        # 创建api服务
+        serverapi.run()
         # 保持主线程运行
         try:
             while True:
@@ -103,23 +100,6 @@ class WxChatClient:
         except KeyboardInterrupt:
             logger.info("服务器正在停止...")
 
-    def test_callback(self):
-        # 新建线程发送消息测试回调是否有效
-        def send_test_msg():
-            self.channel.send_text_message_by_name(self.config.get("master_name"), "测试回调(8秒等待)...")
-            time.sleep(8)
-            global is_callback_success
-            if is_callback_success:
-                logger.success("回调测试成功")
-                self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置成功")
-                self.config.set("call_back_success_falg", True)
-            else:
-                logger.error("回调测试失败")
-                self.channel.send_text_message_by_name(self.config.get("master_name"), "回调设置失败")
-
-        # 新建线程发送消息测试回调是否有效
-        test_thread = threading.Thread(target=send_test_msg, daemon=True)
-        test_thread.start()
 
 
 class Query:
@@ -139,56 +119,8 @@ class Query:
             self.client = ClientFactory.get_client(self.config)
             # 创建通道对象
             self.channel = Channel(self.client, self.config)
-            self.message_queue = []  # 消息队列
-            self.timer = None  # 定时器
-            self.queue_lock = threading.Lock()  # 队列锁
-            self.timer_lock = threading.Lock()  # 定时器锁
-            self.settings_manager = SettingsManager()
             self._initialized = True
             logger.debug("Query类初始化完成")
-
-    def process_message_queue(self):
-        """处理消息队列中的所有消息"""
-        with self.queue_lock:
-            if not self.message_queue:
-                logger.debug("消息队列为空，跳过处理")
-                return
-                
-            # 合并所有消息
-            combined_message = "\n".join([msg.content for msg in self.message_queue])
-            logger.info(f"处理合并后的消息:\n {combined_message}")
-            
-            try:
-                result = self.channel.compose_context(combined_message)
-                logger.info(f"消息处理完成，结果: {result}")
-            except Exception as e:
-                logger.error(f"消息处理过程中出现错误: {str(e)}")
-            
-            # 清空消息队列
-            self.message_queue.clear()
-            
-            # 重置定时器为None
-            with self.timer_lock:
-                self.timer = None
-                logger.debug("定时器已重置")
-        
-    def reset_timer(self):
-        """重置定时器"""
-        with self.timer_lock:
-            # 如果存在定时器，先取消它
-            if self.timer is not None:
-                logger.debug("取消现有定时器")
-                self.timer.cancel()
-                self.timer = None
-            
-            # 获取等待时间
-            wait_time = self.settings_manager.get_settings().get("timer_seconds", 5)
-            logger.debug(f"创建新的定时器，等待时间: {wait_time}秒")
-            
-            # 创建新的定时器
-            self.timer = threading.Timer(wait_time, self.process_message_queue)
-            self.timer.start()
-            logger.debug("新定时器已启动")
 
     def GET(self):
         # 搭建简单的文件服务器，用于向gewechat服务传输语音等文件，但只允许访问tmp目录下的文件
@@ -253,13 +185,6 @@ class Query:
         if int(gewechat_msg.create_time) < int(time.time()) - 60 * 5:  # 跳过5分钟前的历史消息
             logger.debug(f"忽略过期消息（5分钟前），来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
-        
-        # 优化掉
-        # if gewechat_msg.content.lower() in ["#设置", "#setting", "#config"]:
-        #     logger.info(f"收到设置命令: {gewechat_msg.content}")
-        #     wxid = gewechat_msg.other_user_id
-        #     self.channel.compose_context(gewechat_msg.content, wxid)
-        #     return "success"
         
         # 群聊消息处理
         if not gewechat_msg.my_msg:
