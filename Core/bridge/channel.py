@@ -36,6 +36,7 @@ class Channel:
             处理结果
         """
         logging.info(f"收到消息: {message}")
+        self.settings_manager._load_settings()
         self.current_settings = self.settings_manager.get_settings()
         # # 判断是否为设置命令
         # if message.lower() in ["#设置", "#setting", "#config"]:
@@ -68,7 +69,9 @@ class Channel:
             if r['type'] == 'text':
                 self.handle_text(r['content'], _wxid)
             elif r['type'] == 'voice':
-                self.handle_voice(r['content'], _wxid)
+                host = self.config.get("api_base")
+                voice_u = r['content'].replace("localhost", host)
+                self.handle_voice(voice_u, _wxid)
         # if res['type'] == 'text':
         return "success"
 
