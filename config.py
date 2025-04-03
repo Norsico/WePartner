@@ -67,11 +67,11 @@ class Config:
         """
         初始化配置，包括验证配置、设置日志级别和获取token
         """
-        # 验证必需的配置项
-        missing_config = [key for key in self.REQUIRED_CONFIG if not self.data.get(key)]
-        if missing_config:
-            logging.error(f"缺少必要的配置参数：{', '.join(missing_config)}")
-            return
+        # # 验证必需的配置项
+        # missing_config = [key for key in self.REQUIRED_CONFIG if not self.data.get(key)]
+        # if missing_config:
+        #     logging.error(f"缺少必要的配置参数：{', '.join(missing_config)}")
+        #     return
             
         # 设置启动时间
         if not self.data.get('start_time'):
@@ -125,10 +125,10 @@ class Config:
             with open(self.file_path, "r", encoding="utf-8") as file:
                 self.data = json.load(file)
                 
-            # 使用默认值填充缺失的配置项
-            for key, value in self.DEFAULT_CONFIG.items():
-                if key not in self.data:
-                    self.data[key] = value
+            # # 使用默认值填充缺失的配置项
+            # for key, value in self.DEFAULT_CONFIG.items():
+            #     if key not in self.data:
+            #         self.data[key] = value
                     
         except json.JSONDecodeError as e:
             logging.error(f"加载配置文件时出错: {e}")
@@ -213,17 +213,18 @@ class Config:
         Returns:
             bool: 配置是否有效
         """
-        # 检查必需的配置项
-        for key in self.REQUIRED_CONFIG:
-            if not self.data.get(key):
-                logging.error(f"缺少必要的配置参数：{key}")
-                return False
+
+        # # 检查必需的配置项
+        # for key in self.REQUIRED_CONFIG:
+        #     if not self.data.get(key):
+        #         logging.error(f"缺少必要的配置参数：{key}")
+        #         return False
         
-        # 验证URL格式
-        for key in ['gewechat_base_url', 'dify_api_base', 'gewechat_callback_url']:
-            if url := self.data.get(key):
-                if not url.startswith(('http://', 'https://')):
-                    logging.error(f"无效的URL格式：{key} = {url}")
-                    return False
+        # # 验证URL格式
+        # for key in ['gewechat_base_url', 'dify_api_base', 'gewechat_callback_url']:
+        #     if url := self.data.get(key):
+        #         if not url.startswith(('http://', 'https://')):
+        #             logging.error(f"无效的URL格式：{key} = {url}")
+        #             return False
         
         return True

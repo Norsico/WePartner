@@ -125,8 +125,8 @@ class SystemInitializer:
             # 判断时间是否超过8小时
             if self.is_time_difference_over_8_hours(self.config.get('start_time'), time.time()):
                 logger.warning("时间超过8小时，重新登录一下，防止出现回调异常bug")
-                # 将"call_back_success_falg"设置为false
                 self.config.set('call_back_success_falg', False)
+                print(f"已将call_back_success_falg设置为false")
             
             # 更新启动时间
             self.start_time = time.time()
