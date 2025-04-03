@@ -2,6 +2,7 @@
     "master_name": "filehelper",
     "dify_api_base": "http://localhost/v1",
     "api_base": "",
+    "qr_code_url": "",
     "gewechat_base_url": "http://172.26.128.1:2531/v2/api",
     "gewechat_token": "3140d2c2c50a4747aa9c38d902b75902",
     "gewechat_app_id": "wx_5SWxNJaBbobcg1WbHAXwi",

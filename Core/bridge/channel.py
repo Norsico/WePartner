@@ -93,16 +93,19 @@ class Channel:
                                     .get("name", "")
                                     )
         res = dify_client.handle_response(response)
-        # 继续已有对话
-        for r in res:
-            if r['type'] == 'text':
-                self.handle_text(r['content'], _wxid)
-            elif r['type'] == 'voice':
-                host = self.config.get("api_base")
-                voice_u = r['content'].replace("localhost", host)
-                self.handle_voice(voice_u, _wxid)
-                cleanup_tmp_folder()
-        # if res['type'] == 'text':
+        if res:
+            # 继续已有对话
+            for r in res:
+                if r['type'] == 'text':
+                    self.handle_text(r['content'], _wxid)
+                elif r['type'] == 'voice':
+                    # host = self.config.get("api_base")
+                    # voice_u = r['content'].replace("localhost", host)
+                    self.handle_voice(r['content'], _wxid)
+                    cleanup_tmp_folder()
+            # if res['type'] == 'text':
+        else:
+            print(f"maybe no res:{res}")
         return "success"
 
     def handle_text(self, text, _wxid):

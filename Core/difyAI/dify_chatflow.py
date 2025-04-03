@@ -235,10 +235,11 @@ class DifyChatflow:
             response = requests.post(url, json=payload, headers=self.headers)
             response.raise_for_status()
             result = response.json()
+            print(result)
             
-            # 如果是新对话，保存对话信息
-            if not conversation_id and result.get("conversation_id"):
-                self.save_conversation(result["conversation_id"], name=conversation_name)
+            # # 如果是新对话，保存对话信息
+            # if not conversation_id and result.get("conversation_id"):
+            #     self.save_conversation(result["conversation_id"], name=conversation_name)
                 
             return result
         except requests.exceptions.RequestException as e:
@@ -309,16 +310,16 @@ class DifyChatflow:
         
         return self.delete_conversation(conversation_id=conversation_id, user=user)
     
-    @staticmethod
-    def handle_response(response):
+
+    def handle_response(self, response):
         # 假设 response 是一个字典，包含返回的内容
         content = response.get('answer', '')
 
         results = []
-
+        print("handle response...")
         # 检查返回的内容类型
         if '<text>' in content:
-            # 提取文本内容
+            print("提取文本内容")
             text_contents = re.findall(r'<text>(.*?)</text>', content, re.DOTALL)
             if text_contents:
                 for text in text_contents:
@@ -328,19 +329,20 @@ class DifyChatflow:
                     })
 
         if '<voice>' in content:
-            # 提取语音内容
+            print("提取语音内容")
             voice_contents = re.findall(r'<voice>(.*?)</voice>', content, re.DOTALL)
             if voice_contents:
                 for voice_url in voice_contents:
                     # 使用正则表达式提取括号里的内容
                     pattern = r'\((.*?)\)'
                     matches = re.findall(pattern, voice_url)
-                    voice_file_url = f"http://localhost{matches[0]}"
+                    host = self.config.get("api_base")
+                    voice_file_url = f"http://{host}{matches[0]}"
                     results.append({
                         'type': 'voice',
                         'content': voice_file_url.strip()
                     })
-        
+        print(f"results:{results}")
         return results
 
 if __name__ == '__main__':

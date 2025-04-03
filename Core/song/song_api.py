@@ -98,6 +98,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             with open(file_path, 'rb') as file:
                 self.wfile.write(file.read())
 
+        if self.path.startswith('/get_qrcode'):
+            pass
+        
         if self.path.startswith('/merge_voice'):
             # 解析 URL 中的查询参数
             parsed_path = urllib.parse.urlparse(self.path)

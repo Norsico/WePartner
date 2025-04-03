@@ -1,10 +1,10 @@
 {
   "selected_chatflow": {
-    "description": "song",
-    "api_key": "app-e3qdvelQMPStVuv5WZoBWOnI",
+    "description": "",
+    "api_key": "",
     "conversation": {
-      "name": "song_",
-      "id": "ca97d7ef-cfe9-493e-9e91-c4238dbbdab0"
+      "name": "",
+      "id": ""
     }
   },
   "voice_reply_enabled": false,
