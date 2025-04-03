@@ -36,50 +36,40 @@ class Channel:
             处理结果
         """
         logging.info(f"收到消息: {message}")
-        
-        # 判断是否为设置命令
-        if message.lower() in ["#设置", "#setting", "#config"]:
-            logging.info("检测到设置命令")
-            result = self.command_manager.execute_setting_command()
-            logging.info(f"命令处理结果: {result}")
-            return result
-        else:
-            # 处理普通消息
-            logging.info("检测到普通消息")
-            # 从settings.json中获取当前选中的chatflow
-            chatflow_description = self.current_settings.get("selected_chatflow", {}).get("description", "")
-            # 获取是否启用了语音回复
-            voice_reply_enabled = self.current_settings.get("voice_reply_enabled", False)
-            # 调试输出
-            logging.debug(f"当前选中的chatflow: {chatflow_description}")
-            logging.debug(f"是否启用了语音回复: {voice_reply_enabled}")
-
-            dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
-
-            logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
-
-            # 处理消息
-            response = dify_client.chat(query=message,
-                                         conversation_name=self.current_settings
-                                         .get("selected_chatflow", {})
-                                         .get("conversation", {})
-                                         .get("name", "")
-                                         )
-
-            res = dify_client.handle_response(response)
-
-            # 继续已有对话
-            
-            for r in res:
-                if r['type'] == 'text':
-                    self.handle_text(r['content'], _wxid)
-                elif r['type'] == 'voice':
-                    self.handle_voice(r['content'], _wxid)
-
-
-            # if res['type'] == 'text':
-           
-            return "success"
+        # # 判断是否为设置命令
+        # if message.lower() in ["#设置", "#setting", "#config"]:
+        #     logging.info("检测到设置命令")
+        #     result = self.command_manager.execute_setting_command()
+        #     logging.info(f"命令处理结果: {result}")
+        #     return result
+        # else:
+        # 处理普通消息
+        logging.info("检测到普通消息")
+        # 从settings.json中获取当前选中的chatflow
+        chatflow_description = self.current_settings.get("selected_chatflow", {}).get("description", "")
+        # 获取是否启用了语音回复
+        voice_reply_enabled = self.current_settings.get("voice_reply_enabled", False)
+        # 调试输出
+        logging.debug(f"当前选中的chatflow: {chatflow_description}")
+        logging.debug(f"是否启用了语音回复: {voice_reply_enabled}")
+        dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
+        logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
+        # 处理消息
+        response = dify_client.chat(query=message,
+                                    conversation_name=self.current_settings
+                                    .get("selected_chatflow", {})
+                                     .get("conversation", {})
+                                    .get("name", "")
+                                    )
+        res = dify_client.handle_response(response)
+        # 继续已有对话
+        for r in res:
+            if r['type'] == 'text':
+                self.handle_text(r['content'], _wxid)
+            elif r['type'] == 'voice':
+                self.handle_voice(r['content'], _wxid)
+        # if res['type'] == 'text':
+        return "success"
 
     def handle_text(self, text, _wxid):
         try:
@@ -150,7 +140,7 @@ class Channel:
                 
             # 发送语音消息
             self.client.post_voice(self.gewechat_app_id, _wxid, silk_url, duration)
-            logging.info(f"[gewechat] 已发送语音到 {master_name}: {silk_url}, 时长: {duration / 1000.0} 秒")
+            logging.info(f"[gewechat] 已发送语音到 {_wxid}: {silk_url}, 时长: {duration / 1000.0} 秒")
             
             return "success"
             

@@ -649,22 +649,20 @@ class SettingsApp:
             self.interface.launch(
                 server_name="0.0.0.0",
                 server_port=port,
-                share=True,
+                share=False,
                 inbrowser=False,
                 debug=False,
                 root_path=self.settings_path if self.settings_path != "/" else None
             )
-            
         thread = threading.Thread(target=run_interface, daemon=True)
         thread.start()
-        
         time.sleep(5)
         self.is_running = True
-        logger.success(f"设置界面已启动，访问URL: {self.public_url} \n或者 {self.interface.share_url}")
-
-        self.public_url = self.interface.share_url
-        
-        return self.interface.share_url
+        # logger.success(f"设置界面已启动，访问URL: {self.public_url} \n或者 {self.interface.share_url}")
+        logger.success(f"设置界面已启动，URL: {self.public_url}")
+        #self.public_url = self.interface.share_url
+        # return self.interface.share_url
+        return self.public_url
         
 # 单例模式，确保全局只有一个设置应用实例
 _instance = None

@@ -246,11 +246,12 @@ class Query:
             logger.debug(f"忽略过期消息（5分钟前），来自 {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
         
-        if gewechat_msg.content.lower() in ["#设置", "#setting", "#config"]:
-            logger.info(f"收到设置命令: {gewechat_msg.content}")
-            wxid = gewechat_msg.other_user_id
-            self.channel.compose_context(gewechat_msg.content, wxid)
-            return "success"
+        # 优化掉
+        # if gewechat_msg.content.lower() in ["#设置", "#setting", "#config"]:
+        #     logger.info(f"收到设置命令: {gewechat_msg.content}")
+        #     wxid = gewechat_msg.other_user_id
+        #     self.channel.compose_context(gewechat_msg.content, wxid)
+        #     return "success"
         
         # 群聊消息处理
         if not gewechat_msg.my_msg:
