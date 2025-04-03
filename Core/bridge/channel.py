@@ -17,7 +17,7 @@ logging = logger = Logger()
 def cleanup_tmp_folder():
     """清理tmp文件夹中的所有文件"""
     logger.info("正在清理tmp文件夹...")
-    tmp_path = tmp_dir.path()
+    tmp_path = tmp_dir
     
     try:
         # 获取tmp文件夹中的所有文件
