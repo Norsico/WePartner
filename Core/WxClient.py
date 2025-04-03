@@ -51,6 +51,14 @@ class WxChatClient:
         # 在新线程中设置回调地址
         def setup_callback():
             try:
+                if not self.config.get("call_back_success_falg"):
+                    # 重新登录
+                    app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
+                    if error_msg:
+                        logger.error(f"重新登录失败: {error_msg}")
+                        self.config.set("call_back_success_falg", False)
+                    else:
+                        logger.success(f"重新登录成功，应用ID: {app_id}")
                 callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
                 if callback_resp.get("ret") == 200:
                     logger.success("回调地址设置成功")

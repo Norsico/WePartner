@@ -44,5 +44,6 @@ config.json
 gen_audio.py
 *.wav
 *.mp3
+config_remote.json
 # Local configuration
 *.log 

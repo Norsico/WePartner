@@ -36,6 +36,7 @@ class Channel:
             处理结果
         """
         logging.info(f"收到消息: {message}")
+        self.current_settings = self.settings_manager.get_settings()
         # # 判断是否为设置命令
         # if message.lower() in ["#设置", "#setting", "#config"]:
         #     logging.info("检测到设置命令")
