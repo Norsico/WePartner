@@ -149,10 +149,10 @@ class SystemInitializer:
                 self.config.set('is_remote_server', is_remote)
                 logger.info(f"已设置运行环境为: {'远程服务器' if is_remote else '本地机器'}")
             
-            # 确保设置了master_name
-            if not self.config.get('master_name'):
-                logger.warning("未设置master_name，将使用默认值")
-                self.config.set('master_name', 'filehelper')  # 默认使用文件传输助手
+            # # 确保设置了master_name
+            # if not self.config.get('master_name'):
+            #     logger.warning("未设置master_name，将使用默认值")
+            #     self.config.set('master_name', 'filehelper')  # 默认使用文件传输助手
             
             # 验证配置
             if not self.config.validate():

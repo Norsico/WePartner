@@ -74,11 +74,11 @@ class Channel:
     def handle_text(self, text, _wxid):
         try:
             # 发送回复
-            master_name = self.config.get('master_name')
-            master_wxid = self.get_wxid_by_name(master_name)
+            # master_name = self.config.get('master_name')
+            # master_wxid = self.get_wxid_by_name(master_name)
             # self.send_text_message_by_name(master_name, text)
             print(f"微信id:{_wxid}")
-            print(f"master_wxid:{master_wxid}")
+            # print(f"master_wxid:{master_wxid}")
             self.send_text_message_by_wxid(_wxid, text)
             logging.info(f"已发送回复")
             return "success"
@@ -129,7 +129,7 @@ class Channel:
             duration = wav_to_silk(audio_path, silk_path)
             
             # 发送语音消息
-            master_name = self.config.get('master_name')
+            # master_name = self.config.get('master_name')
             callback_url = self.config.get("gewechat_callback_url")
             silk_url = callback_url + "?file=" + str(silk_path)
             

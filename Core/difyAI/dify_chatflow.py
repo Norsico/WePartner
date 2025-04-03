@@ -27,8 +27,8 @@ class DifyChatflow:
         self.description = description
         self.config = Config()
         # self.base_url = base_url.rstrip('/')
-        self.server_host = self.config.get("server_host", "localhost")
-        self.base_url = f"http://{self.server_host}/v1"
+        # self.server_host = self.config.get("dify_api_base", "http://localhost/v1")
+        self.base_url = self.config.get("dify_api_base", "http://localhost/v1")
         self.config_file = config_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "dify_config.json")
         
         self.headers = {
