@@ -237,9 +237,9 @@ class DifyChatflow:
             result = response.json()
             print(result)
             
-            # # 如果是新对话，保存对话信息
-            # if not conversation_id and result.get("conversation_id"):
-            #     self.save_conversation(result["conversation_id"], name=conversation_name)
+            # 如果是新对话，保存对话信息
+            if not conversation_id and result.get("conversation_id"):
+                self.save_conversation(result["conversation_id"], name=conversation_name)
                 
             return result
         except requests.exceptions.RequestException as e:
