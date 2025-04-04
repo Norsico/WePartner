@@ -6,8 +6,8 @@ from config import Config
 
 config = Config()
 
-print(f"gewechat_base_url: {config.get("gewechat_base_url")}")
-print(f"gewechat_token: {config.get("gewechat_token")}")
+print(f"gewechat_base_url: {config.get('gewechat_base_url')}")
+print(f"gewechat_token: {config.get('gewechat_token')}")
 
 loginAPI = LoginApi(base_url=config.get("gewechat_base_url"), token=config.get("gewechat_token"))
 
