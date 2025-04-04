@@ -101,20 +101,25 @@ class LoginApi:
                 成功时 error_msg 为空字符串，qr_url 是新的二维码链接
                 失败时 app_id 可能为空字符串，error_msg 包含错误信息
         """
-        # 1. 退出登录
-        logout_response = self.logout(app_id)
-        if logout_response.get('ret') != 200:
-            print_red(f"退出登录失败: {logout_response}")
-            return app_id, "", f"退出登录失败: {logout_response}"
+        # 1. 检查是否已经在线
+        check_online_response = self.check_online(app_id)
+        if check_online_response.get('ret') == 200 and check_online_response.get('data'):
+            print_green(f"AppID: {app_id} 已在线，正在退出登录...")
+            # 2. 退出登录
+            logout_response = self.logout(app_id)
+            if logout_response.get('ret') != 200:
+                print_red(f"退出登录失败: {logout_response}")
+                return app_id, "", f"退出登录失败: {logout_response}"
+            print_green("退出登录成功，正在重新获取二维码...")
+        else:
+            print_yellow(f"AppID: {app_id} 未在线，直接获取二维码...")
 
-        print_green("退出登录成功，正在重新获取二维码...")
-
-        # 2. 获取新的二维码
+        # 3. 获取新的二维码
         app_id, uuid = self._get_and_validate_qr(app_id)
         if not app_id or not uuid:
             return app_id, "", "获取二维码失败"
 
-        # 3. 生成新的二维码链接
+        # 4. 生成新的二维码链接
         qr_url = f"http://weixin.qq.com/x/{uuid}"
         return app_id, qr_url, ""
 

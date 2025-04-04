@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>微信登录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            color: #52c41a;
+        }
+        .waiting {
+            color: #1890ff;
+        }
+        .error {
+            color: #f5222d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>微信登录</h2>
+        <div id="qrcode">
+            <img id="qr-image" src="" alt="二维码加载中...">
+        </div>
+        <div id="status" class="waiting">请使用微信扫描二维码登录</div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const appId = urlParams.get('app_id');
+        let checkLoginInterval;
+
+        async function startLogin() {
+            try {
+                const response = await fetch(`/login?app_id=${appId}`);
+                const data = await response.json();
+                if (data.qr_url) {
+                    document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.qr_url)}&size=200x200`;
+                    startPolling(data.uuid);
+                } else {
+                    document.getElementById('status').className = 'error';
+                    document.getElementById('status').textContent = '获取二维码失败，请刷新页面重试';
+                }
+            } catch (error) {
+                document.getElementById('status').className = 'error';
+                document.getElementById('status').textContent = '系统错误，请刷新页面重试';
+            }
+        }
+
+        async function checkLoginStatus(uuid) {
+            try {
+                const response = await fetch(`/check_login?app_id=${appId}&uuid=${uuid}`);
+                const data = await response.json();
+                
+                if (data.status === 2) { // 登录成功
+                    clearInterval(checkLoginInterval);
+                    document.getElementById('status').className = 'success';
+                    document.getElementById('status').textContent = '登录成功！';
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function startPolling(uuid) {
+            checkLoginInterval = setInterval(async () => {
+                const success = await checkLoginStatus(uuid);
+                if (success) {
+                    clearInterval(checkLoginInterval);
+                }
+            }, 2000);
+        }
+
+        if (appId) {
+            startLogin();
+        } else {
+            document.getElementById('status').className = 'error';
+            document.getElementById('status').textContent = '缺少必要的参数';
+        }
+    </script>
+</body>
+</html>

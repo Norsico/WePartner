@@ -48,51 +48,9 @@ class WxChatClient:
         logger.info("等待服务器启动（5秒）...")
         time.sleep(5)
         
-        # 在新线程中设置回调地址
-        def setup_callback():
-            try:
-                if not self.config.get("call_back_success_falg"):
-                    # 重新登录
-                    app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
-                    if error_msg:
-                        logger.error(f"重新登录失败: {error_msg}")
-                        self.config.set("call_back_success_falg", False)
-                    else:
-                        logger.success(f"重新登录成功，应用ID: {app_id}")
-                callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
-                if callback_resp.get("ret") == 200:
-                    logger.success("回调地址设置成功")
-                else:
-                    logger.warning(f"回调地址设置返回异常状态: {callback_resp}")
-                    logger.info("继续运行，回调可能仍然有效...")
-                    if not self.config.get("call_back_success_falg"):
-                        self.client.logout(self.gewechat_app_id)
-                        ClientFactory.reset()
-                        # 重新登录
-                        app_id, error_msg = self.client.login(app_id=self.gewechat_app_id)
-                        if error_msg:
-                            logger.error(f"重新登录失败: {error_msg}")
-                            self.config.set("call_back_success_falg", False)
-                        else:
-                            logger.success(f"重新登录成功，应用ID: {app_id}")
-                        # 重新设置回调
-                        callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
-                        if callback_resp.get("ret") == 200:
-                            logger.success("重新登录后回调地址设置成功")
-                        else:
-                            logger.warning(f"重新登录后回调地址设置返回异常状态: {callback_resp}")
-                            logger.info("应该可以用...")
-                        
-            except Exception as e:
-                logger.error(f"设置回调地址时出错: {e}")
-                logger.info("应该可以用...")
-        
-        # 启动回调设置线程  
-        callback_thread = threading.Thread(target=setup_callback, daemon=True)
-        callback_thread.start()
-        
-        # 创建api服务
+        # 启动 API 服务
         serverapi.run()
+        
         # 保持主线程运行
         try:
             while True:
