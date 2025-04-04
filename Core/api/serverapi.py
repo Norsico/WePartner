@@ -160,8 +160,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8002):
     server_address = ('0.0.0.0', port)
     httpd = server_class(server_address, handler_class)
-    print(f"API服务器已启动: http://localhost:{port}")
-    print(f"请访问 http://localhost:{port}/ 进行登录")
+    print(f"API服务器已启动: http://{config.get('server_host')}:{port}")
+    print(f"请访问 http://{config.get('server_host')}:{port}/ 进行登录")
     httpd.serve_forever()
 
 if __name__ == "__main__":
