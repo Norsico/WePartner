@@ -84,51 +84,51 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             "uuid": uuid,
             "app_id": app_id
         })
-def handle_check_login(self):
-    query = urllib.parse.urlparse(self.path).query
-    params = urllib.parse.parse_qs(query)
-    app_id = params.get('app_id', [''])[0]  # 默认为空字符串
-    uuid = params.get('uuid', [None])[0]
+    def handle_check_login(self):
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        app_id = params.get('app_id', [''])[0]  # 默认为空字符串
+        uuid = params.get('uuid', [None])[0]
 
-    if not uuid:  # 只检查uuid，因为首次登录时app_id可能为空
-        self._send_json_response(400, {"error": "缺少必要参数"})
-        return
+        if not uuid:  # 只检查uuid，因为首次登录时app_id可能为空
+            self._send_json_response(400, {"error": "缺少必要参数"})
+            return
 
-    # 检查登录状态
-    login_status = loginAPI.check_qr(app_id, uuid, "")
-    if login_status.get('ret') != 200:
-        self._send_json_response(500, {"error": "检查登录状态失败"})
-        return
+        # 检查登录状态
+        login_status = loginAPI.check_qr(app_id, uuid, "")
+        if login_status.get('ret') != 200:
+            self._send_json_response(500, {"error": "检查登录状态失败"})
+            return
 
-    login_data = login_status.get('data', {})
-    status = login_data.get('status')
-    expired_time = login_data.get('expiredTime', 0)
+        login_data = login_status.get('data', {})
+        status = login_data.get('status')
+        expired_time = login_data.get('expiredTime', 0)
 
-    # 如果二维码过期，返回过期信息
-    if expired_time <= 0:
+        # 如果二维码过期，返回过期信息
+        if expired_time <= 0:
+            self._send_json_response(200, {
+                "status": -1,  # 自定义状态码，表示二维码已过期
+                "app_id": app_id,
+                "message": "二维码已过期，请重新获取"
+            })
+            return
+
+        # 如果登录成功
+        if status == 2:
+            # 保存新的app_id（如果有的话）
+            if login_data.get('appId'):
+                config.set('gewechat_app_id', login_data['appId'])
+            
+            # 设置回调地址
+            callback_url = config.get('gewechat_callback_url')
+            if callback_url:
+                callback_resp = loginAPI.set_callback(login_data.get('appId'), callback_url)
+                print(f"设置回调结果: {callback_resp}")
+
         self._send_json_response(200, {
-            "status": -1,  # 自定义状态码，表示二维码已过期
-            "app_id": app_id,
-            "message": "二维码已过期，请重新获取"
+            "status": status,
+            "app_id": login_data.get('appId', app_id)  # 返回新的app_id
         })
-        return
-
-    # 如果登录成功
-    if status == 2:
-        # 保存新的app_id（如果有的话）
-        if login_data.get('appId'):
-            config.set('gewechat_app_id', login_data['appId'])
-        
-        # 设置回调地址
-        callback_url = config.get('gewechat_callback_url')
-        if callback_url:
-            callback_resp = loginAPI.set_callback(login_data.get('appId'), callback_url)
-            print(f"设置回调结果: {callback_resp}")
-
-    self._send_json_response(200, {
-        "status": status,
-        "app_id": login_data.get('appId', app_id)  # 返回新的app_id
-    })
 
     def handle_relogin(self):
         query = urllib.parse.urlparse(self.path).query
