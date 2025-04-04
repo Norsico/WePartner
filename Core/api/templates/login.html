@@ -50,8 +50,9 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const appId = urlParams.get('app_id');
+        let appId = urlParams.get('app_id') || '';  // 如果没有app_id，使用空字符串
         let checkLoginInterval;
+        let currentUuid;
 
         async function startLogin() {
             try {
@@ -59,7 +60,9 @@
                 const data = await response.json();
                 if (data.qr_url) {
                     document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.qr_url)}&size=200x200`;
-                    startPolling(data.uuid);
+                    currentUuid = data.uuid;
+                    appId = data.app_id || '';  // 更新app_id（如果有的话）
+                    startPolling();
                 } else {
                     document.getElementById('status').className = 'error';
                     document.getElementById('status').textContent = '获取二维码失败，请刷新页面重试';
@@ -70,15 +73,24 @@
             }
         }
 
-        async function checkLoginStatus(uuid) {
+        async function checkLoginStatus() {
             try {
-                const response = await fetch(`/check_login?app_id=${appId}&uuid=${uuid}`);
+                const response = await fetch(`/check_login?app_id=${appId}&uuid=${currentUuid}`);
                 const data = await response.json();
                 
                 if (data.status === 2) { // 登录成功
                     clearInterval(checkLoginInterval);
                     document.getElementById('status').className = 'success';
                     document.getElementById('status').textContent = '登录成功！';
+                    
+                    // 更新app_id（如果有新的）
+                    if (data.app_id && data.app_id !== appId) {
+                        appId = data.app_id;
+                        // 更新URL中的app_id，但不刷新页面
+                        const newUrl = new URL(window.location.href);
+                        newUrl.searchParams.set('app_id', appId);
+                        window.history.pushState({}, '', newUrl);
+                    }
                     return true;
                 }
                 return false;
@@ -87,21 +99,23 @@
             }
         }
 
-        function startPolling(uuid) {
+        function startPolling() {
+            // 清除可能存在的旧定时器
+            if (checkLoginInterval) {
+                clearInterval(checkLoginInterval);
+            }
+            
+            // 启动新的轮询
             checkLoginInterval = setInterval(async () => {
-                const success = await checkLoginStatus(uuid);
+                const success = await checkLoginStatus();
                 if (success) {
                     clearInterval(checkLoginInterval);
                 }
             }, 2000);
         }
 
-        if (appId) {
-            startLogin();
-        } else {
-            document.getElementById('status').className = 'error';
-            document.getElementById('status').textContent = '缺少必要的参数';
-        }
+        // 启动登录流程
+        startLogin();
     </script>
 </body>
 </html>
