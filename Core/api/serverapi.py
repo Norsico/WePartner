@@ -64,7 +64,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             # 设置回调地址
             callback_url = config.get('gewechat_callback_url')
             if callback_url:
-                callback_resp = loginAPI.set_callback(login_data.get('appId'), callback_url)
+                callback_resp = loginAPI.set_callback(config.get("gewechat_token"), callback_url)
                 print(f"设置回调结果: {callback_resp}")
 
         self._send_json_response(200, {
