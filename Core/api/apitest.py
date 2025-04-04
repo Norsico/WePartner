@@ -2,7 +2,7 @@ import requests
 import time
 
 # 配置接口服务器地址和端口
-BASE_URL = ""
+BASE_URL = "http://47.93.3.37:8002/"
 
 # 测试登录接口
 def test_login():
@@ -44,7 +44,6 @@ def poll_check_login(uuid, app_id):
         check_login_result = test_check_login(uuid, app_id)
         if check_login_result:
             status = check_login_result.get("status")
-            expired_time = check_login_result.get("expiredTime", 0)
 
             if status == 2:  # 登录成功
                 print("登录成功！")
@@ -54,6 +53,7 @@ def poll_check_login(uuid, app_id):
                 if retry_count >= max_retries:
                     print("登录超时，请重新尝试")
                     return False
+                time.sleep(5)
         else:
             print("检查登录状态失败，退出轮询")
             return False
@@ -108,20 +108,7 @@ def main():
 
         # 轮询检查登录状态
         if not poll_check_login(uuid, app_id):
-            print("登录失败，请检查以下内容：")
-            print("1. 确保二维码链接可以通过浏览器正常访问：")
-            print(f"   {qr_url}")
-            print("2. 确保网络连接正常。")
-            print("3. 如果二维码过期，请重新获取二维码并扫码。")
-            print("4. 如果问题仍然存在，请稍后重试或检查二维码链接的合法性。")
-            return
-        
-        # # 测试重新登录
-        # relogin_result = test_relogin(app_id)
-        
-        # # 测试设置回调地址
-        # callback_url = "http://example.com/callback"  # 替换为实际的回调地址
-        # set_callback_result = test_set_callback(app_id, callback_url)
+            print("登录失败")
 
 if __name__ == "__main__":
     try:
