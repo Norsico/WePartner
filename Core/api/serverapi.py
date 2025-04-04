@@ -5,6 +5,16 @@ import json
 import os
 from config import Config
 
+def print_green(text):
+    print(f"\033[32m{text}\033[0m")
+
+def print_yellow(text):
+    print(f"\033[33m{text}\033[0m")
+
+def print_red(text):
+    print(f"\033[31m{text}\033[0m")
+
+
 config = Config()
 print(f"gewechat_base_url: {config.get('gewechat_base_url')}")
 print(f"gewechat_token: {config.get('gewechat_token')}")
@@ -103,22 +113,26 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         login_data = login_status.get('data', {})
         status = login_data.get('status')
         expired_time = login_data.get('expiredTime', 0)
-
-        # 如果二维码过期，返回过期信息
-        if expired_time <= 0:
-            self._send_json_response(200, {
-                "status": -1,  # 自定义状态码，表示二维码已过期
-                "app_id": app_id,
-                "message": "二维码已过期，请重新获取"
-            })
-            return
-
+        print(f"expired_time: {expired_time}")
+        # # 如果二维码过期，返回过期信息
+        # if expired_time <= 5:
+        #     print_yellow("二维码即将过期，正在重新获取...")
+        #     _, uuid = loginAPI._get_and_validate_qr(app_id)
+        #     if not uuid:
+        #         self._send_json_response(200, {
+        #                 "status": -1,  # 自定义状态码，表示二维码已过期
+        #                 "app_id": app_id,
+        #                 "message": "重新获取二维码失败"
+        #             })    
+        #         return
         # 如果登录成功
         if status == 2:
             # 保存新的app_id（如果有的话）
+            nick_name = login_data.get('nickName', '未知用户')
+            print_green(f"\n登录成功！用户昵称: {nick_name}")
             if login_data.get('appId'):
                 config.set('gewechat_app_id', login_data['appId'])
-            
+                print_green(f"\nappId保存成功")
             # 设置回调地址
             callback_url = config.get('gewechat_callback_url')
             if callback_url:
