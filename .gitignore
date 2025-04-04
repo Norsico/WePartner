@@ -40,7 +40,6 @@ TODO
 .gradio/
 tmp
 start.bat
-config.json
 gen_audio.py
 *.wav
 *.mp3
