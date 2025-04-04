@@ -88,8 +88,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self._send_json_response(500, {"error": "获取二维码失败"})
             return
 
-        base_url = f"http://weixin.qq.com/x/ {uuid}"
-        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?data= {base_url}"
+        base_url = f"http://weixin.qq.com/x/{uuid}"
+        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?data={base_url}"
 
         # 缓存appId
         tmp_app_id = app_id

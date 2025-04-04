@@ -2,7 +2,7 @@ import requests
 import time
 
 # 配置接口服务器地址和端口
-BASE_URL = "http://47.93.3.37:8002/"
+BASE_URL = ""
 
 # 测试登录接口
 def test_login():
