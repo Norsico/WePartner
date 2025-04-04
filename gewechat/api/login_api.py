@@ -120,7 +120,8 @@ class LoginApi:
             return app_id, "", "获取二维码失败"
 
         # 4. 生成新的二维码链接
-        qr_url = f"http://weixin.qq.com/x/{uuid}"
+        base_url = f"http://weixin.qq.com/x/{uuid}"
+        qr_url = f"https://api.qrserver.com/v1/create-qr-code/?data={base_url}"
         return app_id, qr_url, ""
 
     def login(self, app_id):
