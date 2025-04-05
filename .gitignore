@@ -48,3 +48,4 @@ config_remote.json
 *.log 
 # Test files
 Core/api/apitest.py
+apitest.py
