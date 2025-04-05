@@ -1,7 +1,7 @@
 {
     "dify_server_ip": "localhost",
     "gewe_server_ip": "localhost",
-    "gewechat_token": "1c87b7cbd15b48a7be1bd7f4e0687b09",
-    "gewechat_app_id": "wx_2sRDq-HBcLzZ0fsc7qHGf",
+    "gewechat_token": "",
+    "gewechat_app_id": "",
     "settings_url": "http://localhost:7863"
 }
