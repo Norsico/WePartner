@@ -3,5 +3,5 @@
     "gewe_server_ip": "localhost",
     "gewechat_token": "",
     "gewechat_app_id": "",
-    "settings_url": "http://localhost:7863"
+    "settings_url": ""
 }
