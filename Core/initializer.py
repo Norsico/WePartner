@@ -2,9 +2,7 @@
 系统初始化模块，负责依赖检查、环境检查、配置初始化等功能
 """
 import platform
-import subprocess
 import sys
-import time
 from typing import Tuple
 
 from Core.Logger import Logger
