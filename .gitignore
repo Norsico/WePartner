@@ -46,3 +46,5 @@ gen_audio.py
 config_remote.json
 # Local configuration
 *.log 
+# Test files
+Core/api/apitest.py
