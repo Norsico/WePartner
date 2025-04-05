@@ -21,13 +21,8 @@ class ClientFactory:
         :return: GewechatClient实例
         """
         if cls._client_instance is None:
-            base_url = config.get('gewechat_base_url')
+            base_url = f"http://{config.get("gewe_server_ip")}:2531/v2/api"
             token = config.get('gewechat_token')
-            
-            if not base_url or not token:
-                logging.error("缺少必要的配置参数：gewechat_base_url 或 gewechat_token")
-                return None
-                
             cls._client_instance = GewechatClient(base_url, token)
             logging.info(f"已创建GewechatClient实例，base_url: {base_url}")
         

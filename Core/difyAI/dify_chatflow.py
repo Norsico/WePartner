@@ -26,9 +26,7 @@ class DifyChatflow:
         self.api_key = api_key
         self.description = description
         self.config = Config()
-        # self.base_url = base_url.rstrip('/')
-        # self.server_host = self.config.get("dify_api_base", "http://localhost/v1")
-        self.base_url = self.config.get("dify_api_base", "http://localhost/v1")
+        self.base_url = f"http://{self.config.get('dify_server_ip', 'http://localhost/v1')}/v1"
         self.config_file = config_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "dify_config.json")
         
         self.headers = {
@@ -336,7 +334,7 @@ class DifyChatflow:
                     # 使用正则表达式提取括号里的内容
                     pattern = r'\((.*?)\)'
                     matches = re.findall(pattern, voice_url)
-                    host = self.config.get("api_base")
+                    host = self.config.get("dify_server_ip")
                     voice_file_url = f"http://{host}{matches[0]}"
                     results.append({
                         'type': 'voice',

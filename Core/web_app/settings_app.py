@@ -25,6 +25,7 @@ class SettingsApp:
     def __init__(self):
         """初始化设置应用"""
         self.config = Config()
+        self.dify_url = f"http://{self.config.get("dify_server_ip")}/v1"
         self.settings_manager = SettingsManager()
         # 强制创建新的DifyManager实例，确保从磁盘加载最新配置
         DifyManager._instance = None
@@ -415,8 +416,8 @@ class SettingsApp:
                             )
                             base_url = gr.Textbox(
                                 label="Base URL",
-                                value="http://localhost/v1",
-                                placeholder="输入Dify API基础URL"
+                                value=self.dify_url,
+                                placeholder="输入Dify API基础URL(已自动填写)"
                             )
                             create_btn = gr.Button("创建Chatflow", variant="primary")
                             create_result = gr.Textbox(label="创建结果", interactive=False)
@@ -641,7 +642,7 @@ class SettingsApp:
         self.interface = self._create_interface()
 
         # 在远程服务器模式下，直接使用服务器URL
-        server_host = self.config.get("server_host", "localhost")
+        server_host = self.config.get("gewe_server_ip", "localhost")
         self.public_url = f"http://{server_host}:{port}"
             
         # 在新线程中启动Gradio界面

@@ -9,7 +9,7 @@ def print_green(text):
 
 config = Config()
 
-loginAPI = LoginApi(base_url=config.get("gewechat_base_url"), token=config.get("gewechat_token"))
+loginAPI = LoginApi(base_url=f"http://{config.get("gewe_server_ip")}:2531/v2/api", token=config.get("gewechat_token"))
 
 gewechat_app_id = config.get('gewechat_app_id', '')
 
@@ -62,7 +62,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             # 保存appId
             config.set("gewechat_app_id", str(tmp_app_id))
             # 设置回调地址
-            callback_url = config.get('gewechat_callback_url')
+            callback_url = f"http://{config.get('gewe_server_ip')}:1145/v2/api/callback/collect"
             if callback_url:
                 callback_resp = loginAPI.set_callback(config.get("gewechat_token"), callback_url)
                 print(f"设置回调结果: {callback_resp}")
@@ -102,8 +102,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8002):
     server_address = ('0.0.0.0', port)
     httpd = server_class(server_address, handler_class)
-    print(f"API服务器已启动: http://{config.get('server_host')}:{port}")
-    print(f"请访问 http://{config.get('server_host')}:{port}/ 进行登录")
+    print(f"API服务器已启动: http://{config.get('gewe_server_ip')}:{port}")
+    print(f"请访问 http://{config.get('gewe_server_ip')}:{port}/ 进行登录")
     httpd.serve_forever()
 
 if __name__ == "__main__":

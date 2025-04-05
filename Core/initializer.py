@@ -23,7 +23,6 @@ class SystemInitializer:
         """初始化系统初始化器"""
         self.config = None
         self.wx_client = None
-        self.start_time = None
     
     def check_environment(self) -> bool:
         """
@@ -63,14 +62,7 @@ class SystemInitializer:
             # 创建配置对象
             self.config = Config('./config.json')
             # 更新启动时间
-            self.start_time = time.time()
-            self.config.set('start_time', self.start_time)
-            
-            # 检查运行环境设置
-            is_remote_server = self.config.get('is_remote_server')
-            if is_remote_server is None:
-                system_info = platform.system()
-                logger.info(f"检测到当前系统为: {system_info}")
+
             logger.success("配置初始化完成")
             return True
             

@@ -43,21 +43,6 @@ class Config:
         初始化配置、设置日志级别和获取token
         """
             
-        # 设置启动时间
-        if not self.data.get('start_time'):
-            self.data['start_time'] = time.time()
-            self.save()
-        
-        # 设置日志级别
-        log_level = self.data.get('log_level', 'INFO')
-        debug_mode = self.data.get('debug_mode', False)
-        if debug_mode:
-            log_level = 'DEBUG'
-        try:
-            logging.set_level(log_level)
-        except (ValueError, TypeError) as e:
-            logging.warning(f"设置日志级别失败: {e}，使用默认级别INFO")
-            logging.set_level('INFO')
         
         # 检查token是否存在，如果不存在则获取
         if not self.data.get('gewechat_token'):
@@ -70,10 +55,7 @@ class Config:
         Returns:
             Optional[str]: 获取到的token，如果失败则返回None
         """
-        url = self.data.get('gewechat_base_url', '') + "/tools/getTokenId"
-        if not self.data.get('gewechat_base_url'):
-            logging.error("缺少必要的配置参数：gewechat_base_url")
-            return None
+        url = f"http://{self.data.get("gewe_server_ip")}:2531/v2/api" + "/tools/getTokenId"
             
         try:
             response = requests.post(url, headers={}, data={})

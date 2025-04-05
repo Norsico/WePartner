@@ -18,11 +18,10 @@ is_callback_success = False
 
 class WxChatClient:
     def __init__(self, config):
-        self.gewechat_base_url = config.get('gewechat_base_url')
         self.gewechat_token = config.get('gewechat_token')
         self.gewechat_app_id = config.get('gewechat_app_id')
         self.client = config.get_gewechat_client()
-        self.gewechat_callback_url = config.get('gewechat_callback_url')
+        self.gewechat_callback_url = f"http://{config.get('gewe_server_ip')}:1145/v2/api/callback/collect"
         self.config = config
         self.channel = Channel(self.client, config)
         self.set_wx_callback()

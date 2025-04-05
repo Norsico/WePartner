@@ -1,15 +1,7 @@
 {
-    "dify_api_base": "http://localhost/v1",
-    "api_base": "",
-    "gewechat_base_url": "http://172.26.128.1:2531/v2/api",
-    "gewechat_token": "",
-    "gewechat_app_id": "",
-    "gewechat_callback_url": "http://172.26.128.1:1145/v2/api/callback/collect",
-    "server_host": "localhost",
-    "settings_url": "",
-    "GPT-SoVITS_url": "",
-    "is_remote_server": false,
-    "debug_mode": true,
-    "log_level": "DEBUG",
-    "start_time": 1743595559.402708
+    "dify_server_ip": "localhost",
+    "gewe_server_ip": "localhost",
+    "gewechat_token": "1c87b7cbd15b48a7be1bd7f4e0687b09",
+    "gewechat_app_id": "wx_2sRDq-HBcLzZ0fsc7qHGf",
+    "settings_url": "http://localhost:7863"
 }

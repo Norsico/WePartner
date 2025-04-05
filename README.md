@@ -225,21 +225,7 @@ python main.py
 
 ```bash
 {
-    "master_name": "", # 你的微信账号名称(注意是账号名称不是备注，建议使用不易重名的名称)
-    "dify_api_base": "http://localhost/v1", # dify的地址，一般不用修改
-    "gewechat_base_url": "http://your_local_ip:2531/v2/api", # 将your_local_ip替换为你的电脑IP地址
-    "gewechat_token": "", # 初次创建应用，留空，这里自动填写
-    "gewechat_app_id": "", # 初次创建应用，留空，这里自动填写
-    "gewechat_callback_url": "http://your_local_ip:1145/v2/api/callback/collect", # 一般不需要改
-    "server_host": "localhost", # 应该也不需要修改
-    "settings_url": "", # 自动生成
-    "GPT-SoVITS_url": "http://127.0.0.1:9880", # GPT-SoVITS的url,一般默认即可
-    "text_language": "ja", # 模型发送的语音语言(如果为中文之外的语言，需要在Dify端修改提示词)常用的:中文(zh),英文(en),日文(ja)
-    "call_back_success_falg": false, # 推荐设置为false，这样会少很多莫名其妙的bug
-    "is_remote_server": false, # 是否为远程服务器，本地部署的就填false
-    "debug_mode": true, # 可以不改
-    "log_level": "DEBUG", # 可以不该
-    "start_time": 1742287344.8490422 # 自动生成
+
 }
 ```
 

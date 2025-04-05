@@ -99,8 +99,6 @@ class Channel:
                 if r['type'] == 'text':
                     self.handle_text(r['content'], _wxid)
                 elif r['type'] == 'voice':
-                    # host = self.config.get("api_base")
-                    # voice_u = r['content'].replace("localhost", host)
                     self.handle_voice(r['content'], _wxid)
                     cleanup_tmp_folder()
             # if res['type'] == 'text':
@@ -167,7 +165,8 @@ class Channel:
             
             # 发送语音消息
             # master_name = self.config.get('master_name')
-            callback_url = self.config.get("gewechat_callback_url")
+            callback_url = f"http://{self.config.get('gewe_server_ip')}:1145/v2/api/callback/collect"
+            print(f"callback_url: {callback_url}")
             silk_url = callback_url + "?file=" + str(silk_path)
             
             # wxid = self.get_wxid_by_name(master_name)
