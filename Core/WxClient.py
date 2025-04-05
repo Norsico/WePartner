@@ -153,17 +153,12 @@ class Query:
                     return "success"
                 except Exception as e:
                     logger.error(f"消息处理过程中出现错误: {str(e)}")
-        
+
         # 私信消息处理
         if not gewechat_msg.my_msg:
             if not gewechat_msg.is_group:
-                if gewechat_msg.ctype not in {
-                    ContextType.VOICE,             # 语言
-                    ContextType.IMAGE,             # 图片
-                    ContextType.NON_USER_MSG,      # 公众号消息
-                    ContextType.SHARING,           # 分享信息
-                    ContextType.EMOJI              # 表情包
-                    }:
+                # 目前版本只支持文本消息，后续会更新图片、文件、公众号等消息的回复实现...
+                if gewechat_msg.ctype is ContextType.TEXT:
                     wxid = gewechat_msg.other_user_id
                     # 处理有效消息
                     try:

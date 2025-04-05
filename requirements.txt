@@ -7,3 +7,4 @@ pysilk==0.0.1
 pydub==0.25.1
 qrcode==7.4.2
 typing-extensions==4.9.0 
+cozepy
