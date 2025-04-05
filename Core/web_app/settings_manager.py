@@ -9,10 +9,12 @@ class SettingsManager:
         Args:
             settings_file: 设置文件路径，默认为web目录下的settings.json
         """
-        if settings_file is None:
+        if not settings_file:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             self.settings_file = os.path.join(current_dir, "settings.json")
+            print(self.settings_file)
         else:
+            print("xx")
             self.settings_file = settings_file
             
         self.settings = self._load_settings()
@@ -31,6 +33,9 @@ class SettingsManager:
             default_settings = self._get_default_settings()
             self._save_settings(default_settings)
             return default_settings
+
+    def _update_settings(self):
+        self.settings = self._load_settings()
             
     def _save_settings(self, settings: Dict):
         """保存设置到文件"""
@@ -147,3 +152,6 @@ class SettingsManager:
         except Exception as e:
             print(f"设置配置项失败: {str(e)}")
             return False 
+        
+if __name__ == '__main__':
+    manager = SettingsManager()

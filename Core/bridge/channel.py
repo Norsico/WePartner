@@ -65,7 +65,7 @@ class Channel:
             处理结果
         """
         logging.info(f"收到消息: {message}")
-        self.settings_manager._load_settings()
+        self.settings_manager._update_settings()
         self.current_settings = self.settings_manager.get_settings()
         # # 判断是否为设置命令
         # if message.lower() in ["#设置", "#setting", "#config"]:
@@ -81,10 +81,10 @@ class Channel:
         # 获取是否启用了语音回复
         voice_reply_enabled = self.current_settings.get("voice_reply_enabled", False)
         # 调试输出
-        logging.debug(f"当前选中的chatflow: {chatflow_description}")
-        logging.debug(f"是否启用了语音回复: {voice_reply_enabled}")
+        print(f"当前选中的chatflow: {chatflow_description}")
+        print(f"是否启用了语音回复: {voice_reply_enabled}")
         dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
-        logging.debug(f"当前选中的chatflow: {dify_client.list_conversations()}")
+        print(f"当前选中的chatflow: {dify_client.list_conversations()}")
         # 处理消息
         response = dify_client.chat(query=message,
                                     conversation_name=self.current_settings
