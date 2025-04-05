@@ -82,14 +82,9 @@ class CozeChatManager:
             voice_contents = re.findall(r'<voice>(.*?)</voice>', content, re.DOTALL)
             if voice_contents:
                 for voice_url in voice_contents:
-                    # 使用正则表达式提取括号里的内容
-                    pattern = r'\((.*?)\)'
-                    matches = re.findall(pattern, voice_url)
-                    host = self.config.get("dify_server_ip")
-                    voice_file_url = f"http://{host}{matches[0]}"
                     results.append({
                         'type': 'voice',
-                        'content': voice_file_url.strip()
+                        'content': voice_url.strip()
                     })
 
         print(f"results:{results}")
