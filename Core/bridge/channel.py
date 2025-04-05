@@ -1,7 +1,7 @@
 from Core.Logger import Logger
 from Core.commands.command_manager import CommandManager
 from Core.web_app.settings_manager import SettingsManager
-from Core.voice.audio_convert import wav_to_silk
+from Core.voice.audio_convert import audio_to_silk
 import os
 
 # 获取当前脚本文件的绝对路径
@@ -161,7 +161,7 @@ class Channel:
             silk_path = audio_path + '.silk'
             
             # 转换为silk格式
-            duration = wav_to_silk(audio_path, silk_path)
+            duration = audio_to_silk(audio_path, silk_path)
             
             # 发送语音消息
             # master_name = self.config.get('master_name')
