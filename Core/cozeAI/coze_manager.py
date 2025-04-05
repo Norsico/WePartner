@@ -62,7 +62,7 @@ class CozeChatManager:
 
     def handle_response(self, response):
         # 假设 response 是一个字典，包含返回的内容
-        content = response
+        content = response.get('response')
 
         results = []
         print("handle response...")
@@ -91,9 +91,9 @@ class CozeChatManager:
                         'type': 'voice',
                         'content': voice_file_url.strip()
                     })
+
         print(f"results:{results}")
-        print(f"response: {response}")
-        return response
+        return results
 
     def chat_with_bot(self, bot_id: str, wxid: str, user_message: str):
         """
@@ -128,14 +128,13 @@ class CozeChatManager:
                     response += event.message.content
 
         return {
-            "conversation_id": conversation_id,
             "response": response
         }
 
 # 示例用法
 if __name__ == "__main__":
     # 初始化 CozeChatManager 实例
-    coze_manager = CozeChatManager(api_token="pat_ZhGBBo8lJwQyhdir0tZXzoBZP09KplQWnzbfTjwp6BCJ5rGRzE8Z00mkOMfJbsFO")
+    coze_manager = CozeChatManager(api_token="")
 
     # 智能体的 ID 和用户微信 ID
     bot_id = "7489710610729566242"
