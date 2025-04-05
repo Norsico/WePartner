@@ -55,7 +55,7 @@ class Config:
         Returns:
             Optional[str]: 获取到的token，如果失败则返回None
         """
-        url = f"http://{self.data.get("gewe_server_ip")}:2531/v2/api" + "/tools/getTokenId"
+        url = f"http://{self.data.get('gewe_server_ip')}:2531/v2/api" + "/tools/getTokenId"
             
         try:
             response = requests.post(url, headers={}, data={})
