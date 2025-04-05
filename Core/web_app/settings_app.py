@@ -25,7 +25,7 @@ class SettingsApp:
     def __init__(self):
         """初始化设置应用"""
         self.config = Config()
-        self.dify_url = f"http://{self.config.get("dify_server_ip")}/v1"
+        self.dify_url = f"http://{self.config.get('dify_server_ip')}/v1"
         self.settings_manager = SettingsManager()
         # 强制创建新的DifyManager实例，确保从磁盘加载最新配置
         DifyManager._instance = None

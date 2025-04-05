@@ -9,7 +9,7 @@ def print_green(text):
 
 config = Config()
 
-loginAPI = LoginApi(base_url=f"http://{config.get("gewe_server_ip")}:2531/v2/api", token=config.get("gewechat_token"))
+loginAPI = LoginApi(base_url=f"http://{config.get('gewe_server_ip')}:2531/v2/api", token=config.get("gewechat_token"))
 
 gewechat_app_id = config.get('gewechat_app_id', '')
 
