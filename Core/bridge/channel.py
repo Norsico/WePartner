@@ -1,6 +1,4 @@
 from Core.Logger import Logger
-from Core.commands.command_manager import CommandManager
-from Core.web_app.settings_manager import SettingsManager
 from Core.voice.audio_convert import audio_to_silk
 from Core.cozeAI.coze_manager import CozeChatManager
 import os
@@ -50,9 +48,7 @@ class Channel:
         self.client = client
         self.config = config
         self.gewechat_app_id = config.get('gewechat_app_id')
-        
-        # 初始化命令管理器
-        self.command_manager = CommandManager(self)
+
 
         # 初始化coze和dify管理器
         self.init_managers()

@@ -133,7 +133,6 @@ wxauto不支持发送语音气泡，虽然稳定性强，但是很多可个性�
 wxChatBot/
 ├── Core/                  # 核心功能模块
 │   ├── bridge/            # 通信桥接层
-│   ├── commands/          # 命令系统
 │   ├── difyAI/            # Dify AI集成
 │   ├── factory/           # 服务工厂
 │   ├── voice/             # 语音处理模块
