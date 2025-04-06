@@ -5,14 +5,14 @@ import re
 from cozepy import Coze, TokenAuth, Message, ChatEventType, COZE_CN_BASE_URL
 
 class CozeChatManager:
-    def __init__(self, project_config, base_url=COZE_CN_BASE_URL, config_file="coze_config.json"):
+    def __init__(self, api_token, base_url=COZE_CN_BASE_URL, config_file="coze_config.json"):
         """
         初始化 CozeChatManager 类实例。
         :param api_token: Coze 平台的 API 访问令牌，如果未提供，则从环境变量 COZE_API_TOKEN 获取。
         :param base_url: Coze API 的基础 URL，默认为 Coze 官方地址。
         :param config_file: 用于存储用户对话 ID 的配置文件。
         """
-        self.api_token = project_config.get('coze_api_token')
+        self.api_token = api_token
 
         self.coze = Coze(auth=TokenAuth(token=self.api_token), base_url=base_url)
         self.config_file = config_file

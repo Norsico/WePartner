@@ -56,7 +56,8 @@ class Channel:
     def init_managers(self):
         """初始化AI平台管理器"""
         # 初始化coze
-        self.coze_manager = CozeChatManager(api_token=self.config.get("coze_api_token"),project_config=self.config)
+        if self.config.get("coze_api_token"):
+            self.coze_manager = CozeChatManager(api_token=self.config.get("coze_api_token"),project_config=self.config)
         # 初始化dify
         self.new_dify_manager = NewDifyManager(project_config=self.config)
     
@@ -110,12 +111,15 @@ class Channel:
             print(f"没有获取到回复: {res}")
     
     def _handle_coze(self, meseage, _wxid):
-        response = self.coze_manager.chat_with_bot(
-            bot_id=self.config.get("coze_agent_id"), 
-            wxid=_wxid,
-            user_message=meseage
-        )
-        res = self.coze_manager.handle_response(response)
+        if self.config.get("coze_api_token"):
+            response = self.coze_manager.chat_with_bot(
+                bot_id=self.config.get("coze_agent_id"), 
+                wxid=_wxid,
+                user_message=meseage
+            )
+            res = self.coze_manager.handle_response(response)
+        else:
+            print("没有配置coze")
         
         if res:
             # 继续已有对话
