@@ -56,7 +56,7 @@ class Channel:
     def init_managers(self):
         """初始化AI平台管理器"""
         # 初始化coze
-        self.coze_manager = CozeChatManager(api_token=self.config.get("coze_api_token"))
+        self.coze_manager = CozeChatManager(api_token=self.config.get("coze_api_token"),project_config=self.config)
         # 初始化dify
         self.new_dify_manager = NewDifyManager(project_config=self.config)
     
