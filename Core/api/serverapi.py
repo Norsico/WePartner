@@ -106,8 +106,9 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json; charset=utf-8')
         self.end_headers()
-        self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
-
+        response_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        self.wfile.write(response_data)
+        print(f"Returning JSON response: {response_data.decode('utf-8')}")
     def _handle_login(self, app_id):
         global tmp_app_id
 
