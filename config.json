@@ -2,6 +2,7 @@
     "dify_server_ip": "localhost",
     "gewe_server_ip": "localhost",
     "agent_platform": "coze",
+    "dify_api_key": "",
     "coze_agent_id": "",
     "coze_api_token": "",
     "gewechat_token": "",

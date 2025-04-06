@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import signal
 import threading
 from Core.Logger import Logger
-from Core.initializer import SystemInitializer
+from Core.initializer import SystemInitializer, channel
 from Core.web_app.web_init import WebInitializer
 from Core.bridge.temp_dir import TmpDir
 from Core.song import song_api
@@ -92,4 +92,9 @@ def main():
         cleanup_tmp_folder()
 
 if __name__ == "__main__":
-    main()
+    # 启动应用
+    try:
+        main()
+    except Exception as e:
+        logger.error(f"程序异常终止: {str(e)}")
+        cleanup_tmp_folder()

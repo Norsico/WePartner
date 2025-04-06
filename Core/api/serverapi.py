@@ -3,11 +3,31 @@ from gewechat.client import LoginApi
 import urllib.parse
 import json
 from config import Config
+import importlib.util
+import os
+import sys
+import traceback
 
 def print_green(text):
     print(f"\033[32m{text}\033[0m")
 
 config = Config()
+
+# 获取项目根目录
+current_file_path = os.path.abspath(__file__)
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+sys.path.append(root_dir)
+
+# 导入Channel实例
+def get_channel_instance():
+    """获取全局Channel实例"""
+    try:
+        from Core.initializer import channel
+        return channel
+    except Exception as e:
+        print(f"获取Channel实例失败: {e}")
+        traceback.print_exc()
+        return None
 
 loginAPI = LoginApi(base_url=f"http://{config.get('gewe_server_ip')}:2531/v2/api", token=config.get("gewechat_token"))
 
@@ -21,6 +41,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.handle_login()
         elif self.path.startswith('/check_login'):
             self.handle_check_login()
+        elif self.path.startswith('/changedify'):
+            self.handle_change_dify()
+        elif self.path.startswith('/changecoze'):
+            self.handle_change_coze()
+        elif self.path.startswith('/changeplatform'):
+            self.handle_change_platform()
 
     def handle_login(self):
         global tmp_app_id
@@ -72,7 +98,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             "app_id": login_data.get('appId', app_id)  # 返回新的app_id
         })
 
-
     def _send_json_response(self, status_code, data):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json; charset=utf-8')
@@ -98,6 +123,84 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             "uuid": uuid,
             "app_id": app_id
         })
+
+    def handle_change_dify(self):
+        """
+        处理修改Dify配置的请求
+        格式: /changedify?server_ip=xxx&api_key=yyy
+        """
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        server_ip = params.get('server_ip', [None])[0]
+        api_key = params.get('api_key', [None])[0]
+
+        # 更新配置
+        updated = False
+        if server_ip:
+            config.set("dify_server_ip", server_ip)
+            updated = True
+        if api_key:
+            config.set("dify_api_key", api_key)
+            updated = True
+
+        if updated:
+            # 通知Channel刷新配置
+            channel = get_channel_instance()
+            if channel:
+                channel.refresh_config()
+                print_green("已通知Channel刷新配置")
+            self._send_json_response(200, {"success": True, "message": "Dify配置已更新"})
+        else:
+            self._send_json_response(400, {"success": False, "message": "未提供任何有效参数"})
+
+    def handle_change_coze(self):
+        """
+        处理修改Coze配置的请求
+        格式: /changecoze?agent_id=xxx&api_token=yyy
+        """
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        agent_id = params.get('agent_id', [None])[0]
+        api_token = params.get('api_token', [None])[0]
+
+        # 更新配置
+        updated = False
+        if agent_id:
+            config.set("coze_agent_id", agent_id)
+            updated = True
+        if api_token:
+            config.set("coze_api_token", api_token)
+            updated = True
+
+        if updated:
+            # 通知Channel刷新配置
+            channel = get_channel_instance()
+            if channel:
+                channel.refresh_config()
+                print_green("已通知Channel刷新配置")
+            self._send_json_response(200, {"success": True, "message": "Coze配置已更新"})
+        else:
+            self._send_json_response(400, {"success": False, "message": "未提供任何有效参数"})
+
+    def handle_change_platform(self):
+        """
+        处理修改AI平台的请求
+        格式: /changeplatform?platform=dify 或 /changeplatform?platform=coze
+        """
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        platform = params.get('platform', [None])[0]
+
+        if platform in ["dify", "coze"]:
+            config.set("agent_platform", platform)
+            # 通知Channel刷新配置
+            channel = get_channel_instance()
+            if channel:
+                channel.refresh_config()
+                print_green("已通知Channel刷新配置")
+            self._send_json_response(200, {"success": True, "message": f"AI平台已切换为{platform}"})
+        else:
+            self._send_json_response(400, {"success": False, "message": "无效的平台参数，请使用'dify'或'coze'"})
 
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8002):
     server_address = ('0.0.0.0', port)

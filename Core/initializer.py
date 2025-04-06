@@ -8,9 +8,12 @@ from typing import Tuple
 from Core.Logger import Logger
 from Core.WxClient import WxChatClient
 from config import Config
+from Core.bridge.channel import Channel
 
 logger = Logger()
 
+# 全局channel实例
+channel = None
 
 class SystemInitializer:
     """
@@ -105,6 +108,10 @@ class SystemInitializer:
         # 初始化微信客户端
         if not self.init_wx_client():
             return False, None
+        
+        # 初始化通信通道
+        global channel
+        channel = Channel(self.wx_client, self.config)
         
         logger.success("系统初始化完成")
         return True, self.wx_client

@@ -4,14 +4,15 @@ from Core.web_app.settings_manager import SettingsManager
 from Core.voice.audio_convert import audio_to_silk
 from Core.cozeAI.coze_manager import CozeChatManager
 import os
+from Core.difyAI.new_dify_manager import NewDifyManager
+from config import Config
+
 
 # 获取当前脚本文件的绝对路径
 current_file_path = os.path.abspath(__file__)
 
 # 获取tmp路径
 tmp_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(current_file_path))), "tmp")
-
-from Core.difyAI.dify_manager import DifyManager
 
 logging = logger = Logger()
 
@@ -52,11 +53,27 @@ class Channel:
         
         # 初始化命令管理器
         self.command_manager = CommandManager(self)
-        self.settings_manager = SettingsManager()
-        self.current_settings = self.settings_manager.get_settings()
 
+        # 初始化coze和dify管理器
+        self.init_managers()
+
+    def init_managers(self):
+        """初始化AI平台管理器"""
         # 初始化coze
         self.coze_manager = CozeChatManager(api_token=self.config.get("coze_api_token"))
+        # 初始化dify
+        self.new_dify_manager = NewDifyManager(project_config=self.config)
+    
+    def refresh_config(self):
+        """刷新配置和管理器实例"""
+        logging.info("正在刷新配置...")
+        # 重新加载配置
+        self.config = Config()
+        # 更新appId
+        self.gewechat_app_id = self.config.get('gewechat_app_id')
+        # 重新初始化管理器
+        self.init_managers()
+        logging.success("配置已刷新")
 
     def compose_context(self, message, _wxid):
         """
@@ -71,11 +88,30 @@ class Channel:
         logging.info(f"收到消息: {message}")
         # 判断平台
         if self.config.get("agent_platform") == "dify":
-            self._handle_dify(message, _wxid)
+            self._handle_new_dify(message, _wxid)
         elif self.config.get("agent_platform") == "coze":
             self._handle_coze(message, _wxid)
 
         return "success"
+    
+    def _handle_new_dify(self, message, _wxid):
+
+        response = self.new_dify_manager.chat_with_bot(
+            wxid=_wxid,
+            user_message=message
+        )
+        res = self.new_dify_manager.handle_response(response)
+        
+        if res:
+            # 处理回复内容
+            for r in res:
+                if r['type'] == 'text':
+                    self.handle_text(r['content'], _wxid)
+                elif r['type'] == 'voice':
+                    self.handle_voice(r['content'], _wxid)
+                    cleanup_tmp_folder()
+        else:
+            print(f"没有获取到回复: {res}")
     
     def _handle_coze(self, meseage, _wxid):
         response = self.coze_manager.chat_with_bot(
@@ -85,40 +121,6 @@ class Channel:
         )
         res = self.coze_manager.handle_response(response)
         
-        if res:
-            # 继续已有对话
-            for r in res:
-                if r['type'] == 'text':
-                    self.handle_text(r['content'], _wxid)
-                elif r['type'] == 'voice':
-                    self.handle_voice(r['content'], _wxid)
-                    cleanup_tmp_folder()
-        else:
-            print(f"maybe no res:{res}")
-    
-    def _handle_dify(self, message, _wxid):
-        self.settings_manager._update_settings()
-        self.current_settings = self.settings_manager.get_settings()
-
-        # 处理普通消息
-        logging.info("检测到普通消息")
-        # 从settings.json中获取当前选中的chatflow
-        chatflow_description = self.current_settings.get("selected_chatflow", {}).get("description", "")
-        # 获取是否启用了语音回复
-        voice_reply_enabled = self.current_settings.get("voice_reply_enabled", False)
-        # 调试输出
-        print(f"当前选中的chatflow: {chatflow_description}")
-        print(f"是否启用了语音回复: {voice_reply_enabled}")
-        dify_client = DifyManager().get_instance_by_name(self.current_settings.get("selected_chatflow", {}).get("description", ""))
-        print(f"当前选中的chatflow: {dify_client.list_conversations()}")
-        # 处理消息
-        response = dify_client.chat(query=message,
-                                    conversation_name=self.current_settings
-                                    .get("selected_chatflow", {})
-                                     .get("conversation", {})
-                                    .get("name", "")
-                                    )
-        res = dify_client.handle_response(response)
         if res:
             # 继续已有对话
             for r in res:
