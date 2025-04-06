@@ -37,6 +37,10 @@ tmp_app_id = 0
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")  # 允许所有来源访问
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
         if self.path.startswith('/login'):
             self.handle_login()
         elif self.path.startswith('/check_login'):
