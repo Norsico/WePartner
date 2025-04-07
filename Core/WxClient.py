@@ -47,6 +47,16 @@ class WxChatClient:
         logger.info("等待服务器启动（5秒）...")
         time.sleep(5)
         
+        # 检查在线状态并设置回调地址
+        if self.gewechat_app_id:
+            check_online_response = self.client.check_online(self.gewechat_app_id)
+            if check_online_response.get('ret') == 200 and check_online_response.get('data'):
+                logger.info("微信在线，正在设置回调地址...")
+                callback_resp = self.client.set_callback(self.gewechat_token, self.gewechat_callback_url)
+                logger.info(f"设置回调结果: {callback_resp}")
+            else:
+                logger.warning("微信未在线，请先登录后再设置回调地址")
+        
         # 启动 API 服务
         serverapi.run()
         
@@ -77,7 +87,7 @@ class Query:
             # 创建通道对象
             self.channel = Channel(self.client, self.config)
             self._initialized = True
-            logger.debug("Query类初始化完成")
+            print("Query类初始化完成")
 
     def GET(self):
         # 搭建简单的文件服务器，用于向gewechat服务传输语音等文件，但只允许访问tmp目录下的文件

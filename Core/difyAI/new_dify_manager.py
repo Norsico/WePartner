@@ -32,6 +32,7 @@ class NewDifyManager:
 
         # Dify API 基础URL - 使用http而不是https
         server_ip = self.project_config.get('dify_server_ip')
+        self.dify_server_ip = server_ip
         self.base_url = f"http://{server_ip}/v1" if not server_ip.startswith(('http://', 'https://')) else f"{server_ip}/v1"
         print(f"Dify API URL: {self.base_url}")
         self.headers = {
@@ -103,21 +104,19 @@ class NewDifyManager:
                         'type': 'text',
                         'content': text.strip()
                     })
-        else:
-            # 如果没有特定标记，将整个内容视为文本
-            results.append({
-                'type': 'text',
-                'content': content.strip()
-            })
 
         if '<voice>' in content:
             print("提取语音内容")
-            voice_contents = re.findall(r'<voice>(.*?)</voice>', content, re.DOTALL)
+            # 使用正则表达式提取Dify格式的语音URL
+            voice_pattern = r'\[.*?\]\((.*?)\)'
+            voice_contents = re.findall(voice_pattern, content, re.DOTALL)
             if voice_contents:
                 for voice_url in voice_contents:
+                    # 构建完整的URL
+                    full_url = f"http://{self.dify_server_ip}{voice_url}"
                     results.append({
                         'type': 'voice',
-                        'content': voice_url.strip()
+                        'content': full_url
                     })
 
         print(f"results:{results}")
