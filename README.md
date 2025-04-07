@@ -59,13 +59,11 @@
 ## 视频链接:
 [视频教程-BiliBili](https://www.bilibili.com/video/BV1emo9YfEzL/?spm_id_from=333.1387.homepage.video_card.click&vd_source=77a30ef3628f2526c0b6e937fe4c217e)
 
-## 整合包下载(带python环境)
-
-[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1pCKptFE_hHmWaiOEa-5O6A)
+[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1psBw__2sS3tbO29XWZwM2Q)
 提取码: 2547
 
-[V1.2.0整合包下载-夸克](https://pan.quark.cn/s/28c03a50178c)
-提取码：RUSJ
+[V1.2.0整合包下载-夸克](https://pan.quark.cn/s/039d2171c4f6)
+提取码：rxAm
 
 ## ✨ 功能特性
 
@@ -111,11 +109,11 @@ wxChatBot/
 ### 安装步骤
 
 #### 1. 下载整合包
-[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1pCKptFE_hHmWaiOEa-5O6A)
+[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1psBw__2sS3tbO29XWZwM2Q)
 提取码: 2547
 
-[V1.2.0整合包下载-夸克](https://pan.quark.cn/s/28c03a50178c)
-提取码：RUSJ
+[V1.2.0整合包下载-夸克](https://pan.quark.cn/s/039d2171c4f6)
+提取码：rxAm
 
 #### 2. 检查依赖
 双击 `setup.bat` 检查项目依赖
