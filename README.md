@@ -59,7 +59,7 @@
 ## 视频链接:
 [视频教程-BiliBili](https://www.bilibili.com/video/BV1emo9YfEzL/?spm_id_from=333.1387.homepage.video_card.click&vd_source=77a30ef3628f2526c0b6e937fe4c217e)
 
-[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1psBw__2sS3tbO29XWZwM2Q)
+[V1.2.0整合包下载-百度](https://pan.baidu.com/s/19qeNwRd29d0c_HZYS4zq9w)
 提取码: 2547
 
 [V1.2.0整合包下载-夸克](https://pan.quark.cn/s/039d2171c4f6)
@@ -109,7 +109,7 @@ wxChatBot/
 ### 安装步骤
 
 #### 1. 下载整合包
-[V1.2.0整合包下载-百度](https://pan.baidu.com/s/1psBw__2sS3tbO29XWZwM2Q)
+[V1.2.0整合包下载-百度](https://pan.baidu.com/s/19qeNwRd29d0c_HZYS4zq9w)
 提取码: 2547
 
 [V1.2.0整合包下载-夸克](https://pan.quark.cn/s/039d2171c4f6)
