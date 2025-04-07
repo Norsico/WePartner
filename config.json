@@ -1,11 +1,10 @@
 {
-    "dify_server_ip": "localhost",
-    "gewe_server_ip": "localhost",
+    "dify_server_ip": "",
+    "gewe_server_ip": "",
     "agent_platform": "coze",
     "dify_api_key": "",
-    "coze_agent_id": "",
+    "coze_agent_id": "7489670327732011034",
     "coze_api_token": "",
     "gewechat_token": "",
-    "gewechat_app_id": "",
-    "settings_url": ""
+    "gewechat_app_id": ""
 }

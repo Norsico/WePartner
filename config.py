@@ -114,6 +114,10 @@ class Config:
             self.data[key] = value
             self.save()
             logging.success(f"设置配置项 {key} = {value} 成功")
+            # 如果修改了关键配置，提示需要刷新
+            if key in ['agent_platform', 'dify_server_ip', 'dify_api_key', 
+                      'coze_agent_id', 'coze_api_token', 'gewe_server_ip']:
+                logging.warning("关键配置已更改，其他组件可能需要调用refresh_config()以更新配置")
         else:
             logging.debug(f"配置项 {key} 的值未变化，跳过保存")
 
@@ -144,3 +148,26 @@ class Config:
     def __str__(self) -> str:
         """返回配置数据的字符串表示"""
         return json.dumps(self.data, indent=4, ensure_ascii=False)
+
+    def refresh_config(self) -> None:
+        """
+        从文件重新加载配置数据。
+        当config.json被其他API或进程修改时，调用此方法可以确保配置数据同步。
+        """
+        old_data = self.data.copy()
+        self.load()
+        
+        # 检查关键配置是否发生变化
+        changed_keys = []
+        for key in ['agent_platform', 'dify_server_ip', 'dify_api_key', 
+                   'coze_agent_id', 'coze_api_token', 'gewe_server_ip']:
+            if self.data.get(key) != old_data.get(key):
+                changed_keys.append(key)
+        
+        if changed_keys:
+            logging.warning(f"配置已更新，变更的配置项: {', '.join(changed_keys)}")
+            # 如果gewechat_token不存在，重新获取
+            if not self.data.get('gewechat_token'):
+                self._get_token()
+        else:
+            logging.debug("刷新配置完成，配置未发生变化")

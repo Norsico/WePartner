@@ -4,26 +4,36 @@ import sys
 import re
 import requests
 
+# 获取项目根目录
+current_file_path = os.path.abspath(__file__)
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+sys.path.append(root_dir)
+
+from config import Config
+
+
 class NewDifyManager:
-    def __init__(self,project_config, config_file="new_dify_config.json"):
+    def __init__(self,project_config=Config(), config_file="new_dify_config.json"):
         """
         初始化 NewDifyManager 类实例。
         :param project_config: 项目配置。
         :param config_file: 用于存储用户对话 ID 的配置文件。
         """
         
-        # 获取当前脚本的目录路径
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        sys.path.append(script_dir)
+        # 获取当前文件所在目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 构造配置文件的完整路径（与当前文件同级）
+        self.config_file = os.path.join(current_dir, config_file)
+        print(f"配置文件路径: {self.config_file}")
         
-        # 构造配置文件的完整路径
-        self.config_file = os.path.join(script_dir, config_file)
         self.config = self.load_config()
         self.project_config = project_config
         self.api_key = self.project_config.get("dify_api_key")
 
-        # Dify API 基础URL
-        self.base_url = f"https://{self.project_config.get('dify_server_ip')}/v1"
+        # Dify API 基础URL - 使用http而不是https
+        server_ip = self.project_config.get('dify_server_ip')
+        self.base_url = f"http://{server_ip}/v1" if not server_ip.startswith(('http://', 'https://')) else f"{server_ip}/v1"
+        print(f"Dify API URL: {self.base_url}")
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -35,17 +45,26 @@ class NewDifyManager:
         :return: 配置字典。
         """
         if os.path.exists(self.config_file):
-            with open(self.config_file, 'r') as f:
-                return json.load(f)
+            try:
+                with open(self.config_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"加载配置文件失败: {e}")
+                return {}
         else:
+            print(f"配置文件不存在，将创建新文件: {self.config_file}")
             return {}
 
     def save_config(self):
         """
         保存配置文件。
         """
-        with open(self.config_file, 'w') as f:
-            json.dump(self.config, f, indent=4)
+        try:
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                json.dump(self.config, f, indent=4, ensure_ascii=False)
+            print(f"配置已保存到: {self.config_file}")
+        except Exception as e:
+            print(f"保存配置文件失败: {e}")
 
     def get_conversation_id(self, wxid):
         """
@@ -120,7 +139,8 @@ class NewDifyManager:
         payload = {
             "inputs": {},
             "query": user_message,
-            "response_mode": "streaming"
+            "response_mode": "blocking",  # 改为blocking模式
+            "user": wxid  # 添加用户标识
         }
         
         if conversation_id:
@@ -130,20 +150,36 @@ class NewDifyManager:
             print("开始新对话")
             
         try:
-            response = requests.post(endpoint, headers=self.headers, json=payload)
-            response.raise_for_status()
+            print(f"发送请求到: {endpoint}")
+            print(f"请求参数: {payload}")
+            response = requests.post(endpoint, headers=self.headers, json=payload, verify=False)  # 添加verify=False
+            
+            if response.status_code != 200:
+                error_msg = f"API请求失败: 状态码 {response.status_code}"
+                try:
+                    error_data = response.json()
+                    error_msg += f", 错误信息: {error_data}"
+                except:
+                    error_msg += f", 响应内容: {response.text}"
+                print(error_msg)
+                return {"answer": error_msg}
+            
             data = response.json()
+            print(f"API响应: {data}")
             
             # 提取并保存conversation_id
             if "conversation_id" in data:
                 self.set_conversation_id(wxid, data["conversation_id"])
                 
             return data
+        except requests.exceptions.RequestException as e:
+            error_msg = f"请求异常: {str(e)}"
+            print(error_msg)
+            return {"answer": error_msg}
         except Exception as e:
-            print(f"API请求失败: {e}")
-            if hasattr(e, 'response'):
-                print(f"服务器响应: {e.response.text}")
-            return {"answer": f"对话请求失败: {str(e)}"}
+            error_msg = f"未知错误: {str(e)}"
+            print(error_msg)
+            return {"answer": error_msg}
 
 # 示例用法
 if __name__ == "__main__":

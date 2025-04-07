@@ -44,8 +44,10 @@ gen_audio.py
 *.wav
 *.mp3
 config_remote.json
+*.config
 # Local configuration
 *.log 
 # Test files
 Core/api/apitest.py
 apitest.py
+logintest.py

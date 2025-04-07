@@ -83,6 +83,7 @@ class Channel:
             处理结果
         """
         logging.info(f"收到消息: {message}")
+        self.refresh_config()
         # 判断平台
         if self.config.get("agent_platform") == "dify":
             self._handle_new_dify(message, _wxid)

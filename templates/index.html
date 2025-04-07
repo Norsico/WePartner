@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wxChatBot控制面板</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-item {
+            position: relative;
+            margin: 0 10px;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        .github-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #24292e;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .github-badge:hover {
+            color: white;
+            background-color: #2f363d;
+            text-decoration: none;
+        }
+        .bilibili-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #00a1d6;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .bilibili-badge:hover {
+            color: white;
+            background-color: #00b5e5;
+            text-decoration: none;
+        }
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .qr-code {
+            text-align: center;
+        }
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+        .qq-group {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        .qq-group strong {
+            color: #00a1d6;
+        }
+        .link-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .link-label {
+            min-width: 80px;
+            color: #666;
+        }
+        .online-status {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online {
+            background-color: #28a745;
+        }
+        .status-offline {
+            background-color: #dc3545;
+        }
+        .login-tips {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 4px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">wxChatBot控制面板</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/config">配置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="online-status">
+                            <h6>在线状态</h6>
+                            <div>
+                                <span class="status-indicator" id="statusDot"></span>
+                                <span id="statusText">检查中...</span>
+                            </div>
+                            <div class="login-tips">
+                                <strong>登录提示：</strong>
+                                <ul class="mb-0">
+                                    <li>新设备登录后，隔夜(24h)必须重新登录</li>
+                                    <li>新用户登录API平台，24小时内首夜会100%掉线</li>
+                                    <li>掉线后传appId调用获取二维码接口再次扫码登录即可实现3月内不掉线</li>
+                                    <li>更多账号问题请参考：<a href="http://doc.geweapi.com/doc-3146245" target="_blank">官方文档</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">欢迎使用wxChatBot控制面板</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 link-container">
+                            <div class="link-item">
+                                <span class="link-label">开源链接：</span>
+                                <a href="https://github.com/Norsico/wxChatBot" class="github-badge" target="_blank">
+                                    <i class="fab fa-github"></i> GitHub
+                                </a>
+                            </div>
+                            <div class="link-item">
+                                <span class="link-label">视频教程：</span>
+                                <a href="https://www.bilibili.com/video/BV1emo9YfEzL/?spm_id_from=333.1387.homepage.video_card.click&vd_source=77a30ef3628f2526c0b6e937fe4c217e" class="bilibili-badge" target="_blank">
+                                    <i class="fab fa-bilibili"></i> 演示视频
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">功能特点</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>支持接入Dify聊天流和Coze(扣子)智能体的微信聊天机器人应用</li>
+                            <li>可自定义编排AI作业任务</li>
+                            <li>原生支持永久记忆功能</li>
+                            <li>支持GPT-SoVITS自定义音色</li>
+                            <li>支持RVC变声</li>
+                            <li>可实现音乐作品翻唱(需要在智能体中实现)</li>
+                            <li>能够发送原生微信语音气泡</li>
+                            <li>简单易用的Web控制面板</li>
+                            <li>实时配置更新</li>
+                            <li>安全的微信登录机制</li>
+                            <li>支持自定义回调地址</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">使用说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>在配置页面选择并设置AI平台参数</li>
+                            <li>在登录页面使用微信扫码登录</li>
+                            <li>登录成功后即可开始使用</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">赞助支持</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-center">如果这个项目对你有帮助，欢迎赞助支持！</p>
+                        <div class="qr-code-container">
+                            <div class="qr-code">
+                                <img src="/static/wechat_qr.jpg" alt="微信赞赏码">
+                                <p>微信赞赏</p>
+                            </div>
+                            <div class="qr-code">
+                                <img src="/static/alipay_qr.jpg" alt="支付宝收款码">
+                                <p>支付宝</p>
+                            </div>
+                        </div>
+                        <div class="qq-group">
+                            交流QQ群：<strong>953715009</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">免责声明</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>本软件仅供学习和研究使用，请勿用于商业用途。使用本软件产生的任何问题，作者概不负责。</p>
+                        <p>微信机器人功能需要遵守微信平台的相关规定，请合理使用。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // 添加检查在线状态的函数
+        function checkOnlineStatus(retryCount = 0) {
+            fetch('/api/check_online')
+                .then(response => response.json())
+                .then(data => {
+                    const statusDot = document.getElementById('statusDot');
+                    const statusText = document.getElementById('statusText');
+                    
+                    if (data.online) {
+                        statusDot.className = 'status-indicator status-online';
+                        statusText.textContent = '在线';
+                    } else {
+                        statusDot.className = 'status-indicator status-offline';
+                        statusText.textContent = '离线';
+                        // 如果离线且重试次数小于3次，则重试
+                        if (retryCount < 3) {
+                            setTimeout(() => {
+                                checkOnlineStatus(retryCount + 1);
+                            }, 2000); // 2秒后重试
+                        }
+                    }
+                })
+                .catch(error => {
+                    const statusDot = document.getElementById('statusDot');
+                    const statusText = document.getElementById('statusText');
+                    statusDot.className = 'status-indicator status-offline';
+                    statusText.textContent = '检查失败';
+                    // 如果请求失败且重试次数小于3次，则重试
+                    if (retryCount < 3) {
+                        setTimeout(() => {
+                            checkOnlineStatus(retryCount + 1);
+                        }, 2000); // 2秒后重试
+                    }
+                });
+        }
+
+        // 页面加载时检查状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟3秒后开始第一次检查，给API服务器启动时间
+            setTimeout(() => {
+                checkOnlineStatus();
+                // 每15秒检查一次在线状态（提高检测频率）
+                setInterval(checkOnlineStatus, 15000);
+            }, 3000);
+            
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置 - wxChatBot控制面板</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-item {
+            position: relative;
+            margin: 0 10px;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        .config-section {
+            margin-bottom: 2rem;
+        }
+        .save-btn {
+            margin-top: 1rem;
+        }
+        .status-message {
+            display: inline-block;
+            margin-left: 10px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-message.error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">wxChatBot控制面板</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/config">配置</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">配置设置</h5>
+                        
+                        <!-- AI平台选择 -->
+                        <div class="config-section">
+                            <h6>选择AI平台</h6>
+                            <div class="d-flex align-items-center">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-primary" id="difyPlatform">Dify</button>
+                                    <button type="button" class="btn btn-outline-primary" id="cozePlatform">Coze</button>
+                                </div>
+                                <button type="button" class="btn btn-primary ms-3" onclick="savePlatform()">保存平台</button>
+                                <span id="platformStatus" class="status-message"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Dify配置 -->
+                            <div class="col-md-6">
+                                <div class="config-section">
+                                    <h6>Dify配置</h6>
+                                    <form id="difyForm">
+                                        <div class="mb-3">
+                                            <label for="difyServer" class="form-label">服务器地址</label>
+                                            <input type="text" class="form-control" id="difyServer" placeholder="请打开cmd输入ipconfig查看">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="difyKey" class="form-label">API密钥</label>
+                                            <input type="password" class="form-control" id="difyKey">
+                                        </div>
+                                        <button type="button" class="btn btn-primary save-btn" onclick="updateDifyConfig()">保存Dify配置</button>
+                                        <span id="difyStatus" class="status-message"></span>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Coze配置 -->
+                            <div class="col-md-6">
+                                <div class="config-section">
+                                    <h6>Coze配置</h6>
+                                    <form id="cozeForm">
+                                        <div class="mb-3">
+                                            <label for="cozeId" class="form-label">智能体ID</label>
+                                            <input type="text" class="form-control" id="cozeId" placeholder="请填入您的智能体id">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="cozeToken" class="form-label">API令牌</label>
+                                            <input type="password" class="form-control" id="cozeToken">
+                                        </div>
+                                        <button type="button" class="btn btn-primary save-btn" onclick="updateCozeConfig()">保存Coze配置</button>
+                                        <span id="cozeStatus" class="status-message"></span>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GEWE服务器配置 -->
+                        <div class="config-section mt-4">
+                            <h6>Gewe_ip设置</h6>
+                            <form id="geweForm">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="geweServer" placeholder="请打开cmd输入ipconfig查看">
+                                </div>
+                                <button type="button" class="btn btn-primary save-btn" onclick="updateGeweConfig()">保存GEWE配置</button>
+                                <span id="geweStatus" class="status-message"></span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 初始化平台选择
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取当前平台
+            fetch('/api/get_current_platform')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.platform) {
+                        const platformBtn = document.getElementById(data.platform + 'Platform');
+                        if (platformBtn) {
+                            platformBtn.classList.add('active');
+                        }
+                    }
+                });
+
+            // 获取当前配置
+            fetch('/api/get_current_config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.dify) {
+                        document.getElementById('difyServer').value = data.dify.server_ip || '';
+                        document.getElementById('difyKey').value = data.dify.api_key || '';
+                    }
+                    if (data.coze) {
+                        document.getElementById('cozeId').value = data.coze.agent_id || '';
+                        document.getElementById('cozeToken').value = data.coze.api_token || '';
+                    }
+                    if (data.gewe_server_ip) {
+                        document.getElementById('geweServer').value = data.gewe_server_ip || '';
+                    }
+                });
+        });
+
+        // 切换平台按钮样式
+        document.getElementById('difyPlatform').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('cozePlatform').classList.remove('active');
+        });
+
+        document.getElementById('cozePlatform').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('difyPlatform').classList.remove('active');
+        });
+
+        // 保存平台
+        function savePlatform() {
+            const difyActive = document.getElementById('difyPlatform').classList.contains('active');
+            const platform = difyActive ? 'dify' : 'coze';
+            
+            fetch('/api/change_platform', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ platform: platform })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('platformStatus');
+                if (data.success) {
+                    statusElement.textContent = '平台切换成功！';
+                    statusElement.classList.remove('error');
+                } else {
+                    statusElement.textContent = '平台切换失败：' + data.message;
+                    statusElement.classList.add('error');
+                }
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            })
+            .catch(error => {
+                const statusElement = document.getElementById('platformStatus');
+                statusElement.textContent = '请求失败：' + error;
+                statusElement.classList.add('error');
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            });
+        }
+
+        // 更新Dify配置
+        function updateDifyConfig() {
+            const server = document.getElementById('difyServer').value;
+            const key = document.getElementById('difyKey').value;
+
+            fetch('/api/change_dify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    server_ip: server,
+                    api_key: key
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('difyStatus');
+                if (data.success) {
+                    statusElement.textContent = 'Dify配置更新成功！';
+                    statusElement.classList.remove('error');
+                } else {
+                    statusElement.textContent = 'Dify配置更新失败：' + data.message;
+                    statusElement.classList.add('error');
+                }
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            })
+            .catch(error => {
+                const statusElement = document.getElementById('difyStatus');
+                statusElement.textContent = '请求失败：' + error;
+                statusElement.classList.add('error');
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            });
+        }
+
+        // 更新Coze配置
+        function updateCozeConfig() {
+            const id = document.getElementById('cozeId').value;
+            const token = document.getElementById('cozeToken').value;
+
+            fetch('/api/change_coze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    agent_id: id,
+                    api_token: token
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('cozeStatus');
+                if (data.success) {
+                    statusElement.textContent = 'Coze配置更新成功！';
+                    statusElement.classList.remove('error');
+                } else {
+                    statusElement.textContent = 'Coze配置更新失败：' + data.message;
+                    statusElement.classList.add('error');
+                }
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            })
+            .catch(error => {
+                const statusElement = document.getElementById('cozeStatus');
+                statusElement.textContent = '请求失败：' + error;
+                statusElement.classList.add('error');
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            });
+        }
+
+        // 更新GEWE配置
+        function updateGeweConfig() {
+            const geweServer = document.getElementById('geweServer').value;
+            
+            fetch('/api/changegewe?' + new URLSearchParams({
+                server_ip: geweServer
+            }))
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.getElementById('geweStatus');
+                if (data.success) {
+                    statusElement.textContent = 'GEWE配置已保存！';
+                    statusElement.classList.remove('error');
+                } else {
+                    statusElement.textContent = '保存失败：' + data.message;
+                    statusElement.classList.add('error');
+                }
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            })
+            .catch(error => {
+                const statusElement = document.getElementById('geweStatus');
+                statusElement.textContent = '请求失败：' + error;
+                statusElement.classList.add('error');
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            });
+        }
+    </script>
+</body>
+</html> 

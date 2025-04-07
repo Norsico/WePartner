@@ -1,5 +1,5 @@
 @echo off
 
-runtime\python.exe main.py
+runtime\python.exe app.py
 
 pause

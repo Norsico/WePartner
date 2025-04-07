@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - wxChatBot控制面板</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nav-item {
+            position: relative;
+            margin: 0 10px;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 3px;
+        }
+        .qr-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .qr-placeholder {
+            width: 250px;
+            height: 250px;
+            border: 2px solid #000;
+            margin: 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 16px;
+            background-color: #fff;
+        }
+        .qr-image {
+            width: 250px;
+            height: 250px;
+            margin: 1rem auto;
+            display: none;
+        }
+        .status-message {
+            margin: 1rem 0;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .status-message.error {
+            color: #dc3545;
+        }
+        .btn-container {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">wxChatBot控制面板</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/config">配置</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/login">登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">微信登录</h5>
+                        
+                        <div class="qr-container">
+                            <p>请使用微信扫描下方二维码登录</p>
+                            <div class="qr-placeholder" id="qrPlaceholder">请点击开始登录</div>
+                            <img id="qrImage" class="qr-image" src="" alt="登录二维码">
+                            <div class="status-message" id="statusMessage"></div>
+                            <div class="btn-container">
+                                <button class="btn btn-primary" onclick="startLogin()">开始登录</button>
+                                <button class="btn btn-danger" onclick="cancelLogin()">取消登录</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let checkInterval = null;
+        let currentUuid = null;
+        let currentAppId = null;
+
+        // 开始登录流程
+        function startLogin() {
+            document.getElementById('qrPlaceholder').style.display = 'none';
+            document.getElementById('qrImage').style.display = 'none';
+            document.getElementById('statusMessage').textContent = '正在获取二维码...';
+
+            fetch('/api/login')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.qr_url) {
+                        document.getElementById('qrImage').src = data.qr_url;
+                        document.getElementById('qrImage').style.display = 'block';
+                        currentUuid = data.uuid;
+                        currentAppId = data.app_id;
+                        document.getElementById('statusMessage').textContent = '请使用微信扫描二维码登录';
+                        startCheckingLogin();
+                    } else {
+                        document.getElementById('qrPlaceholder').style.display = 'flex';
+                        document.getElementById('statusMessage').textContent = '获取二维码失败';
+                        document.getElementById('statusMessage').classList.add('error');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('qrPlaceholder').style.display = 'flex';
+                    document.getElementById('statusMessage').textContent = '请求失败：' + error;
+                    document.getElementById('statusMessage').classList.add('error');
+                });
+        }
+
+        // 开始检查登录状态
+        function startCheckingLogin() {
+            if (checkInterval) {
+                clearInterval(checkInterval);
+            }
+
+            // 立即进行第一次检查
+            checkLoginStatus();
+
+            checkInterval = setInterval(checkLoginStatus, 5000); // 每5秒检查一次
+        }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            if (!currentUuid) return;
+
+            fetch(`/api/check_login?uuid=${currentUuid}&app_id=${currentAppId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('登录状态检查返回:', data);
+                    if (data.status === 2) {
+                        // 登录成功
+                        clearInterval(checkInterval);
+                        document.getElementById('statusMessage').textContent = '登录成功！';
+                        document.getElementById('statusMessage').classList.remove('error');
+                        document.getElementById('qrImage').style.display = 'none';
+                        // 登录成功后延迟跳转到首页
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1500);
+                    } else if (data.status === 1) {
+                        // 已扫码，等待确认
+                        document.getElementById('statusMessage').textContent = '请在手机上确认登录';
+                        document.getElementById('statusMessage').classList.remove('error');
+                        document.getElementById('qrImage').style.display = 'block';
+                    } else if (data.status === 0) {
+                        // 等待扫码
+                        document.getElementById('statusMessage').textContent = '请使用微信扫描二维码登录';
+                        document.getElementById('statusMessage').classList.remove('error');
+                        document.getElementById('qrImage').style.display = 'block';
+                    } else if (data.message && data.message.includes('过期')) {
+                        // 二维码过期
+                        clearInterval(checkInterval);
+                        document.getElementById('statusMessage').textContent = data.message;
+                        document.getElementById('statusMessage').classList.add('error');
+                        document.getElementById('qrImage').style.display = 'none';
+                        document.getElementById('qrPlaceholder').style.display = 'flex';
+                    }
+                })
+                .catch(error => {
+                    console.error('检查登录状态失败:', error);
+                    document.getElementById('statusMessage').textContent = '检查登录状态失败，请重试';
+                    document.getElementById('statusMessage').classList.add('error');
+                });
+        }
+
+        // 取消登录
+        function cancelLogin() {
+            if (checkInterval) {
+                clearInterval(checkInterval);
+                checkInterval = null;
+            }
+            currentUuid = null;
+            currentAppId = null;
+            document.getElementById('qrImage').style.display = 'none';
+            document.getElementById('qrPlaceholder').style.display = 'flex';
+            document.getElementById('statusMessage').textContent = '已取消登录';
+            document.getElementById('statusMessage').classList.remove('error');
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('qrPlaceholder').style.display = 'flex';
+        });
+    </script>
+</body>
+</html> 

@@ -3,15 +3,20 @@ from gewechat.client import LoginApi
 import urllib.parse
 import json
 from config import Config
-import importlib.util
 import os
 import sys
 import traceback
-
+import time
 def print_green(text):
     print(f"\033[32m{text}\033[0m")
 
 config = Config()
+
+def print_yellow(text):
+    print(f"\033[33m{text}\033[0m")
+
+def print_red(text):
+    print(f"\033[31m{text}\033[0m")
 
 # 获取项目根目录
 current_file_path = os.path.abspath(__file__)
@@ -47,19 +52,34 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.handle_change_coze()
         elif self.path.startswith('/changeplatform'):
             self.handle_change_platform()
+        elif self.path.startswith('/changegewe'):
+            self.handle_change_gewe()
+        elif self.path.startswith('/check_online'):
+            self.handle_check_online()
 
     def handle_login(self):
         global tmp_app_id
 
         app_id = config.get('gewechat_app_id', '')
         if app_id:
-            print("退出登录")
-            loginAPI.logout(app_id)
-            print("退出成功")
-            self._handle_login(app_id)
+            print("检查在线状态...")
+            check_online_response = loginAPI.check_online(app_id)
+            if check_online_response.get('ret') == 200 and check_online_response.get('data'):
+                print_green(f"AppID: {app_id} 已在线，正在退出登录...")
+                # 退出登录
+                logout_response = loginAPI.logout(app_id)
+                if logout_response.get('ret') != 200:
+                    print_red(f"退出登录失败: {logout_response}")
+                    self._send_json_response(500, {"error": "退出登录失败"})
+                    return
+                print_green("退出登录成功，正在重新获取二维码...")
+                time.sleep(1)  # 等待一秒确保退出完成
+            else:
+                print_yellow(f"AppID: {app_id} 未在线，直接获取二维码...")
         else:
             print("新登录")
-            self._handle_login(app_id)
+        
+        self._handle_login(app_id)
             
     def handle_check_login(self):
         query = urllib.parse.urlparse(self.path).query
@@ -73,12 +93,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
         # 检查登录状态
         login_status = loginAPI.check_qr(app_id, uuid, "")
+        print_green(f"检查登录状态返回: {login_status}")
+
         if login_status.get('ret') != 200:
             self._send_json_response(500, {"error": "检查登录状态失败"})
             return
 
         login_data = login_status.get('data', {})
         status = login_data.get('status')
+        expired_time = login_data.get('expiredTime', 0)
+        print_green(f"登录状态: {status}, 过期时间: {expired_time}")
+
+        # 如果二维码即将过期，返回特殊状态
+        if expired_time <= 5:
+            self._send_json_response(200, {
+                "status": 0,  # 使用0表示需要重新获取二维码
+                "message": "二维码即将过期，请重新获取"
+            })
+            return
 
         # 如果登录成功
         if status == 2:
@@ -93,10 +125,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 callback_resp = loginAPI.set_callback(config.get("gewechat_token"), callback_url)
                 print(f"设置回调结果: {callback_resp}")
 
-        self._send_json_response(200, {
+        response_data = {
             "status": status,
             "app_id": login_data.get('appId', app_id)  # 返回新的app_id
-        })
+        }
+        print_green(f"返回数据: {response_data}")
+        self._send_json_response(200, response_data)
 
     def _send_json_response(self, status_code, data):
         self.send_response(status_code)
@@ -104,7 +138,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         response_data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         self.wfile.write(response_data)
-        print(f"Returning JSON response: {response_data.decode('utf-8')}")
+
     def _handle_login(self, app_id):
         global tmp_app_id
 
@@ -124,6 +158,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             "uuid": uuid,
             "app_id": app_id
         })
+        print_green(f"返回二维码: {qr_url}")
 
     def handle_change_dify(self):
         """
@@ -151,6 +186,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 channel.refresh_config()
                 print_green("已通知Channel刷新配置")
             self._send_json_response(200, {"success": True, "message": "Dify配置已更新"})
+            print_green("Dify配置已更新")
         else:
             self._send_json_response(400, {"success": False, "message": "未提供任何有效参数"})
 
@@ -180,6 +216,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 channel.refresh_config()
                 print_green("已通知Channel刷新配置")
             self._send_json_response(200, {"success": True, "message": "Coze配置已更新"})
+            print_green("Coze配置已更新")
         else:
             self._send_json_response(400, {"success": False, "message": "未提供任何有效参数"})
 
@@ -203,11 +240,45 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_json_response(400, {"success": False, "message": "无效的平台参数，请使用'dify'或'coze'"})
 
+    def handle_change_gewe(self):
+        """
+        处理修改GEWE服务器配置的请求
+        格式: /changegewe?server_ip=xxx
+        """
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        server_ip = params.get('server_ip', [None])[0]
+
+        if server_ip:
+            config.set("gewe_server_ip", server_ip)
+            self._send_json_response(200, {"success": True, "message": "GEWE服务器配置已更新"})
+            print_green("GEWE服务器配置已更新")
+        else:
+            self._send_json_response(400, {"success": False, "message": "未提供服务器IP地址"})
+
+    def handle_check_online(self):
+        """
+        处理检查在线状态的请求
+        """
+        app_id = config.get('gewechat_app_id', '')
+        if not app_id:
+            self._send_json_response(200, {"online": False, "message": "未登录"})
+            return
+
+        try:
+            check_online_response = loginAPI.check_online(app_id)
+            if check_online_response.get('ret') == 200 and check_online_response.get('data'):
+                self._send_json_response(200, {"online": True, "message": "在线"})
+            else:
+                self._send_json_response(200, {"online": False, "message": "离线"})
+        except Exception as e:
+            print_red(f"检查在线状态失败: {e}")
+            self._send_json_response(200, {"online": False, "message": f"检查失败: {str(e)}"})
+
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8002):
     server_address = ('0.0.0.0', port)
     httpd = server_class(server_address, handler_class)
     print(f"API服务器已启动: http://{config.get('gewe_server_ip')}:{port}")
-    print(f"请访问 http://{config.get('gewe_server_ip')}:{port}/ 进行登录")
     httpd.serve_forever()
 
 if __name__ == "__main__":
