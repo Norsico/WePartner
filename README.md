@@ -1,9 +1,9 @@
-# wxChatBot
+# WePartner
 
 ---
 
 <div align="center">
-  <p>⭐️ 如果这个项目对你有帮助，欢迎点个Star支持一下！ ⭐️</p>
+  <p>⭐️ 如果这个项目对你有帮助，欢迎点个Star支持一下~ ⭐️</p>
 </div>
 
 ---
@@ -24,7 +24,7 @@
   <a href="docs/en/README.md">English</a>
 </div>
 
-<p align="center">wxChatBot 是一个基于Dify/Coze和Gewechat开发的智能聊天机器人项目。它通过集成 Dify AI 平台或Coze(扣子)平台，提供高效、智能的消息处理和自动回复服务。支持GPT-SoVITS合成语音，支持RVC变声合成歌曲，根据知识库中的音乐实现AI唱歌</p>
+<p align="center">WePartner 是一个基于Dify/Coze和Gewechat开发的智能聊天机器人项目。它通过集成 Dify AI 平台或Coze(扣子)平台，提供高效、智能的消息处理和自动回复服务。支持GPT-SoVITS合成语音，支持RVC变声合成歌曲，根据知识库中的音乐实现AI唱歌</p>
 
 <h2 align="center">🤖 功能展示</h2>
 
@@ -75,7 +75,7 @@
 
 ### 📱 微信集成
 - 无缝对接个人微信，轻松接入微信生态
-- 支持文本回复
+- 支持文本、语音回复
 - 通过Web界面管理配置和登录
 
 ### ⚙️ 系统功能
@@ -85,7 +85,7 @@
 ## 📁 项目结构
 
 ```
-wxChatBot/
+WePartner/
 ├── Core/                  # 核心功能模块
 │   ├── api/              # API接口
 │   ├── difyAI/           # Dify AI集成
@@ -173,7 +173,7 @@ docker update --restart=always gewe
 | 群类型 | 群号 | 状态 |
 |--------|------|------|
 | ✨ 交流群 | 953715009 | ✅ 已开放 |
-| 🎁 赞助群 | 1040728529 | ✅ 已开放 |
+| 🎁 付费群 | 1040728529 | ✅ 已开放 |
 
 ## 🤝 贡献指南
 

@@ -58,6 +58,15 @@ class CozeChatManager:
         """
         self.config[wxid] = conversation_id
         self.save_config()
+        
+    def clear_all_conversations(self):
+        """
+        清除所有对话记录，重置配置文件
+        """
+        print("正在清除所有Coze对话记录...")
+        self.config = {}
+        self.save_config()
+        print("所有Coze对话记录已清除")
 
     def handle_response(self, response):
         # 假设 response 是一个字典，包含返回的内容
@@ -84,6 +93,18 @@ class CozeChatManager:
                     results.append({
                         'type': 'voice',
                         'content': voice_url.strip()
+                    })
+                    
+        if '<emoji>' in content:
+            print("提取表情包内容")
+            emoji_contents = re.findall(r'<emoji>(.*?)</emoji>', content, re.DOTALL)
+            if emoji_contents:
+                for emoji_path in emoji_contents:
+                    # 从完整路径中提取文件名（不包含扩展名）
+                    emoji_name = os.path.splitext(os.path.basename(emoji_path))[0]
+                    results.append({
+                        'type': 'emoji',
+                        'content': emoji_name
                     })
 
         print(f"results:{results}")

@@ -64,12 +64,49 @@ class Channel:
     def refresh_config(self):
         """刷新配置和管理器实例"""
         logging.info("正在刷新配置...")
+        # 保存旧配置
+        old_config = self.config
+        
         # 重新加载配置
         self.config = Config()
         # 更新appId
         self.gewechat_app_id = self.config.get('gewechat_app_id')
+        
+        # 检查关键配置是否变更
+        dify_config_changed = (
+            old_config.get("dify_server_ip") != self.config.get("dify_server_ip") or
+            old_config.get("dify_api_key") != self.config.get("dify_api_key")
+        )
+        
+        coze_config_changed = (
+            old_config.get("coze_agent_id") != self.config.get("coze_agent_id") or
+            old_config.get("coze_api_token") != self.config.get("coze_api_token")
+        )
+        
+        platform_changed = old_config.get("agent_platform") != self.config.get("agent_platform")
+        
         # 重新初始化管理器
         self.init_managers()
+        
+        # 如果关键配置变更，清除对话记录
+        if dify_config_changed or platform_changed:
+            logging.warning("Dify配置或平台已变更，正在清除对话记录...")
+            try:
+                # 清空new_dify_config.json
+                if hasattr(self, 'new_dify_manager'):
+                    self.new_dify_manager.clear_all_conversations()
+            except Exception as e:
+                logging.error(f"清除Dify对话记录失败: {str(e)}")
+        
+        if coze_config_changed or platform_changed:
+            logging.warning("Coze配置或平台已变更，正在清除对话记录...")
+            try:
+                # 清空coze_config.json
+                if hasattr(self, 'coze_manager'):
+                    self.coze_manager.clear_all_conversations()
+            except Exception as e:
+                logging.error(f"清除Coze对话记录失败: {str(e)}")
+        
         logging.success("配置已刷新")
 
     def compose_context(self, message, _wxid):
@@ -93,7 +130,6 @@ class Channel:
         return "success"
     
     def _handle_new_dify(self, message, _wxid):
-
         response = self.new_dify_manager.chat_with_bot(
             wxid=_wxid,
             user_message=message
@@ -108,6 +144,8 @@ class Channel:
                 elif r['type'] == 'voice':
                     self.handle_voice(r['content'], _wxid)
                     cleanup_tmp_folder()
+                elif r['type'] == 'emoji':
+                    self.handle_emoji(r['content'], _wxid)
         else:
             print(f"没有获取到回复: {res}")
     
@@ -130,6 +168,8 @@ class Channel:
                 elif r['type'] == 'voice':
                     self.handle_voice(r['content'], _wxid)
                     cleanup_tmp_folder()
+                elif r['type'] == 'emoji':
+                    self.handle_emoji(r['content'], _wxid)
         else:
             print(f"maybe no res:{res}")
 
@@ -279,3 +319,78 @@ class Channel:
         except Exception as e:
             logging.error(f"获取好友wxid失败: {e}")
             return None
+
+    def handle_emoji(self, emoji_name, _wxid):
+        """
+        处理表情包消息，改为发送图片形式
+        
+        Args:
+            emoji_name: 表情包名称
+            _wxid: 接收者微信ID
+            
+        Returns:
+            处理结果
+        """
+        try:
+            import requests
+            import os
+            import shutil
+            import uuid
+            from Core.bridge.temp_dir import TmpDir
+            
+            # 获取表情包文件路径
+            response = requests.get(f"http://{self.config.get('gewe_server_ip')}:8002/get_emoji?name={emoji_name}")
+            if response.status_code != 200:
+                logging.error(f"获取表情包失败: {response.status_code}")
+                return "error"
+                
+            data = response.json()
+            emoji_path = data.get('path', '')
+            
+            print(f"emoji_path: {emoji_path}")
+            
+            if not emoji_path:
+                logging.warning(f"未找到表情包: {emoji_name}")
+                return "not_found"
+            
+            # 创建临时目录并复制表情包到tmp目录
+            tmp_dir = TmpDir().path()
+            file_ext = os.path.splitext(emoji_path)[1]  # 获取文件扩展名
+            tmp_emoji_file = f"emoji_{uuid.uuid4()}{file_ext}"
+            tmp_emoji_path = os.path.join(tmp_dir, tmp_emoji_file)
+            
+            # 复制文件
+            shutil.copy2(emoji_path, tmp_emoji_path)
+            logging.info(f"表情包已复制到临时目录: {tmp_emoji_path}")
+            
+            # 构建本地图片URL (使用tmp目录中的文件)
+            callback_url = f"http://{self.config.get('gewe_server_ip')}:1145/v2/api/callback/collect"
+            img_url = callback_url + "?file=" + str(tmp_emoji_path)
+            print(f"图片URL: {img_url}")
+                
+            # 发送图片
+            send_result = self.client.post_image(
+                self.gewechat_app_id,
+                _wxid,
+                img_url
+            )
+            
+            print(f"send_result: {send_result}")
+            if send_result.get('ret') != 200:
+                logging.error(f"发送表情包图片失败: {send_result}")
+                return "error"
+                
+            logging.success(f"已发送表情包图片: {emoji_name}")
+            
+            # 清理临时文件
+            try:
+                os.remove(tmp_emoji_path)
+                logging.debug(f"已删除临时表情包文件: {tmp_emoji_path}")
+            except Exception as e:
+                logging.warning(f"删除临时表情包文件失败: {str(e)}")
+                
+            return "success"
+            
+        except Exception as e:
+            logging.error(f"处理表情包消息时出错: {str(e)}")
+            return "error"

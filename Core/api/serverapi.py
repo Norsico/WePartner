@@ -56,6 +56,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.handle_change_gewe()
         elif self.path.startswith('/check_online'):
             self.handle_check_online()
+        elif self.path.startswith('/get_emoji'):
+            self.handle_get_emoji()
 
     def handle_login(self):
         global tmp_app_id
@@ -274,6 +276,39 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         except Exception as e:
             print_red(f"检查在线状态失败: {e}")
             self._send_json_response(200, {"online": False, "message": f"检查失败: {str(e)}"})
+
+    def handle_get_emoji(self):
+        """
+        处理获取表情包文件的请求
+        格式: /get_emoji?name=xxx
+        """
+        query = urllib.parse.urlparse(self.path).query
+        params = urllib.parse.parse_qs(query)
+        emoji_name = params.get('name', [None])[0]
+
+        if not emoji_name:
+            self._send_json_response(400, {"error": "未提供表情包名称"})
+            return
+
+        try:
+            # 获取项目根目录
+            current_file_path = os.path.abspath(__file__)
+            root_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+            emojis_dir = os.path.join(root_dir, "emojis")
+            
+            # 检查文件是否存在
+            for ext in ['.jpg', '.png']:
+                emoji_path = os.path.join(emojis_dir, f"{emoji_name}{ext}")
+                if os.path.exists(emoji_path):
+                    self._send_json_response(200, {"path": emoji_path})
+                    return
+            
+            # 如果没找到文件
+            self._send_json_response(200, {"path": ""})
+            
+        except Exception as e:
+            print_red(f"获取表情包失败: {e}")
+            self._send_json_response(500, {"error": f"获取表情包失败: {str(e)}"})
 
 def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8002):
     server_address = ('0.0.0.0', port)
