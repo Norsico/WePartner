@@ -1,10 +1,10 @@
 {
-    "dify_server_ip": "",
-    "gewe_server_ip": "",
-    "agent_platform": "coze",
-    "dify_api_key": "",
+    "dify_server_ip": "192.168.45.9",
+    "gewe_server_ip": "192.168.45.9",
+    "agent_platform": "dify",
+    "dify_api_key": "app-smdBSLNSS2RWZcXj6Z82TURx",
     "coze_agent_id": "7489670327732011034",
-    "coze_api_token": "",
-    "gewechat_token": "",
-    "gewechat_app_id": ""
+    "coze_api_token": "pat_ZhGBBo8lJwQyhdir0tZXzoBZP09KplQWnzbfTjwp6BCJ5rGRzE8Z00mkOMfJbsFO",
+    "gewechat_token": "1c30e1696ea547f5b0b007c7be650316",
+    "gewechat_app_id": "wx_iyN347elVwH_7Op0V2c2U"
 }

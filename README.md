@@ -1,5 +1,7 @@
 # WePartner
 
+
+
 ---
 
 <div align="center">
@@ -8,6 +10,9 @@
 
 ---
 
+<div align="center">
+  <img src="docs/images/WePartner.jpg" alt="WePartner Logo" width="200" style="margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</div>
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
